@@ -84,7 +84,12 @@ const ProfileMenu = () => {
         K
       </DropdownMenuTrigger>
       <DropdownMenuContent className="min-w-[160px]">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuLabel>
+          {/* {
+            JSON.stringify(userInfo)
+          } */}
+          Account profile
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {menuItems.map((item) => (
           <DropdownMenuItem

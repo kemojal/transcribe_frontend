@@ -16,7 +16,7 @@ const Login = () => {
         password,
       });
       localStorage.setItem("token", response.data.access_token);
-      router.push("/transcriptions");
+      router.push("/projects");
     } catch (error) {
       console.error(error);
       setError("Invalid email or password");

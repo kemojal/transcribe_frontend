@@ -2,6 +2,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import ProjectTable from "./tables/ProjectTable";
+import { DataTable } from "./tables/DataTable";
+import { ProjectColumns } from "./tables/columns";
+import { Button } from "@/components/ui/button";
+import { ProjectDialogue } from "./ProjectDialogue";
 
 const ProjectList = () => {
   const router = useRouter();
@@ -26,23 +31,20 @@ const ProjectList = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       <div className="container px-4 py-8 mx-auto">
-        <h1 className="text-3xl font-bold text-center">Projects</h1>
-        <div className="grid gap-4 mt-8">
-          {projects.map((project: any) => (
-            <div key={project.id} className="p-4 bg-white rounded shadow-md">
-              <h2 className="text-xl font-bold">{project.name}</h2>
-              <button
-                onClick={() => router.push(`/projects/${project.id}`)}
-                className="px-4 py-2 mt-4 font-bold text-white bg-indigo-600 rounded hover:bg-indigo-700"
-              >
-                View
-              </button>
-            </div>
-          ))}
+        <div className="flex items-center justify-between bg-white">
+          <h1 className="text-lg text-sm">Projects</h1>
+          {/* <Button>New Project</Button> */}
+          <ProjectDialogue />
+        </div>
+
+        <div className="grid gap-4 mt-2">
+          <DataTable data={projects} columns={ProjectColumns} />
         </div>
       </div>
+      {/* {JSON.stringify(projects)} */}
+      {/* <ProjectTable projects={projects} /> */}
     </div>
   );
 };

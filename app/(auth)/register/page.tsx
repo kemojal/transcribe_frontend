@@ -19,7 +19,7 @@ const Register = () => {
           password,
         }
       );
-      router.push("/auth/login");
+      router.push("/login");
     } catch (error) {
       console.error(error);
     }

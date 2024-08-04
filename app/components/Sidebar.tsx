@@ -8,22 +8,17 @@ const Sidebar: React.FC = () => {
         <ul className="space-y-4">
           <li>
             <a href="#" className="text-gray-700 hover:text-gray-900">
-              Dashboard
+              Projects
             </a>
           </li>
           <li>
             <a href="#" className="text-gray-700 hover:text-gray-900">
-              Transcriptions
+              Recordings
             </a>
           </li>
           <li>
             <a href="#" className="text-gray-700 hover:text-gray-900">
-              Settings
-            </a>
-          </li>
-          <li>
-            <a href="#" className="text-gray-700 hover:text-gray-900">
-              Help
+              Workspaces
             </a>
           </li>
         </ul>

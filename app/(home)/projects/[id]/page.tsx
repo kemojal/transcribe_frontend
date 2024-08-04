@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { BASEURL } from "@/constants";
 import { ProjectDropdown } from "@/app/components/Dropdowns/ProjectDropdown";
+import { FileDialogue } from "@/app/components/Dialogues/FileDialogue";
+import { FileDropzone } from "@/app/components/FileDropzone";
 
 const ProjectDetail = ({ params }: { params: { id: string } }) => {
   const id = params.id;
@@ -94,19 +96,16 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
             </div>
           </div>
         </div>
-        <div className="p-4 mt-8 bg-white rounded">
-          <div className="flex items-center justify-between border-b-1 border-gray-100 pb-4">
-            <h2 className="text-xl font-bold">Files</h2>
-            <Button
-              onClick={() => router.push(`/projects/${id}/upload`)}
-              className="flex items-center gap-2"
-            >
-              <span>
-                <Upload size={16} />
-              </span>
-              Upload
-            </Button>
-          </div>
+        <div className="p-4 mt-4 bg-white rounded">
+          {files && files.length > 0 ? (
+            <div className="flex items-center justify-between border-b-1 border-gray-100 pb-2">
+              <h2 className="font-medium ">Files</h2>
+
+              <FileDialogue />
+            </div>
+          ) : (
+            <></>
+          )}
 
           {files && files.length > 0 ? (
             <>
@@ -118,7 +117,7 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                   <div className=" w-3/4 flex flex-col  gap-1 text-sm">
                     <p>{file.name}</p>
                     <Player src={file.path} />
-                    {/* cccc */}
+
                     {/* <AudioWave url={file.path} /> */}
                   </div>
 
@@ -151,25 +150,32 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                       {/* Remove */}
                     </Button>
                   </div>
-
-                  {/* <button
-                onClick={() => router.push(`/projects/${id}/files/${file.id}`)}
-                className="px-4 py-2 mt-2 font-bold text-white bg-indigo-600 rounded hover:bg-indigo-700"
-              >
-                View File
-              </button> */}
                 </div>
               ))}
             </>
           ) : (
-            <div className="flex flex-col ">
-              No files found files
-              <Button
+            <div className="flex flex-col items-center w-full mt-20">
+              <div className="flex flex-col  items-center justify-center w-full max-w-[800px]">
+                <div className="flex flex-col gap-1 w-full text-center pb-4">
+                  <span className="text-2xl font-bold">Get started</span>
+
+                  <span className="text-sm flex items-center gap-2">
+                    <span className=" font-medium">No file yet</span>
+                    Record something, dive into editing or upload files to use
+                    in this project.
+                  </span>
+                </div>
+
+                <div className="w-full">
+                  <FileDropzone />
+                </div>
+                {/* <Button
                 onClick={() => router.push(`/projects/${id}/upload`)}
                 className="px-4 py-2 mt-4 font-bold text-white bg-indigo-600 rounded hover:bg-indigo-700"
               >
                 Upload
-              </Button>
+              </Button> */}
+              </div>
             </div>
           )}
         </div>

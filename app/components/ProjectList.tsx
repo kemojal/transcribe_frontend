@@ -6,7 +6,7 @@ import ProjectTable from "./tables/ProjectTable";
 import { DataTable } from "./tables/DataTable";
 import { ProjectColumns } from "./tables/columns";
 import { Button } from "@/components/ui/button";
-import { ProjectDialogue } from "./ProjectDialogue";
+import { ProjectDialogue } from "./Dialogues/ProjectDialogue";
 import { BASEURL } from "@/constants";
 import { Input } from "@/components/ui/input";
 

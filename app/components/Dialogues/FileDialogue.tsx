@@ -12,8 +12,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { BASEURL } from "@/constants";
+import { Upload } from "lucide-react";
+import { FileDropzone } from "../FileDropzone";
 
-export const ProjectDialogue = () => {
+export const FileDialogue = () => {
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [open, setOpen] = React.useState(false);
@@ -59,36 +61,20 @@ export const ProjectDialogue = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
-        New Project
+        <span>
+          <Upload className="mr-2 h-4 w-4" />
+        </span>
+        Upload
       </DialogTrigger>
-      <DialogContent className="overflow-hidden p-2">
+      <DialogContent className="overflow-hidden py-8 px-4">
         <DialogHeader className="border-b-1 border-gray-200">
-          <DialogTitle>New Project</DialogTitle>
-          <DialogDescription>Give your project a name</DialogDescription>
+          <DialogTitle>Upload audio </DialogTitle>
+          <DialogDescription>
+            Upload your content to edit in Riverside.
+          </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="p-2 space-y-4">
-          <div className="mb-4">
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Name
-            </label>
-            <Input
-              type="text"
-              id="name"
-              name="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              required
-              disabled={submitting}
-            />
-          </div>
-          <Button type="submit" className="mt-4">
-            {submitting ? " Creating Project..." : " Create Project"}
-          </Button>
-        </form>
+
+        <FileDropzone />
         {submitting && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-xl opacity-50">
             Submitting...

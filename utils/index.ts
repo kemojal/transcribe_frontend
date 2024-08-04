@@ -23,3 +23,8 @@ export function formatFullDate(dateString: string): string {
 
   return date.toLocaleDateString("en-US", options);
 }
+
+export function bytesToMegabytes(bytes: number): number {
+  const bytesInOneMegabyte = 1024 * 1024;
+  return Math.round((bytes / bytesInOneMegabyte) * 100) / 100;
+}

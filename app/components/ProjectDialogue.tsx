@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
+import { BASEURL } from "@/constants";
 
 export const ProjectDialogue = () => {
   const [name, setName] = useState("");
@@ -30,7 +31,7 @@ export const ProjectDialogue = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:8000/projects", {
+      const response = await fetch(`${BASEURL}/projects`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

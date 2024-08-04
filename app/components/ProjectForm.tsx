@@ -2,6 +2,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
+import { BASEURL } from "@/constants";
 
 const ProjectForm = () => {
   const router = useRouter();
@@ -11,7 +12,7 @@ const ProjectForm = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        "http://localhost:8000/projects",
+        `${BASEURL}/projects`,
         {
           name,
         },

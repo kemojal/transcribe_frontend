@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { BASEURL } from "@/constants";
 
 const TranscriptionDetail = ({ params }: { params: { id: string } }) => {
   const id = params.id;
@@ -13,7 +14,7 @@ const TranscriptionDetail = ({ params }: { params: { id: string } }) => {
         try {
           const token = localStorage.getItem("token");
           const response = await axios.get(
-            `http://localhost:8000/transcriptions/${id}`,
+            `${BASEURL}/transcriptions/${id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,

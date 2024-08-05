@@ -26,6 +26,7 @@ import { ProjectDropdown } from "@/app/components/Dropdowns/ProjectDropdown";
 import { FileDialogue } from "@/app/components/Dialogues/FileDialogue";
 import { FileDropzone } from "@/app/components/FileDropzone";
 import { bytesToMegabytes, formatDate } from "@/utils";
+import SideProjectTabs from "@/app/components/SideProjectTabs";
 
 const getAudioDuration = (url: string): Promise<number> => {
   return new Promise((resolve, reject) => {
@@ -208,10 +209,14 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
         }
       );
       console.log("response = ", response);
+      if (response.status === 200) {
+        alert("Transcription created successfully");
+        setTranscribing(false);
+      }
+      console.log("Transcription created successfully", response.data);
     } catch (error) {
       console.error(error);
     }
-    setTranscribing(false);
   };
 
   const handleUpload = async (file) => {
@@ -290,16 +295,16 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
             <></>
           )}
 
-          <div className="grid grid-cols-6  grid-rows-1 gap-1">
+          <div className="grid grid-cols-6  grid-rows-1 gap-0">
             <div
               className={` ${
                 selectedFile && selectedFile?.path
-                  ? "col-span-4 border-r-[1px] border-gray-300"
+                  ? "col-span-4 border-r-[0.5px] border-gray-200"
                   : "col-span-6"
-              } min-h-screen pr-6 py-6 flex flex-col items-center gap-1`}
+              } min-h-screen pr-6 py-6 flex flex-col items-center`}
             >
               {files && files.length > 0 ? (
-                <div className="w-full flex flex-col gap-4">
+                <div className="w-full flex flex-col gap-1">
                   {files.map((file) => {
                     const fileSizeMB = fileSizes[file.id] || 0;
                     const duration = fileDurations[file.id];
@@ -307,21 +312,37 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                     return (
                       <div
                         key={file.id}
-                        className={` p-4 border-[0.5px] border-gray-200 rounded-lg flex items-center justify-between hover:bg-gray-100 cursor-pointer transition-colors duration-200
-            ${
-              selectedFile?.id === file.id ? "bg-blue-50 border-blue-300" : ""
-            }`}
+                        className={` px-4 py-2 border-[0.5px] border-gray-200 rounded flex items-center justify-between  cursor-pointer transition-colors duration-200
+           flex-wrap gap-2 ${
+             selectedFile?.id === file.id
+               ? "bg-blue-50 border-blue-300"
+               : "hover:bg-gray-100"
+           }`}
                         onClick={() => handleFileClick(file)}
                       >
                         <div className="flex items-center gap-3">
-                          <div className="flex-shrink-0 w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                            <FileMusic size={24} className="text-gray-600" />
+                          <div
+                            className={`flex-shrink-0 w-8 h-8  rounded-md flex items-center justify-center text-white border-[0.5px]  shadow-xs
+                            ${
+                              selectedFile?.id === file.id
+                                ? "bg-blue-100 border-blue-300 "
+                                : "bg-gray-100 border-gray-300 "
+                            }`}
+                          >
+                            <FileMusic
+                              size={14}
+                              className={` ${
+                                selectedFile?.id === file.id
+                                  ? "text-blue-600 "
+                                  : "text-gray-600 "
+                              }`}
+                            />
                           </div>
-                          <div className="min-w-[80%] flex  gap-2 flex items-center gap-2">
-                            <p className="font-semibold  text-gray-800">
+                          <div className="min-w-[80%] flex  flex items-center gap-2 flex-wrap">
+                            <p className="  text-gray-600 text-sm">
                               {file.name}
                             </p>
-                            <div className="flex  gap-1 text-sm text-gray-500 min-w-[200px] bg-red-t00 ">
+                            <div className="flex  gap-1 text-sm text-gray-500 min-w-[200px]  xl:ml-5">
                               <span className="bg-gray-200 px-2 py-1 rounded-md text-xs">
                                 {fileSizeMB.toFixed(2)} MB
                               </span>
@@ -346,16 +367,17 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                         <div className="flex gap-2 text-gray-600">
                           <Button
                             variant="outline"
-                            className="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors"
+                            size={"sm"}
+                            className="flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-colors text-xs text-muted-foreground border-gray-100 h-8 gap-2 "
                           >
-                            <ArrowDownToLine size={16} />
+                            <ArrowDownToLine size={14} />
                             Download
                           </Button>
                           <Button
                             variant="outline"
-                            className="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors"
+                            className="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors h-8"
                           >
-                            <Trash size={16} />
+                            <Trash size={14} />
                           </Button>
                         </div>
                       </div>
@@ -417,109 +439,13 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
               )}
             </div>
 
-            {selectedFile && selectedFile?.path && (
-              <div className="col-span-2 col-start-5 py-4 pl-4">
-                <div className="p-4 rounded-lg  border border-gray-200 bg-gray-50 rounded-lg  mb-6">
-                  {/* Transcription Header */}
-                  <div className="text-lg font-semibold text-gray-800">
-                    {selectedFile?.name || "Transcription"}
-                  </div>
-                  <div className="mt-2">
-                    {selectedFile?.path && (
-                      <Player src={selectedFile?.path} width={380} />
-                    )}
-                  </div>
-                  <div className="mt-4 text-sm text-gray-600 flex items-center gap-2">
-                    <span className="block">
-                      <span className="font-medium">Duration:</span>{" "}
-                      {selectedFile?.duration || 0} seconds
-                    </span>
-                    <span className="block">
-                      <span className="font-medium">Size:</span>{" "}
-                      {selectedFile?.size || 0} bytes
-                    </span>
-                    <span className="block">
-                      <span className="font-medium">Created:</span>{" "}
-                      {formatDate(selectedFile?.created_at)}
-                    </span>
-                    {/* Uncomment if needed */}
-                    {/* <span className="block">
-          <span className="font-medium">Modified:</span> {formatDate(selectedFile?.updated_at)}
-        </span> */}
-                  </div>
-                </div>
-
-                <div className="relative flex flex-col w-full h-[550px] bg-white rounded-lg  border border-gray-200 overflow-hidden pb-8">
-                  <div className="relative w-full h-[650px] p-4 overflow-auto">
-                    {transcriptionEntries && transcriptionEntries.length > 0 ? (
-                      transcriptionEntries.map((entry, index) => (
-                        <div
-                          key={index}
-                          className={`transcription-entry p-4 mb-2 rounded-lg ${
-                            currentTranscription &&
-                            currentTranscription?.start === entry.start
-                              ? "bg-yellow-100 border-l-4 border-yellow-500"
-                              : "bg-gray-50"
-                          } shadow-xs`}
-                        >
-                          <div className="text-xs text-gray-500">
-                            {entry.timestamp}
-                          </div>
-                          <div className="mt-1 text-gray-800">
-                            {entry.content}
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="flex flex-col items-center justify-center h-full bg-gray-100 rounded-lg text-gray-600 py-20">
-                        <span>No transcription yet</span>
-                        <Button
-                          className="mt-4 flex items-center gap-2"
-                          variant="outline"
-                          disabled={
-                            !selectedFile || !selectedFile?.path || transcribing
-                          }
-                          onClick={() => {
-                            if (selectedFile) {
-                              transcribeAudio(
-                                selectedFile?.project_id,
-                                selectedFile?.id
-                              );
-                            }
-                          }}
-                        >
-                          <Captions size={16} />
-                          <span>
-                            {transcribing ? "Transcribing..." : "Transcribe"}
-                          </span>
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="absolute bottom-0 left-0 w-full border-t-[1px] border-gray-200 bg-gray-50 flex flex-col items-center gap-2 p-2">
-                    <div className="flex gap-2 items-center text-xs text-gray-600 py-2 border-t-[1px] border-gray-200 bg-gray-100 rounded-t-lg w-full">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="py-0 h-8 font-medium"
-                      >
-                        <Copy className="h-4 w-4 mr-1" />
-                        Copy
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="py-0 h-8 font-medium"
-                      >
-                        <Zap className="h-4 w-4 mr-1" />
-                        AI
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+            <SideProjectTabs
+              selectedFile={selectedFile}
+              transcriptionEntries={transcriptionEntries}
+              currentTranscription={currentTranscription}
+              transcribeAudio={transcribeAudio}
+              transcribing={transcribing}
+            />
           </div>
         </div>
       </div>

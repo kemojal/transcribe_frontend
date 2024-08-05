@@ -195,19 +195,25 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
     return <div>Loading...</div>;
   }
 
-  const transcribeAudio = async (projectId: number, fileId: number) => {
+  const transcribeAudio = async (projectId, fileId) => {
     setTranscribing(true);
     try {
       const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found in localStorage");
+      }
+
       const response = await axios.post(
-        `${BASEURL}/projects/${id}/files/${fileId}/transcriptions/`,
+        `${BASEURL}/projects/${projectId}/files/${fileId}/transcriptions/`,
+        {},
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         }
       );
+
       console.log("response = ", response);
       if (response.status === 200) {
         alert("Transcription created successfully");
@@ -215,7 +221,10 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
       }
       console.log("Transcription created successfully", response.data);
     } catch (error) {
-      console.error(error);
+      console.error(
+        "Error during transcription:",
+        error.response || error.message
+      );
     }
   };
 

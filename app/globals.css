@@ -57,3 +57,33 @@
     @apply bg-background text-foreground;
   }
 }
+
+.transcription-container {
+  border: 0.5px solid #efefef;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+.transcription-entry {
+  margin-bottom: 10px;
+  width: 100%;
+  display: flex;
+  justify-items: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+.timestamp {
+  font-weight: normal;
+  color: #fdb500;
+  margin-bottom: 4px;
+  font-size: 14px;
+  background-color: #e1bf6820;
+  padding: 4px;
+  border-radius: 4px;
+  display: inline;
+  /* font-size: small; */
+}
+.text {
+  color: #666;
+}

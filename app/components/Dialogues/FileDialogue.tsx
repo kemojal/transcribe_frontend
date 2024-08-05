@@ -14,48 +14,52 @@ import { useRouter } from "next/navigation";
 import { BASEURL } from "@/constants";
 import { Upload } from "lucide-react";
 import { FileDropzone } from "../FileDropzone";
+import { bytesToMegabytes } from "@/utils";
 
-export const FileDialogue = () => {
+export const FileDialogue = ({ id }) => {
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [open, setOpen] = React.useState(false);
 
+  const [acceptedFiles, setAcceptedFiles] = useState<any[]>([]);
+
   const router = useRouter();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleUpload = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
     setSubmitting(true);
 
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("No token found");
-      return;
-    }
-
     try {
-      const response = await fetch(`${BASEURL}/projects`, {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No token found");
+        return;
+      }
+      const response = await fetch(`${BASEURL}/projects/${id}/files`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name }),
+        body: formData,
       });
 
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error("Failed to upload file");
+      } else {
+        setOpen(false);
       }
 
-      const data = await response.json();
-      setSubmitting(false);
-      setName("");
-      setOpen(false);
+      console.log("responseXXX = ", response);
 
-      console.log("Project created:", data);
-      router.push(`/projects/${data.id}`);
+      const data = await response.json();
+      console.log("File uploaded successfully:", data);
     } catch (error) {
-      console.error("There was a problem with the fetch operation:", error);
+      console.error("Error uploading file:", error);
     }
+
+    setSubmitting(false);
   };
 
   return (
@@ -70,14 +74,46 @@ export const FileDialogue = () => {
         <DialogHeader className="border-b-1 border-gray-200">
           <DialogTitle>Upload audio </DialogTitle>
           <DialogDescription>
-            Upload your content to edit in Riverside.
+            Upload your content to transcribe.
           </DialogDescription>
         </DialogHeader>
 
-        <FileDropzone />
+        {acceptedFiles && acceptedFiles.length > 0 ? (
+          <div>
+            <div className="flex items-center">
+              {acceptedFiles.map((file) => (
+                <div
+                  key={file.name}
+                  className="flex items-center gap-2 justify-between  w-full"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className=" ">{file.name}</span>
+                    <span className="text-gray-500 bg-gray-100 px-2 py-1 rounded-md text-xs">
+                      {bytesToMegabytes(file.size)} MB
+                    </span>
+                    <span className="text-gray-500 bg-gray-100 px-2 py-1 rounded-md text-xs">
+                      {file.type}
+                    </span>
+                  </div>
+
+                  <Button
+                    onClick={() => {
+                      handleUpload(acceptedFiles[0]);
+                    }}
+                  >
+                    Upload
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <FileDropzone setAcceptedFiles={setAcceptedFiles} />
+        )}
+
         {submitting && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-xl opacity-50">
-            Submitting...
+            Uploading... audio
           </div>
         )}
       </DialogContent>

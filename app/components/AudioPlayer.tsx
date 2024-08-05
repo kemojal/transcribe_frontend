@@ -1,7 +1,40 @@
+"use client";
+import { useEffect, useRef } from "react";
 import { AudioPlayer } from "react-audio-player-component";
-export const Player = ({ src, width }: { src: string, width: number }) => {
+export const Player = ({
+  src,
+  width,
+  onTimeUpdate,
+}: {
+  src: string;
+  width: number;
+  onTimeUpdate?: (currentTime: number) => void;
+}) => {
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    const audioElement = audioRef.current;
+
+    const handleTimeUpdate = () => {
+      if (onTimeUpdate) {
+        onTimeUpdate(audioElement?.currentTime);
+      }
+    };
+
+    if (audioElement) {
+      audioElement?.addEventListener("timeupdate", handleTimeUpdate);
+    }
+
+    return () => {
+      if (audioElement) {
+        audioElement?.removeEventListener("timeupdate", handleTimeUpdate);
+      }
+    };
+  }, [onTimeUpdate]);
+
   return (
     <AudioPlayer
+      ref={audioRef}
       src={src}
       minimal={true}
       width={width ? width : 400}
@@ -20,6 +53,8 @@ export const Player = ({ src, width }: { src: string, width: number }) => {
       // volumeControlColor="blue"
       // hideSeekBar={true}
       hideTrackKnobWhenPlaying={true}
+      onTimeUpdate={onTimeUpdate}
+      // onListen = {(currentTime) => console.log(currentTime)}
     />
   );
 };

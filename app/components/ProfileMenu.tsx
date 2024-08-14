@@ -83,7 +83,7 @@ const ProfileMenu = () => {
       <DropdownMenuTrigger className="w-6 h-6 rounded-full flex items-center justify-center bg-gray-100 text-gray-500 text-xs">
         K
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="min-w-[160px]">
+      <DropdownMenuContent className="min-w-[160px] mr-2">
         <DropdownMenuLabel>
           {/* {
             JSON.stringify(userInfo)

@@ -293,7 +293,7 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
             </div>
           </div>
         </div>
-        <div className="p-4 mt-4 bg-white rounded">
+        <div className="py-4 bg-white rounded">
           {files && files.length > 0 ? (
             <div className="flex items-center justify-between border-b-[0.5px] border-gray-200 pb-2">
               <h2 className="font-medium ">Files</h2>
@@ -331,7 +331,7 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                       >
                         <div className="flex items-center gap-3">
                           <div
-                            className={`flex-shrink-0 w-8 h-8  rounded-md flex items-center justify-center text-white border-[0.5px]  shadow-xs
+                            className={`flex-shrink-0 w-8 h-8  rounded-md flex items-center justify-center text-white border-[0.5px]  
                             ${
                               selectedFile?.id === file.id
                                 ? "bg-blue-100 border-blue-300 "
@@ -412,7 +412,7 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                           {acceptedFiles.map((file) => (
                             <div
                               key={file.name}
-                              className="flex items-center justify-between gap-4 mb-4 p-4 border border-gray-200 rounded-lg shadow-sm"
+                              className="flex items-center justify-between gap-4 mb-4 p-4 border border-gray-200 rounded-lg "
                             >
                               <div className="flex items-center gap-2">
                                 <span className="font-medium text-gray-800">

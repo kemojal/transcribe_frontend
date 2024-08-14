@@ -4,9 +4,9 @@ import ProfileMenu from "./ProfileMenu";
 
 const AuthNavbar: React.FC = () => {
   return (
-    <nav className="bg-gray-800 text-white shadow-md">
+    <nav className="bg-white text-black shadow-xs py-2 px-5">
       <div className="container mx-auto px-1 py-2 flex justify-between items-center">
-        <a href="#" className="text-2xl font-bold">
+        <a href="#" className="text-xl font-semibold">
           Transcriber
         </a>
         <div className="hidden md:flex space-x-4">

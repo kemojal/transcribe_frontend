@@ -12,8 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { BASEURL } from "@/constants";
+import Loader from "../Loader";
 
-export const ProjectDialogue = () => {
+export const ProjectDialogue = ({ onAddProject }) => {
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [open, setOpen] = React.useState(false);
@@ -50,7 +51,9 @@ export const ProjectDialogue = () => {
       setOpen(false);
 
       console.log("Project created:", data);
-      router.push(`/projects/${data.id}`);
+      console.log("Project created:", data);
+      onAddProject(data);
+      // router.push(`/projects/${data.id}`);
     } catch (error) {
       console.error("There was a problem with the fetch operation:", error);
     }
@@ -58,7 +61,7 @@ export const ProjectDialogue = () => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+      <DialogTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-8 px-4 ">
         New Project
       </DialogTrigger>
       <DialogContent className="overflow-hidden py-8 px-4">
@@ -90,8 +93,11 @@ export const ProjectDialogue = () => {
           </Button>
         </form>
         {submitting && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-xl opacity-50">
-            Submitting...
+          // <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-xl opacity-50">
+          //   Submitting...
+          // </div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Loader />
           </div>
         )}
       </DialogContent>

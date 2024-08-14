@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { bytesToMegabytes } from "@/utils";
-import { Upload } from "lucide-react";
+import { FileAudio2, Upload } from "lucide-react";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 
@@ -23,8 +23,6 @@ export const FileDropzone = ({ setAcceptedFiles }) => {
         const binaryStr = reader.result;
         console.log(binaryStr);
 
-       
-
         //   if (onAcceptedFiles && typeof onAcceptedFiles === "function") {
         //     onAcceptedFiles(acceptedFiles);
         //     console.log("onAcceptedFilesXXX = ", onAcceptedFiles);
@@ -36,8 +34,6 @@ export const FileDropzone = ({ setAcceptedFiles }) => {
   }, []);
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
- 
-
   return (
     <>
       <div
@@ -45,8 +41,8 @@ export const FileDropzone = ({ setAcceptedFiles }) => {
         className="relative box-border outline-none  m-0 cursor-pointer align-middle appearance-none  transition-all ease-out duration-100 shadow-none select-none flex-shrink-0 text-none  text-sm leading-relaxed p-0 bg-gray-100 rounded-lg flex flex-col gap-2 flex-grow  h-[163px] items-center justify-center border-2 border-dashed border-dashed border-gray-300"
       >
         <input {...getInputProps()} />
-        <span>
-          <Upload size={20} />
+        <span className="bg-[#E5E7EB] rounded-3xl  w-14 h-14 flex items-center justify-center">
+          <FileAudio2 size={30} strokeWidth={1} className="text-gray-400" />
         </span>
         <p className="font-semibold">Select files or Drag & drop</p>
         <span className="text-xs text-muted-foreground">

@@ -1,18 +1,23 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { BASEURL } from "@/constants";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const Login = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [fadeClass, setFadeClass] = useState("fade-in");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
+    setIsLoading(true);
+    setError("");
     try {
       const response = await axios.post(`${BASEURL}/users/login`, {
         email,
@@ -22,58 +27,158 @@ const Login = () => {
       router.push("/projects");
     } catch (error) {
       console.error(error);
+
       setError("Invalid email or password");
     }
+    setIsLoading(false);
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <div className="w-full max-w-[400px] p-8 space-y-6 bg-white rounded-lg  min-h-[512px]">
-        <h2 className="text-3xl font-bold text-center text-gray-900">Login</h2>
-        {error && <p className="text-sm text-red-500 text-center">{error}</p>}
-        <div>
-          {/* <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Email
-          </label> */}
-          <Input
-            type="email"
-            name="email"
-            id="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2 mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
-          />
+    <div
+      className={`flex items-center justify-center min-h-screen ${fadeClass}`}
+    >
+      <div className="absolute bg-purple-100 w-[603px] h-[464px] blur-[100px] dark:opacity-50 left-8 top-1/3"></div>
+      <section className="container flex h-full w-full max-w-md flex-col items-center justify-center space-y-8 p-8  relative z-10">
+        <div className="w-full p-8 rounded-lg bg-white border border-gray-200">
+          <h3 className="text-3xl font-extrabold text-gray-800 tracking-tight text-center mb-4">
+            Welcome Back
+          </h3>
+          <p className="text-gray-500 text-center mb-8">
+            Sign in to your account
+          </p>
+
+          <div className="space-y-4">
+            <button
+              className="w-full py-3 flex items-center justify-center rounded-lg bg-white border border-gray-300 shadow-sm text-gray-600 hover:bg-gray-50"
+              aria-label="Sign in with Google"
+            >
+              <svg
+                role="img"
+                viewBox="0 0 24 24"
+                className="mr-3 h-5 w-5"
+                aria-hidden="true"
+              >
+                <path
+                  fill="currentColor"
+                  d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
+                ></path>
+              </svg>
+              Continue with Google
+            </button>
+
+            <div className="relative text-center">
+              <span className="block bg-white px-4 text-gray-400 text-xs">
+                OR
+              </span>
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-gray-200"></span>
+              </div>
+            </div>
+
+            <form
+              className="space-y-6"
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleLogin();
+              }}
+            >
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Email
+                </label>
+                <Input
+                  type="email"
+                  name="email"
+                  id="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-lg border-gray-300 text-gray-700 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500"
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Password
+                </label>
+                <div className="relative flex items-center">
+                  <Input
+                    type="password"
+                    name="password"
+                    id="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full rounded-lg border-gray-300 text-gray-700 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500"
+                    disabled={isLoading}
+                  />
+                  <Button
+                    className="absolute right-1 flex items-center justify-center text-gray-500 hover:text-gray-700 h-8 w-8"
+                    type="button"
+                    variant={"ghost"}
+                  >
+                    <div>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </div>
+                  </Button>
+                </div>
+              </div>
+
+              <Button
+                isLoading={isLoading}
+                disabled={isLoading}
+                className="w-full py-3 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                Sign In
+              </Button>
+            </form>
+
+            {error && (
+              <p className="text-sm text-red-500 text-center mt-4">{error}</p>
+            )}
+
+            <div className="p-6 pt-0 flex flex-wrap items-center justify-between gap-2">
+              <div className="text-gray-500 text-sm">
+                No account?{" "}
+                <Link
+                  aria-label="Sign in"
+                  className="text-blue-500 underline-offset-4 transition-colors hover:underline"
+                  href="/register"
+                >
+                  Register
+                </Link>
+              </div>
+              <a
+                aria-label="Reset password"
+                className="text-blue-500 text-sm underline-offset-4 transition-colors hover:underline"
+                href="/reset-password"
+              >
+                Reset password
+              </a>
+            </div>
+          </div>
         </div>
-        <div>
-          {/* <label
-            htmlFor="password"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Password
-          </label> */}
-          <Input
-            type="password"
-            name="password"
-            id="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
-          />
-        </div>
-        <div>
-          <Button
-            onClick={handleLogin}
-            className="w-full px-4 py-2 font-bold text-white bg-indigo-600 rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            Login
-          </Button>
-        </div>
-      </div>
+      </section>
     </div>
   );
 };

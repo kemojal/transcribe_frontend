@@ -32,7 +32,7 @@ const FileList: FC<FileSectionProps> = ({
     <div
       className={`${
         selectedFile && selectedFile?.path
-          ? "col-span-2 border-r-[0.5px] border-gray-200"
+          ? "col-span-6 border-r-[0.5px] border-gray-200"
           : "col-span-6"
       } min-h-screen pr-6 py-6 flex flex-col items-center`}
     >

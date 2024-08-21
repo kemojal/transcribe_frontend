@@ -2,7 +2,15 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Player } from "./AudioPlayer";
 import { formatDate } from "@/utils";
-import { Captions, Copy, Zap } from "lucide-react";
+import {
+  Captions,
+  Clock,
+  Copy,
+  Languages,
+  List,
+  Sparkles,
+  Zap,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MetricsEvaluation } from "./Analysis/ MetricsEvaluation";
 import { OverallScore } from "./Analysis/OverallScore";
@@ -15,6 +23,8 @@ const SideProjectTabs = ({
   currentTranscription,
   transcribeAudio,
   transcribing,
+  selectedFileSizeMB,
+  selectedFileDuration,
 }) => {
   // ai part
 
@@ -40,62 +50,87 @@ const SideProjectTabs = ({
   ];
 
   return (
-    <div className="">
+    <div className="pb-20">
       <div
         className="
-      border-b-[1px] border-gray-200"
+      border-b-[1px] border-gray-200 flex justify-center bg-white flex-col pl-4 py-3 gap-2"
       >
-        <div className=" text-gray-800 border-b-1 bg-white font-medium p-4 rounded-lg">
-          {selectedFile?.name || "Transcription"}
+        <div className="flex items-center py-2 border-b-[1px] border-gray-100">
+          <div
+            className=" text-gray-800 text-sm border-b-1 font-semibold  truncate max-w-[400px] border-b-1"
+            title={selectedFile?.name || "Transcription"}
+          >
+            {selectedFile?.name || "Transcription"}
+          </div>
+        </div>
+        <div className="flex gap-1 text-sm text-gray-500 min-w-[200px]">
+          <span className="bg-gray-100 px-2 py-1 rounded-md text-xs">
+            {selectedFileSizeMB.toFixed(2)} MB
+          </span>
+          <span className="bg-gray-100 px-2 py-1 rounded-md flex items-center gap-1 text-xs">
+            <Clock size={16} className="text-gray-600" />{" "}
+            {selectedFileDuration
+              ? `${Math.floor(selectedFileDuration / 60)}:${Math.floor(
+                  selectedFileDuration % 60
+                )}`
+              : "-"}
+          </span>
+          <span className="bg-gray-100 rounded-md flex items-center gap-1 text-xs">
+            <Clock size={16} className="text-gray-600" />{" "}
+            {selectedFile?.created_at
+              ? `${formatDate(selectedFile?.created_at)}`
+              : "-"}
+          </span>
+        </div>
+        <div>end part</div>
+        <div className="p-0  bg-white rounded-lg  border-[0.5px] border-gray-200 bg-gray-50 rounded-lg  mb-4">
+          <div className="">
+            {selectedFile && selectedFile?.path && (
+              <Player src={selectedFile?.path} width={380} />
+            )}
+          </div>
         </div>
       </div>
 
       <div className="py-4">
         <Tabs defaultValue="transcriptions" className=" p-2">
           <TabsList>
-            <TabsTrigger value="transcriptions">Transcription</TabsTrigger>
+            <TabsTrigger
+              value="transcriptions"
+              className="flex items-center gap-1"
+            >
+              <span>
+                <List className="w-4 h-4" />
+              </span>
+              Transcription
+            </TabsTrigger>
 
-            <TabsTrigger value="magicai">Magic AI</TabsTrigger>
+            <TabsTrigger value="magicai" className="flex items-center gap-1">
+              <span>
+                <Sparkles className="w-4 h-4" />
+              </span>
+              Magic AI
+            </TabsTrigger>
             <TabsTrigger value="translate" disabled>
+              <span>
+                <Languages className="w-4 h-4" />
+              </span>
               Translations
             </TabsTrigger>
-            <TabsTrigger value="subtitles" disabled>
+            <TabsTrigger
+              value="subtitles"
+              disabled
+              className="flex items-center gap-1"
+            >
+              <span>
+                <Captions className="w-4 h-4" />
+              </span>
               Subtitle
             </TabsTrigger>
           </TabsList>
           <TabsContent value="transcriptions" className="">
             {selectedFile && selectedFile?.path && (
-              <div className="col-span-2 col-start-5 py-4 pl-4">
-                <div className="p-4  rounded-lg  border-[0.5px] border-gray-200 bg-gray-50 rounded-lg  mb-4">
-                  {/* Transcription Header */}
-                  {/* <div className="text-sm text-gray-800 border-b-1 bg-white font-medium p-4 rounded-lg">
-                  {selectedFile?.name || "Transcription"}
-                </div> */}
-                  <div className="mt-2">
-                    {selectedFile && selectedFile?.path && (
-                      <Player src={selectedFile?.path} width={380} />
-                    )}
-                  </div>
-                  <div className="mt-4 text-sm text-gray-600 flex items-center gap-2">
-                    <span className="block">
-                      <span className="font-medium">Duration:</span>{" "}
-                      {selectedFile?.duration || 0} seconds
-                    </span>
-                    <span className="block">
-                      <span className="font-medium">Size:</span>{" "}
-                      {selectedFile?.size || 0} bytes
-                    </span>
-                    <span className="block">
-                      <span className="font-medium">Created:</span>{" "}
-                      {formatDate(selectedFile?.created_at)}
-                    </span>
-                    {/* Uncomment if needed */}
-                    {/* <span className="block">
-          <span className="font-medium">Modified:</span> {formatDate(selectedFile?.updated_at)}
-        </span> */}
-                  </div>
-                </div>
-
+              <div className=" ">
                 <div className="relative flex flex-col w-full h-[550px] bg-white rounded-lg  border-[0.5px] border-gray-200 overflow-hidden pb-8">
                   <div className="relative w-full h-[650px] p-4 overflow-auto">
                     {transcriptionEntries && transcriptionEntries.length > 0 ? (

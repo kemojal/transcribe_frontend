@@ -17,7 +17,6 @@ import FileItem from "@/components/File/FileItem";
 import FileUploader from "@/components/File/FileUploader";
 import FileList from "@/components/File/FileList";
 
-
 const getAudioDuration = (url: string): Promise<number> => {
   return new Promise((resolve, reject) => {
     const audio = new Audio(url);
@@ -81,6 +80,8 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
   const [currentTranscription, setCurrentTranscription] = useState(null);
 
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
+  const [selectedFileSize, setSelectedFileSize] = useState(0);
+  const [selectedFileDuration, setSelectedFileDuration] = useState(0);
   const [transcribing, setTranscribing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -88,6 +89,7 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
     // const file = files.find((file: any) => file.id === fileId);
     if (file) {
       setSelectedFile(file);
+      setSelectedFileSize(fileSizes[file.id] || 0);
       //   setTranscriptionText(file.transcriptions?.[0]?.transcription_text || "");
       const entries = parseTranscriptionText(
         file?.transcriptions[0]?.transcription_text || ""
@@ -135,6 +137,7 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
           );
           setFiles(filesResponse.data);
           setSelectedFile(filesResponse.data[0]);
+          setSelectedFileSize(fileSizes[filesResponse.data[0].id] || 0);
           const entries = parseTranscriptionText(
             filesResponse?.data[0]?.transcriptions[0]?.transcription_text || ""
           );
@@ -156,6 +159,7 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
             {}
           );
           setFileDurations(durationMap);
+          setSelectedFileDuration(durationMap[filesResponse.data[0].id] || 0);
 
           // Fetch file sizes for each file
           const sizes = await Promise.all(
@@ -299,7 +303,7 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
               <></>
             )}
 
-            <div className="grid grid-cols-6  grid-rows-1 gap-0 ">
+            <div className="grid grid-cols-6  grid-rows-1 gap-0 relative">
               <FileList
                 files={files}
                 selectedFile={selectedFile}
@@ -313,13 +317,15 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                 bytesToMegabytes={bytesToMegabytes}
               />
 
-              <div className="col-span-4 col-start-3">
+              <div className="w-[450px] fixed z-50 right-[45px] top-[178px] bg-gray-50 rounded-xl overflow-x-hidden shadow-xs h-[calc(100vh-180px)] ring-1 ring-black ring-opacity-5 border-2 border-gray-200 overflow-hidden">
                 <SideProjectTabs
                   selectedFile={selectedFile}
                   transcriptionEntries={transcriptionEntries}
                   currentTranscription={currentTranscription}
                   transcribeAudio={transcribeAudio}
                   transcribing={transcribing}
+                  selectedFileSizeMB={selectedFileSize}
+                  selectedFileDuration={selectedFileDuration}
                 />
               </div>
             </div>

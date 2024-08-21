@@ -1,6 +1,7 @@
 import { FileMusic, Trash, Clock } from "lucide-react";
 import { formatFileSize } from "@/utils/file";
 import { Button } from "@/components/ui/button";
+import { FileDropdown } from "../Dropdowns/FileDropDown";
 
 interface FileItemProps {
   file: {
@@ -49,8 +50,13 @@ const FileItem = ({
           />
         </div>
         <div className="min-w-[80%] flex flex items-center gap-2 flex-wrap">
-          <p className="text-gray-600 text-sm">{file.name}</p>
-          <div className="flex gap-1 text-sm text-gray-500 min-w-[200px] xl:ml-5">
+          <p
+            className="text-gray-600 text-sm truncate max-w-[200px]"
+            title={file.name}
+          >
+            {file.name}
+          </p>
+          {/* <div className="flex gap-1 text-sm text-gray-500 min-w-[200px] xl:ml-5">
             <span className="bg-gray-200 px-2 py-1 rounded-md text-xs">
               {fileSizeMB.toFixed(2)} MB
             </span>
@@ -60,16 +66,17 @@ const FileItem = ({
                 ? `${Math.floor(duration / 60)}:${Math.floor(duration % 60)}`
                 : "-"}
             </span>
-          </div>
+          </div> */}
         </div>
       </div>
       <div className="flex gap-2 text-gray-600">
-        <Button
+        {/* <Button
           variant="outline"
           className="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors h-8"
         >
           <Trash size={14} />
-        </Button>
+        </Button> */}
+        <FileDropdown file={file} />
       </div>
     </div>
   );

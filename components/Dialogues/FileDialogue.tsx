@@ -13,6 +13,7 @@ import { FileDropzone } from "../FileDropzone";
 import { bytesToMegabytes } from "@/utils";
 import { useReactMediaRecorder } from "react-media-recorder";
 import { ExampleComponent } from "../ExampleComponent";
+import { BASEURL } from "@/constants";
 
 export const FileDialogue = ({ id }) => {
   const [submitting, setSubmitting] = useState(false);
@@ -40,7 +41,7 @@ export const FileDialogue = ({ id }) => {
         return;
       }
 
-      const response = await fetch(`/projects/${id}/files`, {
+      const response = await fetch(`${BASEURL}/projects/${id}/files`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

@@ -29,7 +29,7 @@ const ProjectList = () => {
         });
         setIsLoading(false);
         console.log("Project response status = ", response.status);
-        console.log("Project response projects = ", response);
+        console.log("Project response projectsXXX = ", response);
         setProjects(response.data);
       } catch (error) {
         if (error.code === "ECONNABORTED") {

@@ -6,6 +6,7 @@ import { BASEURL } from "@/constants";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import GoogleLoginButton from "../login/GoogleLogin";
 
 const Register = () => {
   const router = useRouter();
@@ -44,7 +45,8 @@ const Register = () => {
           </div>
 
           <div className="p-6 pt-0 grid gap-6">
-            <button
+            <GoogleLoginButton />
+            {/* <button
               className="focus-visible:ring-ring inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 border-input hover:bg-blue-500 hover:text-white border shadow-md px-4 py-3 bg-white h-12 w-full"
               aria-label="Sign in with Google"
             >
@@ -60,7 +62,7 @@ const Register = () => {
                 ></path>
               </svg>
               Continue with Google
-            </button>
+            </button> */}
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -128,6 +130,26 @@ const Register = () => {
           {error && (
             <p className="text-sm text-red-500 text-center mt-4">{error}</p>
           )}
+
+          <div className="text-center text-xs text-gray-500 my-6">
+            By clicking "Sign In with Google", you agree to our{" "}
+            <a
+              href="/terms-of-service"
+              className="text-blue-500 underline hover:text-blue-600"
+              aria-label="Terms of Service"
+            >
+              Terms of Service
+            </a>{" "}
+            and{" "}
+            <a
+              href="/privacy-policy"
+              className="text-blue-500 underline hover:text-blue-600"
+              aria-label="Privacy Policy"
+            >
+              Privacy Policy
+            </a>
+            .
+          </div>
           <div className="p-6 pt-0 flex flex-wrap items-center justify-between gap-2">
             <div className="text-gray-500 text-sm">
               Already have an account?{" "}

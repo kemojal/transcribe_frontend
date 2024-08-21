@@ -16,7 +16,7 @@ export default function HomeLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="h-screen flex flex-col overflow-hidden">
       <AuthNavbar />
       <div className="flex flex-1 mt-0">
         <Sidebar />

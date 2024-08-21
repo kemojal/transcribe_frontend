@@ -6,6 +6,7 @@ import { BASEURL } from "@/constants";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import GoogleLoginButton from "./GoogleLogin";
 
 const Login = () => {
   const router = useRouter();
@@ -24,6 +25,7 @@ const Login = () => {
         password,
       });
       localStorage.setItem("token", response.data.access_token);
+      localStorage.setItem("refresh_token", response.data.refresh_token);
       router.push("/projects");
     } catch (error) {
       console.error(error);
@@ -47,26 +49,10 @@ const Login = () => {
             Sign in to your account
           </p>
 
-          <div className="space-y-4">
-            <button
-              className="w-full py-3 flex items-center justify-center rounded-lg bg-white border border-gray-300 shadow-sm text-gray-600 hover:bg-gray-50"
-              aria-label="Sign in with Google"
-            >
-              <svg
-                role="img"
-                viewBox="0 0 24 24"
-                className="mr-3 h-5 w-5"
-                aria-hidden="true"
-              >
-                <path
-                  fill="currentColor"
-                  d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
-                ></path>
-              </svg>
-              Continue with Google
-            </button>
+          <div className="space-y-4 w-full  ">
+            <GoogleLoginButton />
 
-            <div className="relative text-center">
+            <div className="relative text-center w-full">
               <span className="block bg-white px-4 text-gray-400 text-xs">
                 OR
               </span>
@@ -76,7 +62,7 @@ const Login = () => {
             </div>
 
             <form
-              className="space-y-6"
+              className="space-y-6 w-full"
               onSubmit={(e) => {
                 e.preventDefault();
                 handleLogin();
@@ -156,6 +142,26 @@ const Login = () => {
             {error && (
               <p className="text-sm text-red-500 text-center mt-4">{error}</p>
             )}
+
+            <div className="text-center text-xs text-gray-500 my-6">
+              By clicking "Sign In with Google", you agree to our{" "}
+              <a
+                href="/terms-of-service"
+                className="text-blue-500 underline hover:text-blue-600"
+                aria-label="Terms of Service"
+              >
+                Terms of Service
+              </a>{" "}
+              and{" "}
+              <a
+                href="/privacy-policy"
+                className="text-blue-500 underline hover:text-blue-600"
+                aria-label="Privacy Policy"
+              >
+                Privacy Policy
+              </a>
+              .
+            </div>
 
             <div className="p-6 pt-0 flex flex-wrap items-center justify-between gap-2">
               <div className="text-gray-500 text-sm">

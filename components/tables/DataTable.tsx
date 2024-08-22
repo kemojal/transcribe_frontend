@@ -22,7 +22,6 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   onEditClick: (item: TData) => void;
   onDeleteClick: (item: TData) => void;
-
 }
 
 export function DataTable<TData, TValue>({
@@ -67,7 +66,7 @@ export function DataTable<TData, TValue>({
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
-                // onClick={() => router.push(`/projects/${row.original.id}`)}
+                onClick={() => router.push(`/projects/${row.original.id}`)}
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
                 className="hover:bg-gray-100 cursor-pointer transition-colors duration-200"

@@ -16,19 +16,12 @@ import Loader from "../Loader";
 import { Pen } from "lucide-react";
 import { DialogueBase } from "./DialogueBase";
 
-import {
-  fetchProjects,
-  addProject,
-  updateProject,
-  deleteProject,
-  // Project,
-} from "@/lib/reducers/ProjectSlice";
+import { updateProject } from "@/lib/reducers/ProjectSlice";
 import { ProjectProps } from "@/types/interfaces";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 
 export const EditProjectDialogue = ({
   item,
-  // onUpdateProject
 }) => {
   const [name, setName] = useState(item?.name || "");
   const [submitting, setSubmitting] = useState(false);
@@ -68,12 +61,8 @@ export const EditProjectDialogue = ({
       setSubmitting(false);
       setOpen(false);
 
-      // console.log("Project updated:", data);
-
       dispatch(updateProject(data));
-      //   onUpdateProject(data);
-      // Optionally, you can navigate to the updated project page
-      // router.push(`/projects/${data.id}`);
+      
     } catch (error) {
       console.error("There was a problem with the fetch operation:", error);
       setOpen(false);

@@ -14,14 +14,19 @@ import { BASEURL } from "@/constants";
 import { Trash2 } from "lucide-react";
 import { DialogueBase } from "./DialogueBase";
 
-export const DeleteProjectModal = ({
-  item,
-  // , onDeleteProject
-}) => {
+import { deleteProject } from "@/lib/reducers/ProjectSlice";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+
+export const DeleteProjectModal = ({ item }) => {
   const [open, setOpen] = useState(false);
   const [confirmationText, setConfirmationText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
+
+  const dispatch = useAppDispatch();
+  const { projects, isLoading, error } = useAppSelector(
+    (state) => state.project
+  );
 
   const handleDelete = async () => {
     setSubmitting(true);
@@ -46,9 +51,8 @@ export const DeleteProjectModal = ({
 
       setSubmitting(false);
       setOpen(false);
-      //   onDeleteProject(item.id); // Callback after successful deletion
-      // Optionally, redirect the user or refetch the projects list
-      // router.push("/projects");
+
+      dispatch(deleteProject(item.id));
     } catch (error) {
       console.error("There was a problem with the fetch operation:", error);
       setSubmitting(false);

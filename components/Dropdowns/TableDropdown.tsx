@@ -15,7 +15,8 @@ import { EditProjectDialogue } from "../Dialogues/EditProjectDialogue";
 import { DeleteProjectModal } from "../Dialogues/DeleteProjectModal";
 
 const TableDropdown = ({ item,  }) => {
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  // const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  // const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   return (
     <div className="">
       <DropdownMenu>
@@ -26,7 +27,7 @@ const TableDropdown = ({ item,  }) => {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              setIsEditDialogOpen(true);
+              // setIsEditDialogOpen(true);
               // navigator.clipboard.writeText(item.id);
             }}
           >
@@ -40,7 +41,7 @@ const TableDropdown = ({ item,  }) => {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              setIsEditDialogOpen(false);
+              // setIsEditDialogOpen(false);
               // navigator.clipboard.writeText(item.id);
             }}
           >
@@ -57,15 +58,15 @@ const TableDropdown = ({ item,  }) => {
             </span>
             Project access
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <span className="w-6 h-6 flex items-center justify-center text-gray-500 mr-2 rounded-xl bg-gray-100">
-              <Trash2 className=" h-3 w-3" />
-            </span>
-            {/* <DeleteProjectModal
-              item={item}
-              // onDeleteProject={onDeleteProject}
-            /> */}
-            Delete Project
+          <DropdownMenuItem
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            // setIsDeleteDialogOpen(false);
+            
+          }}
+          >
+            <DeleteProjectModal item={item} />
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

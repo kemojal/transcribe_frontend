@@ -1,32 +1,24 @@
-"use client";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
-import { BASEURL } from "@/constants";
 import { Trash2 } from "lucide-react";
 import { DialogueBase } from "./DialogueBase";
 
 import { deleteProject } from "@/lib/reducers/ProjectSlice";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { useAppDispatch } from "@/lib/hooks";
+import { BASEURL } from "@/constants";
+import { useToast } from "@/components/ui/use-toast";
+import { ToastAction } from "../ui/toast";
 
 export const DeleteProjectModal = ({ item }) => {
   const [open, setOpen] = useState(false);
   const [confirmationText, setConfirmationText] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const router = useRouter();
-
   const dispatch = useAppDispatch();
-  const { projects, isLoading, error } = useAppSelector(
-    (state) => state.project
-  );
+
+  const inputRef = useRef(null);
+  const { toast } = useToast();
+
 
   const handleDelete = async () => {
     setSubmitting(true);
@@ -34,6 +26,7 @@ export const DeleteProjectModal = ({ item }) => {
     const token = localStorage.getItem("token");
     if (!token) {
       console.error("No token found");
+      setSubmitting(false); // Make sure to reset submitting state
       return;
     }
 
@@ -49,8 +42,17 @@ export const DeleteProjectModal = ({ item }) => {
         throw new Error("Network response was not ok");
       }
 
-      setSubmitting(false);
-      setOpen(false);
+      toast({
+        variant: "destructive",
+        title: "Deleted successfully",
+        description: `${item.name} is permanently deleted successfully`,
+        // action: <ToastAction altText="undo">Undo</ToastAction>,
+      });
+
+      setTimeout(() => {
+        setSubmitting(false);
+        setOpen(false);
+      }, 1000);
 
       dispatch(deleteProject(item.id));
     } catch (error) {
@@ -60,62 +62,17 @@ export const DeleteProjectModal = ({ item }) => {
   };
 
   return (
-    // <Dialog open={open} onOpenChange={setOpen}>
-    //   <DialogTrigger
-    //     asChild
-    //     onClick={(e) => {
-    //       e.preventDefault();
-    //       e.stopPropagation();
-    //       setOpen(true);
-    //     }}
-    //   >
-    //     <span className="w-6 h-6 flex items-center justify-center text-gray-500 mr-2 rounded-xl bg-gray-100">
-    //       <Trash2 className="h-3 w-3" />
-    //     </span>
-    //     Delete Project
-    //   </DialogTrigger>
-    //   <DialogContent>
-    //     <DialogHeader>
-    //       <DialogTitle>Delete Project</DialogTitle>
-    //       <p className="text-sm text-gray-600">
-    //         Type <strong>Delete {item.name}</strong> to confirm.
-    //       </p>
-    //     </DialogHeader>
-    //     <div className="mt-4">
-    //       <Input
-    //         type="text"
-    //         placeholder={`Delete ${item.name}`}
-    //         value={confirmationText}
-    //         onChange={(e) => setConfirmationText(e.target.value)}
-    //         disabled={submitting}
-    //         required
-    //       />
-    //     </div>
-    //     <div className="mt-6 flex justify-end space-x-4">
-    //       <Button
-    //         variant="outline"
-    //         onClick={() => setOpen(false)}
-    //         disabled={submitting}
-    //       >
-    //         Cancel
-    //       </Button>
-    //       <Button
-    //         variant="destructive"
-    //         onClick={handleDelete}
-    //         disabled={confirmationText !== `Delete ${item.name}` || submitting}
-    //       >
-    //         {submitting ? "Deleting..." : "Delete"}
-    //       </Button>
-    //     </div>
-    //   </DialogContent>
-    // </Dialog>
     <DialogueBase
       trigger={
-        <span className="w-6 h-6 flex items-center justify-center text-gray-500 mr-2 rounded-xl bg-gray-100">
-          <Trash2 className="h-3 w-3" />
-        </span>
+        <>
+          <span className="w-6 h-6 flex items-center justify-center text-gray-500 mr-2 rounded-xl bg-gray-100">
+            <Trash2 className="h-3 w-3" />
+          </span>
+          Delete Project
+        </>
       }
       title="Delete Project"
+      triggerStyle="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 !bg-transparent text-gray-500 "
       description={`Type "Delete ${item.name}" to confirm.`}
       open={open}
       setOpen={setOpen}
@@ -125,15 +82,19 @@ export const DeleteProjectModal = ({ item }) => {
             variant="outline"
             onClick={() => setOpen(false)}
             disabled={submitting}
+            type="button"
           >
             Cancel
           </Button>
           <Button
+            type="button"
             variant="destructive"
             onClick={handleDelete}
-            disabled={confirmationText !== `Delete ${item.name}` || submitting}
+            // disabled={confirmationText !== `Delete ${item.name}` || submitting}
           >
             {submitting ? "Deleting..." : "Delete"}
+
+            {}
           </Button>
         </div>
       }
@@ -143,27 +104,15 @@ export const DeleteProjectModal = ({ item }) => {
           type="text"
           placeholder={`Delete ${item.name}`}
           value={confirmationText}
-          onChange={(e) => setConfirmationText(e.target.value)}
+          ref={inputRef}
+          onChange={(e) => {
+            console.log(e.target.value);
+            setConfirmationText(e.target.value);
+          }}
           disabled={submitting}
           required
         />
       </div>
-      {/* <div className="mt-6 flex justify-end space-x-4">
-        <Button
-          variant="outline"
-          onClick={() => setOpen(false)}
-          disabled={submitting}
-        >
-          Cancel
-        </Button>
-        <Button
-          variant="destructive"
-          onClick={handleDelete}
-          disabled={confirmationText !== `Delete ${item.name}` || submitting}
-        >
-          {submitting ? "Deleting..." : "Delete"}
-        </Button>
-      </div> */}
     </DialogueBase>
   );
 };

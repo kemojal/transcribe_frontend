@@ -67,7 +67,7 @@ export function DataTable<TData, TValue>({
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
-                onClick={() => router.push(`/projects/${row.original.id}`)}
+                // onClick={() => router.push(`/projects/${row.original.id}`)}
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
                 className="hover:bg-gray-100 cursor-pointer transition-colors duration-200"

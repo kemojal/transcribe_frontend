@@ -7,13 +7,14 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/remix-dropdown-menu";
+// "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Pen, Trash2, UserPlus } from "lucide-react";
 import React, { useState } from "react";
 import { EditProjectDialogue } from "../Dialogues/EditProjectDialogue";
 import { DeleteProjectModal } from "../Dialogues/DeleteProjectModal";
 
-const TableDropdown = ({ item }) => {
+const TableDropdown = ({ item,  }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   return (
     <div className="">

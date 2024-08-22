@@ -20,11 +20,16 @@ import { useRouter } from "next/navigation";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  onEditClick: (item: TData) => void;
+  onDeleteClick: (item: TData) => void;
+
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  onEditClick,
+  onDeleteClick,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,

@@ -6,7 +6,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/remix-dropdown-menu";
+// "@/components/ui/remix-dropdown-menu"
 import { Copy, Ellipsis, Info, SquarePen, Trash, UserPlus } from "lucide-react";
 import { useState } from "react";
 import DeleteConfirmModal from "../Dialogues/DeleteFile";

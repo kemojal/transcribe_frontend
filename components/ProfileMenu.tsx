@@ -6,7 +6,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/remix-dropdown-menu";
+// "@/components/ui/dropdown-menu";
 import { CreditCard, DollarSign, LogOut, User, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -75,6 +76,7 @@ const ProfileMenu = () => {
       disabled: false,
       onClick: () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("refresh_token");
         router.push("/login");
       },
     },

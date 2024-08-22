@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Sidebar from "@/components/Sidebar";
 import AuthNavbar from "@/components/AuthNavbar";
+import AuthWrapper from "./AuthWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,13 +16,5 @@ export default function HomeLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <div className="h-screen flex flex-col overflow-hidden">
-      <AuthNavbar />
-      <div className="flex flex-1 mt-0">
-        <Sidebar />
-        <main className={`flex-1 p-6 ${inter.className}`}>{children}</main>
-      </div>
-    </div>
-  );
+  return <AuthWrapper inter={inter}>{children}</AuthWrapper>;
 }

@@ -82,8 +82,21 @@ export const ProjectDialogue = ({ onAddProject }) => {
           New Project
         </>
       }
+      triggerStyle="px-4 h-8 border-[1.5px] border-black bg-transparent text-black"
       open={open}
       setOpen={setOpen}
+      footerButton={
+        <>
+          <Button
+            type="submit"
+            onClick={handleSubmit}
+            className="mt-4"
+            disabled={!isButtonActive || submitting}
+          >
+            {submitting ? " Creating Project..." : " Create Project"}
+          </Button>
+        </>
+      }
     >
       <form onSubmit={handleSubmit} className="p-2 space-y-4">
         <div className="mb-4">
@@ -104,13 +117,6 @@ export const ProjectDialogue = ({ onAddProject }) => {
             disabled={submitting}
           />
         </div>
-        <Button
-          type="submit"
-          className="mt-4"
-          disabled={!isButtonActive || submitting}
-        >
-          {submitting ? " Creating Project..." : " Create Project"}
-        </Button>
       </form>
       {submitting && (
         // <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-xl opacity-50">

@@ -10,45 +10,115 @@ import { ProjectDialogue } from "./Dialogues/ProjectDialogue";
 import { BASEURL } from "@/constants";
 import { Input } from "@/components/ui/input";
 import Loader from "./Loader";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { ProjectProps } from "@/types/interfaces";
 
+// import { DeleteProjectModal } from "./Dialogues/DeleteProjectModal";
+// import { EditProjectDialogue } from "./Dialogues/EditProjectDialogue";
+import {
+  fetchProjects,
+  addProject,
+  updateProject,
+  deleteProject,
+  // Project,
+} from "@/lib/reducers/ProjectSlice";
+import { EditProjectDialogue } from "./Dialogues/EditProjectDialogue";
+import { DeleteProjectModal } from "./Dialogues/DeleteProjectModal";
 const ProjectList = () => {
   const router = useRouter();
-  const [projects, setProjects] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  // const [projects, setProjects] = useState([]);
+  // const [isLoading, setIsLoading] = useState(false);
+
+  const dispatch = useAppDispatch();
+  const { projects, isLoading, error } = useAppSelector(
+    (state) => state.project
+  );
+  const [selectedProject, setSelectedProject] = useState<ProjectProps | null>(
+    null
+  );
+  // const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  // const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  // const [selectedProject, setSelectedProject] = useState(null);
+  // const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  // const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  // useEffect(() => {
+  //   const fetchProjects = async () => {
+  //     setIsLoading(true);
+  //     try {
+  //       const token = localStorage.getItem("token");
+  //       const response = await axios.get(`${BASEURL}/projects`, {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //         timeout: 3000,
+  //       });
+  //       setIsLoading(false);
+  //       console.log("Project response status = ", response.status);
+  //       console.log("Project response projectsXXX = ", response);
+  //       setProjects(response.data);
+  //     } catch (error) {
+  //       if (error.code === "ECONNABORTED") {
+  //         console.error("Request timed out:", error.message);
+  //       } else {
+  //         setIsLoading(false);
+  //         console.error(
+  //           "Error fetching projects:",
+  //           error.response || error.message || error
+  //         );
+  //       }
+  //     }
+  //     setIsLoading(false);
+  //   };
+  //   fetchProjects();
+  // }, []);
+
+  // const addProject = (newProject) => {
+  //   setProjects((prevProjects) => [...prevProjects, newProject]);
+  // };
+
+  // const handleEditClick = (project) => {
+  //   setSelectedProject(project);
+  //   setIsEditDialogOpen(true);
+  // };
+
+  // const handleDeleteClick = (project) => {
+  //   setSelectedProject(project);
+  //   setIsDeleteModalOpen(true);
+  // };
+
+  // const handleUpdateProject = (updatedProject) => {
+  //   alert("Project updated");
+  //   setProjects((prevProjects) =>
+  //     prevProjects.map((project) =>
+  //       project.id === updatedProject.id ? updatedProject : project
+  //     )
+  //   );
+  // };
+
+  // const handleDeleteProject = (deletedProjectId) => {
+  //   setProjects((prevProjects) =>
+  //     prevProjects.filter((project) => project.id !== deletedProjectId)
+  //   );
+  // };
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      setIsLoading(true);
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(`${BASEURL}/projects`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          timeout: 3000,
-        });
-        setIsLoading(false);
-        console.log("Project response status = ", response.status);
-        console.log("Project response projectsXXX = ", response);
-        setProjects(response.data);
-      } catch (error) {
-        if (error.code === "ECONNABORTED") {
-          console.error("Request timed out:", error.message);
-        } else {
-          setIsLoading(false);
-          console.error(
-            "Error fetching projects:",
-            error.response || error.message || error
-          );
-        }
-      }
-      setIsLoading(false);
-    };
-    fetchProjects();
-  }, []);
+    dispatch(fetchProjects());
+  }, [dispatch]);
 
-  const addProject = (newProject) => {
-    setProjects((prevProjects) => [...prevProjects, newProject]);
+  const handleAddProject = (newProject: ProjectProps) => {
+    dispatch(addProject(newProject));
+  };
+
+  const handleEditClick = (project: ProjectProps) => {
+    setSelectedProject(project);
+    // setIsEditDialogOpen(true);
+  };
+
+  const handleDeleteClick = (project: ProjectProps) => {
+    setSelectedProject(project);
+    // setIsDeleteModalOpen(true);
   };
 
   return (
@@ -64,7 +134,7 @@ const ProjectList = () => {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-700">Projects</h2>
             <div className="flex items-center gap-4">
-              <ProjectDialogue onAddProject={addProject} />
+              <ProjectDialogue onAddProject={handleAddProject} />
               {/* <Input
                 placeholder="Search projects..."
                 onChange={(e) => {
@@ -80,10 +150,29 @@ const ProjectList = () => {
                 <Loader />
               </div>
             ) : (
-              <DataTable data={projects} columns={ProjectColumns} />
+              <DataTable
+                data={projects}
+                columns={ProjectColumns}
+                onEditClick={handleEditClick}
+                onDeleteClick={handleDeleteClick}
+              />
             )}
           </div>
         </div>
+        {/* {isEditDialogOpen && selectedProject && (
+          <EditProjectDialogue
+            project={selectedProject}
+            onClose={() => setIsEditDialogOpen(false)}
+            onUpdate={handleUpdateProject}
+          />
+        )}
+        {isDeleteModalOpen && selectedProject && (
+          <DeleteProjectModal
+            project={selectedProject}
+            onClose={() => setIsDeleteModalOpen(false)}
+            onDelete={handleDeleteProject}
+          />
+        )} */}
       </div>
     </div>
   );

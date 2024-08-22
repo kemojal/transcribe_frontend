@@ -122,7 +122,7 @@ export const FileDialogue = ({ id }) => {
 
       <DialogContent className="overflow-hidden py-8 px-4">
         <DialogHeader className="border-b-1 border-gray-200">
-          <DialogTitle>Upload Audio</DialogTitle>
+          <DialogTitle className="">Upload Audio</DialogTitle>
           <DialogDescription>
             Upload your content to transcribe.
           </DialogDescription>

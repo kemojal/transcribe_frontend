@@ -82,7 +82,7 @@ const ProfileMenu = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="w-6 h-6 rounded-full flex items-center justify-center bg-gray-100 text-gray-500 text-xs">
+      <DropdownMenuTrigger className="w-8 h-8  rounded-full flex items-center justify-center bg-gray-100 text-gray-500 text-xs">
         K
       </DropdownMenuTrigger>
       <DropdownMenuContent className="min-w-[160px] mr-2">

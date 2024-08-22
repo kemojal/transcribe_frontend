@@ -1,5 +1,5 @@
+import { ProfileTab } from "@/components/Tabs/ProfileTab";
 import React from "react";
-import { ProfileTab } from "../../components/Tabs/ProfileTab";
 
 const Settings = () => {
   return (

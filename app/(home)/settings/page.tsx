@@ -1,10 +1,10 @@
 import { ProfileTab } from "@/components/Tabs/ProfileTab";
-import React from "react";
 
 const Settings = () => {
   return (
-    <div>
-      Settings
+    <div className="flex h-screen bg-gray-100">
+      {/* Settings */}
+
       <ProfileTab />
     </div>
   );

@@ -5,8 +5,8 @@ import { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import TermSection from "../components/TermSection";
-import ContentSidebar from "../components/ContentSidebar";
+import TermSection from "@/components/TermSection";
+import ContentSidebar from "@/components/ContentSidebar";
 
 const PrivacyPolicy: NextPage = () => {
   const sections = [

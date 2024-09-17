@@ -13,6 +13,10 @@ import Loader from "./Loader";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { ProjectProps } from "@/types/interfaces";
 
+import { SelectProjectOption } from "@/components/SelectProjectOption";
+import { Box, Boxes, ChevronRight } from "lucide-react";
+import { ProjectDropdown } from "@/components/Dropdowns/ProjectDropdown";
+
 // import { DeleteProjectModal } from "./Dialogues/DeleteProjectModal";
 // import { EditProjectDialogue } from "./Dialogues/EditProjectDialogue";
 import {
@@ -24,10 +28,18 @@ import {
 } from "@/lib/reducers/ProjectSlice";
 import { EditProjectDialogue } from "./Dialogues/EditProjectDialogue";
 import { DeleteProjectModal } from "./Dialogues/DeleteProjectModal";
+import Link from "next/link";
 const ProjectList = () => {
   const router = useRouter();
   // const [projects, setProjects] = useState([]);
   // const [isLoading, setIsLoading] = useState(false);
+  const [selectedProjectOption, setSelectedProjectOption] =
+    useState<ProjectProps | null>(null);
+
+  const handleProjectOptionChange = (project: ProjectProps) => {
+    console.log("project", project);
+    setSelectedProjectOption(project);
+  };
 
   const dispatch = useAppDispatch();
   const { projects, isLoading, error } = useAppSelector(
@@ -36,72 +48,18 @@ const ProjectList = () => {
   const [selectedProject, setSelectedProject] = useState<ProjectProps | null>(
     null
   );
-  // const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  // const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  // const [selectedProject, setSelectedProject] = useState(null);
-  // const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  // const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [projOptions, setProjectOptions] = useState<
+    { value: number; label: string }[]
+  >([]);
 
-  // useEffect(() => {
-  //   const fetchProjects = async () => {
-  //     setIsLoading(true);
-  //     try {
-  //       const token = localStorage.getItem("token");
-  //       const response = await axios.get(`${BASEURL}/projects`, {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //         timeout: 3000,
-  //       });
-  //       setIsLoading(false);
-  //       console.log("Project response status = ", response.status);
-  //       console.log("Project response projectsXXX = ", response);
-  //       setProjects(response.data);
-  //     } catch (error) {
-  //       if (error.code === "ECONNABORTED") {
-  //         console.error("Request timed out:", error.message);
-  //       } else {
-  //         setIsLoading(false);
-  //         console.error(
-  //           "Error fetching projects:",
-  //           error.response || error.message || error
-  //         );
-  //       }
-  //     }
-  //     setIsLoading(false);
-  //   };
-  //   fetchProjects();
-  // }, []);
-
-  // const addProject = (newProject) => {
-  //   setProjects((prevProjects) => [...prevProjects, newProject]);
-  // };
-
-  // const handleEditClick = (project) => {
-  //   setSelectedProject(project);
-  //   setIsEditDialogOpen(true);
-  // };
-
-  // const handleDeleteClick = (project) => {
-  //   setSelectedProject(project);
-  //   setIsDeleteModalOpen(true);
-  // };
-
-  // const handleUpdateProject = (updatedProject) => {
-  //   alert("Project updated");
-  //   setProjects((prevProjects) =>
-  //     prevProjects.map((project) =>
-  //       project.id === updatedProject.id ? updatedProject : project
-  //     )
-  //   );
-  // };
-
-  // const handleDeleteProject = (deletedProjectId) => {
-  //   setProjects((prevProjects) =>
-  //     prevProjects.filter((project) => project.id !== deletedProjectId)
-  //   );
-  // };
+  useEffect(() => {
+    let mapOptions = projects.map((project) => ({
+      value: project.id,
+      label: project.name,
+    }));
+    setProjectOptions(mapOptions);
+  }, [projects]);
 
   useEffect(() => {
     dispatch(fetchProjects());
@@ -121,6 +79,19 @@ const ProjectList = () => {
     // setIsDeleteModalOpen(true);
   };
 
+  useEffect(() => {
+    if (selectedProjectOption) {
+      console.log("selectedProjectOption", selectedProjectOption);
+      projects.filter((project) => {
+        if (project.id === selectedProjectOption) {
+          console.log("project", project);
+          setSelectedProject(project);
+        }
+      });
+      // setSelectedProject(null);
+    }
+  }, [selectedProjectOption]);
+
   return (
     <div className="min-h-screen ">
       <div className="container mx-auto p-0 bg-white">
@@ -130,9 +101,53 @@ const ProjectList = () => {
           </h1>
         </div>
 
-        <div className="bg-white rounded-xl  px-4 mb-6">
+        <div className="flex items-center gap-3 ">
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-1">
+              <Link
+                className="text-gray-500 hover:text-indigo-800 flex items-center font-medium"
+                href="/projects"
+              >
+                <span className="mr-1">
+                  <Boxes size={16} strokeWidth={1} />
+                </span>
+                workspaces
+              </Link>
+              <span>
+                <span>
+                  <ChevronRight size={20} />
+                </span>
+              </span>
+
+              <SelectProjectOption
+                placeholder="Select file"
+                options={projOptions}
+                onvalueChange={handleProjectOptionChange}
+              />
+              <div>
+                <span className="flex items-center gap-1">
+                  <span className="mr-1">
+                    <Boxes size={16} strokeWidth={1} />
+                  </span>
+                  {projOptions?.length}
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <ProjectDropdown />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl   mb-6 mt-2 bg-red-500">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-700">Projects</h2>
+            <h2 className="text-xl font-semibold text-gray-700 flex items-center">
+              <span className="mr-1">
+                <Box size={16} strokeWidth={1} />
+              </span>
+              :: {selectedProject && selectedProject.name}
+            </h2>
             <div className="flex items-center gap-4">
               <ProjectDialogue onAddProject={handleAddProject} />
               {/* <Input
@@ -159,20 +174,6 @@ const ProjectList = () => {
             )}
           </div>
         </div>
-        {/* {isEditDialogOpen && selectedProject && (
-          <EditProjectDialogue
-            project={selectedProject}
-            onClose={() => setIsEditDialogOpen(false)}
-            onUpdate={handleUpdateProject}
-          />
-        )}
-        {isDeleteModalOpen && selectedProject && (
-          <DeleteProjectModal
-            project={selectedProject}
-            onClose={() => setIsDeleteModalOpen(false)}
-            onDelete={handleDeleteProject}
-          />
-        )} */}
       </div>
     </div>
   );

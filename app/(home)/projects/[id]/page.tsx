@@ -5,17 +5,26 @@ import axios from "axios";
 import { Player } from "@/components/AudioPlayer";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import {
+  Box,
+  Boxes,
+  ChevronRight,
+  CloudUpload,
+  FileUpIcon,
+  Mic,
+  Video,
+} from "lucide-react";
 import { BASEURL } from "@/constants";
 import { ProjectDropdown } from "@/components/Dropdowns/ProjectDropdown";
-import { FileDialogue } from "@/components/Dialogues/FileDialogue";
+import { FileDialogue } from "@/components/Dialogues/File/FileDialogue";
 import { FileDropzone } from "@/components/FileDropzone";
 import { bytesToMegabytes, formatDate } from "@/utils";
-import SideProjectTabs from "@/components/SideProjectTabs";
+import SideProjectTabs from "@/components/SideProjecTabs/SideProjectTabs";
 import ContinousLoader from "@/components/ContinousLoader";
 import FileItem from "@/components/File/FileItem";
 import FileUploader from "@/components/File/FileUploader";
 import FileList from "@/components/File/FileList";
+import { Input } from "@/components/ui/input";
 
 const getAudioDuration = (url: string): Promise<number> => {
   return new Promise((resolve, reject) => {
@@ -84,6 +93,83 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
   const [selectedFileDuration, setSelectedFileDuration] = useState(0);
   const [transcribing, setTranscribing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [filterTypeFilter, setFilterTypeFilter] = useState("all");
+
+  // Function to handle search input change
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  // Function to toggle filter dropdown
+  const toggleFilter = () => {
+    setFilterOpen(!filterOpen);
+  };
+
+  // Function to apply filter based on selection
+  const handleFilterSelect = (filterTypeFilter) => {
+    // Implement filtering logic here
+    console.log("Selected filter:", filterTypeFilter);
+    setFilterTypeFilter(filterTypeFilter);
+    setFilterOpen(false); // Close dropdown after selection
+  };
+
+  // Filter and search logic
+  const filteredFiles = files.filter((file) => {
+    const matchesSearch = file.name
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesFilter =
+      filterTypeFilter === "all" || file.type === filterTypeFilter;
+    return matchesSearch && matchesFilter;
+  });
+
+  const AddFileOptions = [
+    {
+      title: <FileDialogue id={id} />,
+      description:
+        "Convert any audio file (mp3, mp4, wav, aac, m4a, webm,...) or video file to text",
+      icon: <FileUpIcon size={28} strokeWidth={1} />,
+      onClick: () => {
+        // setOpen(true);
+      },
+    },
+    {
+      title: "Record Audio",
+      description:
+        "Convert any audio file (mp3, mp4, wav, aac, m4a, webm,...) or video file to text",
+      icon: <Mic size={28} strokeWidth={1} />,
+      onClick: () => {
+        // setOpen(true);
+      },
+    },
+    {
+      title: "Audio from Youtube or Cloud",
+      description:
+        "Transcribe audio or video from Youtube link or any cloud storage (Google Drive, One Drive, Dropbox).",
+      icon: (
+        <CloudUpload
+          size={28}
+          className="text-muted-foreground "
+          strokeWidth={1}
+        />
+      ),
+      onClick: () => {
+        // setOpen(true);
+      },
+    },
+    {
+      title: "Smart Meeting Recorder",
+      description:
+        "Connect your calendar or share URL to automatically record and transcribe meetings.",
+      icon: <Video size={28} strokeWidth={1} />,
+      onClick: () => {
+        // setOpen(true);
+      },
+    },
+  ];
 
   const handleFileClick = (file) => {
     // const file = files.find((file: any) => file.id === fileId);
@@ -265,7 +351,7 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
 
   return (
     <div className="min-h-screen ">
-      <div className="container px-4 pb-8 mx-auto  ">
+      <div className="container px-4 pb-8 mx-auto">
         <div className="flex items-center gap-3 ">
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-1">
@@ -273,17 +359,22 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                 className="text-gray-500 hover:text-indigo-800 flex items-center font-medium"
                 href="/projects"
               >
-                {/* <span>
-                <ChevronLeft size={20} />
-            </span> */}
-                projects
+                <span className="mr-1">
+                  <Boxes size={16} strokeWidth={1} />
+                </span>
+                workspaces
               </Link>
               <span>
                 <span>
                   <ChevronRight size={20} />
                 </span>
               </span>
-              <span className="">{project.name}</span>
+              <span className="flex items-center gap-1">
+                <span className="mr-1">
+                  <Box size={16} strokeWidth={1} />
+                </span>
+                {project.name}
+              </span>
             </div>
 
             <div>
@@ -291,21 +382,114 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
             </div>
           </div>
         </div>
-        <div className="flex w-full">
-          <div className="py-4  rounded relative w-full">
-            {files && files.length > 0 ? (
-              <div className="flex items-center justify-between border-b-[0.5px] border-gray-200 pb-2">
-                <h2 className="font-medium ">Files</h2>
 
-                <FileDialogue id={id} />
+        {/* <div className="grid grid-cols-4 gap-4 pt-6">
+          {AddFileOptions.map((option) => (
+            <div
+              key={option.title}
+              className="flex flex-col items-center gap-4 border border-gray-200 hover:border-gray-300 p-0 rounded-lg shadow-xs  transition-shadow duration-300 ease-in-out overflow-hidden cursor-pointer "
+            >
+              <div className="w-full flex items-center justify-center bg-gray-50  p-6">
+                {option.icon}
+              </div>
+              <div className="flex flex-col  items-center px-4 pb-4">
+                <h2 className="text-lg font-semibold text-gray-600 border-b-[0.5px] border-gray-50 w-full pb-1 text-center">
+                  {option.title}
+                </h2>
+                <p className="text-xs text-muted-foreground text-center pt-1">
+                  {option.description}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div> */}
+
+        <div className=" w-full">
+          <div className="py-4 rounded relative w-full">
+            {files && files.length > 0 ? (
+              <div>
+                <div className="flex items-center justify-between border-b-[0.5px] border-gray-200 pb-2">
+                  <h2 className="font-medium">Files</h2>
+                </div>
+                <div className="flex items-center gap-1 py-3">
+                  {/* Search Input */}
+                  <div className="relative flex-grow max-w-6xl z-50 min-w-[420px]">
+                    <input
+                      type="text"
+                      placeholder="Search files..."
+                      className="w-full py-2 px-4 rounded-md border border-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                  {/* Filter Dropdown */}
+                  <div className="relative z-50">
+                    <Button
+                      type="button"
+                      disabled
+                      className="flex items-center py-2 px-4 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200"
+                      onClick={() => setFilterOpen(!filterOpen)}
+                    >
+                      Filter
+                      <ChevronRight size={16} className="ml-2" />
+                    </Button>
+                    {/* Dropdown Menu */}
+                    {filterOpen && (
+                      <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg">
+                        <a
+                          href="#"
+                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                          onClick={() => setFilterTypeFilter("all")}
+                        >
+                          All Files
+                        </a>
+                        <a
+                          href="#"
+                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                          onClick={() => setFilterTypeFilter("audio")}
+                        >
+                          Audio Files
+                        </a>
+                        <a
+                          href="#"
+                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                          onClick={() => setFilterTypeFilter("video")}
+                        >
+                          Video Files
+                        </a>
+                        <a
+                          href="#"
+                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                          onClick={() => setFilterTypeFilter("document")}
+                        >
+                          Documents
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                  <FileDialogue id={id} />
+                </div>
               </div>
             ) : (
               <></>
             )}
 
-            <div className="grid grid-cols-6  grid-rows-1 gap-0 relative">
+            <div className="grid grid-cols-6 grid-rows-1 gap-4 ">
               <FileList
-                files={files}
+                files={files.filter(
+                  (file) =>
+                    file.name
+                      .toLowerCase()
+                      .includes(searchQuery.toLowerCase()) &&
+                    (filterTypeFilter === "all" ||
+                      (filterTypeFilter === "audio" &&
+                        file.path.endsWith(".mp3")) ||
+                      (filterTypeFilter === "video" &&
+                        file.path.endsWith(".mp4")) ||
+                      (filterTypeFilter === "document" &&
+                        file.path.endsWith(".pdf")))
+                )}
+                fileLength={files.length}
                 selectedFile={selectedFile}
                 fileSizes={fileSizes}
                 fileDurations={fileDurations}
@@ -316,8 +500,7 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                 handleFileClick={handleFileClick}
                 bytesToMegabytes={bytesToMegabytes}
               />
-
-              <div className="w-[450px] fixed z-50 right-[45px] top-[178px] bg-gray-50 rounded-xl overflow-x-hidden shadow-xs h-[calc(100vh-180px)] ring-1 ring-black ring-opacity-5 border-2 border-gray-200 overflow-hidden">
+              <div className="col-span-4 col-start-3 ">
                 <SideProjectTabs
                   selectedFile={selectedFile}
                   transcriptionEntries={transcriptionEntries}

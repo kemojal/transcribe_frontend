@@ -32,13 +32,20 @@ export const Player = ({
     };
   }, [onTimeUpdate]);
 
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.src = src;
+      audioRef.current.load();
+    }
+  }, [src]);
+
   return (
     <AudioPlayer
       ref={audioRef}
       src={src}
       minimal={true}
       width={width ? width : 400}
-      trackHeight={25}
+      trackHeight={45}
       barWidth={1}
       gap={1}
       visualise={true}

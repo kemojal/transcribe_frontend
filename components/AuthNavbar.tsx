@@ -6,7 +6,7 @@ import { Bell, Settings } from "lucide-react";
 const AuthNavbar: React.FC = () => {
   return (
     <nav className="bg-white text-black shadow-xs py-2 px-0 ">
-      <div className="container mx-auto  py-2 flex justify-between items-center">
+      <div className="px-4 py-2 flex justify-between items-center">
         <a href="#" className="text-xl font-semibold">
           Transcriber
         </a>

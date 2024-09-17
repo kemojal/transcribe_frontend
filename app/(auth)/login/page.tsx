@@ -1,13 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { BASEURL } from "@/constants";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import GoogleLoginButton from "./GoogleLogin";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import Image from "next/image";
 
 const Login = () => {
   const router = useRouter();
@@ -16,9 +17,6 @@ const Login = () => {
   const [error, setError] = useState("");
   const [fadeClass, setFadeClass] = useState("fade-in");
   const [isLoading, setIsLoading] = useState(false);
-
-  
-
 
   const handleLogin = async () => {
     setIsLoading(true);
@@ -43,7 +41,10 @@ const Login = () => {
     <div
       className={`flex items-center justify-center min-h-screen ${fadeClass}`}
     >
-      <div className="absolute bg-purple-100 w-[603px] h-[464px] blur-[100px] dark:opacity-50 left-8 top-1/3"></div>
+      <div className="absolute  w-full flex flex-col items-center ">
+        <Image src="/dashboard.png" width={900} height={464} alt=""  className="blur-xs rounded-3xl border-[1px] border-gray-100 mt-20"/>
+      </div>
+      <div className="absolute bg-purple-100 w-[603px] h-[464px] blur-[100px] dark:opacity-50 left-8 top-1/3 "></div>
       <section className="container flex h-full w-full max-w-md flex-col items-center justify-center space-y-8 p-8  relative z-10">
         <div className="w-full p-8 rounded-lg bg-white border border-gray-200">
           <h3 className="text-3xl font-extrabold text-gray-800 tracking-tight text-center mb-4">

@@ -4,6 +4,7 @@ import { formatDate, formatFullDate } from "@/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { create } from "domain";
 import TableDropdown from "../Dropdowns/TableDropdown";
+import { Box } from "lucide-react";
 
 interface User {
   username: string;
@@ -23,7 +24,10 @@ export const ProjectColumns: ColumnDef<ProjectProps>[] = [
     header: "Name",
     cell: ({ row }) => {
       return (
-        <div className="min-w-[40vw] text-gray-900 font-medium">
+        <div className="min-w-[40vw] text-gray-900 font-medium flex items-center">
+          <span className="mr-1">
+                  <Box size={16} strokeWidth={1}/>
+                </span>
           {row.getValue("name")}
         </div>
       );

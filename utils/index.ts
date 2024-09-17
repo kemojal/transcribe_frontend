@@ -28,3 +28,16 @@ export function bytesToMegabytes(bytes: number): number {
   const bytesInOneMegabyte = 1024 * 1024;
   return Math.round((bytes / bytesInOneMegabyte) * 100) / 100;
 }
+
+export const formatTimestamp = (timestamp: string) => {
+  return timestamp.replace(/,\d{3}/, ""); // Removes the milliseconds part (e.g., ,000)
+};
+
+export const parseTimeToSeconds = (timeString: string) => {
+  const [hours, minutes, seconds] = timeString.split(":");
+  return (
+    parseInt(hours) * 3600 +
+    parseInt(minutes) * 60 +
+    parseFloat(seconds.replace(",", "."))
+  );
+};

@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import TermSection from "../components/TermSection";
 import { useEffect, useRef, useState } from "react";
-import ContentSidebar from "../components/ContentSidebar";
+import ContentSidebar from "@/components/ContentSidebar";
+import TermSection from "@/components/TermSection";
 
 const TermsOfService: NextPage = () => {
   const sections = [
@@ -56,7 +56,7 @@ const TermsOfService: NextPage = () => {
 
   return (
     <>
-      <Head >
+      <Head>
         <title>Terms of Service | kemzapps Inc.</title>
         <meta name="description" content="Terms of Service for kemzapps Inc." />
       </Head>

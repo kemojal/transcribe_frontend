@@ -8,6 +8,7 @@ import { setAuthState } from "@/lib/reducers/authSlice";
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 import {
   useQuery,
@@ -34,6 +35,7 @@ const AuthWrapper = ({
 }) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const pathname = usePathname();
 
   const authState = useAppSelector((state) => state.auth.authState);
   const [loading, setLoading] = useState(true);
@@ -50,7 +52,8 @@ const AuthWrapper = ({
 
           if (decodedToken.exp > currentTime) {
             dispatch(setAuthState(true));
-            router.push("/projects");
+            console.log("Current pathname: ", pathname);
+            router.push(pathname || "/projects");
           } else {
             // Token has expired, try to refresh it
             const refreshResponse = await fetch(
@@ -68,7 +71,9 @@ const AuthWrapper = ({
               localStorage.setItem("token", refreshData.access_token); // Update the token
               localStorage.setItem("refresh_token", refreshData.refresh_token); // Update the refresh token
               dispatch(setAuthState(true));
-              router.push("/projects");
+              router.push(pathname || "/projects");
+              console.log("Current pathname: ", pathname);
+              // return <p>Current pathname: {pathname}</p>;
             } else {
               dispatch(setAuthState(false));
               router.push("/login");
@@ -77,6 +82,7 @@ const AuthWrapper = ({
         } catch (error) {
           console.error("Authentication check failed:", error);
           dispatch(setAuthState(false));
+
           //   router.push("/login");
         }
       } else {
@@ -105,7 +111,7 @@ const AuthWrapper = ({
         <AuthNavbar />
         <div className="flex flex-1 mt-0">
           <Sidebar />
-          <main className={`flex-1 p-6 ${inter.className}`}>{children}</main>
+          <main className={`flex-1 px-6 ${inter.className}`}>{children}</main>
         </div>
       </div>
     </QueryClientProvider>

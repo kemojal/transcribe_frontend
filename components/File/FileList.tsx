@@ -27,13 +27,14 @@ const FileList: FC<FileSectionProps> = ({
   handleUpload,
   handleFileClick,
   bytesToMegabytes,
+  fileLength,
 }) => {
   return (
     <div
-      className={`${
+      className={`col-span-2 ${
         selectedFile && selectedFile?.path
-          ? "col-span-6 border-r-[0.5px] border-gray-200"
-          : "col-span-6"
+          ? " border-r-[0.5px] border-gray-200"
+          : ""
       } min-h-screen pr-6 py-6 flex flex-col items-center`}
     >
       {files && files.length > 0 ? (

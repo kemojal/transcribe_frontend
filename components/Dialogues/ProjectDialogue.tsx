@@ -55,12 +55,12 @@ export function ProjectDialogue({ onAddProject }: ProjectDialogueProps) {
 
   return (
     <DialogueBase
-      title="New Workspace"
+      title="New Space"
       description="Give your workspace a name"
       trigger={
         <Button variant="default" className="bg-indigo-600 hover:bg-indigo-700">
           <PlusCircle className="w-4 h-4 mr-2" />
-          New Workspace
+          New Space
         </Button>
       }
       open={open}
@@ -72,7 +72,7 @@ export function ProjectDialogue({ onAddProject }: ProjectDialogueProps) {
           className="w-full bg-indigo-600 hover:bg-indigo-700"
           disabled={!name.trim() || submitting}
         >
-          {submitting ? "Creating Workspace..." : "Create Workspace"}
+          {submitting ? "Creating space..." : "Create space"}
         </Button>
       }
     >

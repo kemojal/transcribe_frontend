@@ -100,11 +100,11 @@ const Sidebar = ({
               className="hover:text-indigo-600 flex items-center"
             >
               <Boxes size={16} className="mr-1" />
-              Workspaces
+              Spaces
             </Link>
             <div className="flex w-auto py-1">
               <SelectProjectOption
-                placeholder="Select project"
+                placeholder="No space"
                 options={projects.map((p) => ({ value: p.id, label: p.name }))}
                 onValueChange={handleProjectOptionChange}
                 defaultValue={currentProject?.id}

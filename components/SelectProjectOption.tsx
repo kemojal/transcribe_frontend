@@ -59,11 +59,13 @@ export const SelectProjectOption = ({
 
   return (
     <Select value={selectedValue} onValueChange={handleValueChange}>
-      <SelectTrigger className="h-8 text-sm focus:ring-0 outline-gray-50 flex items-center gap-1">
-        <span className="">
-          <Box size={16} strokeWidth={1} />
-        </span>
-        <SelectValue placeholder={placeholder || "No space found"} />
+      <SelectTrigger className="py-6 text-sm focus:ring-0 outline-gray-50 flex items-center gap-1">
+        <div className="flex space-x-1 items-center">
+          <span className="">
+            <Box size={16} strokeWidth={1} />
+          </span>
+          <SelectValue placeholder={placeholder || "No Space"} />
+        </div>
       </SelectTrigger>
       <SelectContent onClick={(e) => e.stopPropagation()}>
         <div className="p-2">
@@ -75,12 +77,11 @@ export const SelectProjectOption = ({
             className="w-full px-2 h-8  border border-gray-300 rounded-xl text-xs"
           />
         </div>
-        {filteredOptions.map((option, index) => 
-        {
+        {filteredOptions.map((option, index) => {
           let item = {
             id: option.value,
             name: option.label,
-          }
+          };
           return (
             <div key={index} className="flex items-center gap-2">
               <SelectItem
@@ -92,9 +93,8 @@ export const SelectProjectOption = ({
               </SelectItem>
               <TableDropdown item={item} />
             </div>
-          )
-        }
-        )}
+          );
+        })}
         <div className="py-3 w-full">
           <ProjectDialogue onAddProject={handleAddProject} />
         </div>

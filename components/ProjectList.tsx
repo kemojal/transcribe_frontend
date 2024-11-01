@@ -101,18 +101,7 @@ const ProjectList = () => {
     dispatch(addProject(newProject));
   };
 
-  // const handleEditClick = (project: ProjectProps) => {
-  //   setSelectedProject(project);
-  //   dispatch(setCurrentProject(project));
-  //   // setIsEditDialogOpen(true);
-  // };
-
-  // const handleDeleteClick = (project: ProjectProps) => {
-  //   console.log("projectXX", project);
-  //   setSelectedProject(project);
-  //   dispatch(setCurrentProject(project));
-  //   // setIsDeleteModalOpen(true);
-  // };
+ 
 
   useEffect(() => {
     if (selectedProjectOption) {

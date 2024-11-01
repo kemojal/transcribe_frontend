@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import CustomAudioPlayer from "./CustomAudioPlayer";
@@ -14,13 +15,31 @@ import {
   Download,
   List,
   Sparkles,
+  Calendar,
+  Check,
+  Globe,
+  Tags,
+  Trash,
+  DownloadCloud,
+  Search,
+  Copy,
+  FileDown,
+  CloudDownload,
 } from "lucide-react";
 import { formatDate, formatTimestamp, parseTimeToSeconds } from "@/utils";
-// import { MetricsEvaluation } from "./Analysis/MetricsEvaluation";
 import { OverallScore } from "../Analysis/OverallScore";
 import Recommendations from "../Analysis/Recommendations";
 import EditableTranscriptionEntries from "./EditableTranscriptionEntries";
 import RenderVideo from "./Podcast/RenderVideo";
+import { TranscriptionDropdown } from "../Dropdowns/TranscriptionDropdown";
+import { ShareDialog } from "../Dialogues/ShareDialogue";
+import AudioLoader from "../AudioLoader";
+import { useSearchParams } from "next/navigation";
+import NoTranscription from "./NoTranscription";
+import { FileProps } from "@/types/interfaces";
+import { deleteTranscription } from "@/lib/reducers/fileSlice";
+import { useAppDispatch } from "@/lib/hooks";
+import { Input } from "../ui/input";
 
 const SideProjectTabs = ({
   selectedFile,
@@ -32,11 +51,40 @@ const SideProjectTabs = ({
   selectedFileDuration,
 }) => {
   const [currentFile, setCurrentFile] = useState(null);
-
   const [currentPlayingEntry, setCurrentPlayingEntry] = useState(null);
   const [transcriptions, setTranscriptions] = useState(
     [] || transcriptionEntries
   );
+  const [currentTime, setCurrentTime] = useState(0); //to see which word is highlighted
+  const audioPlayerRef = useRef(null);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const [isAudioPaused, setIsAudioPaused] = useState(false);
+  const [isAudioLoading, setIsAudioLoading] = useState(false);
+
+  const searchParams = useSearchParams();
+  const currentFileId = searchParams.get("current_file_id");
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const dispatch = useAppDispatch();
+
+  const tabItems = [
+    {
+      label: "Activity",
+      content: <div>Activity content goes here</div>,
+    },
+    {
+      label: "Transcript",
+      content: <div>Transcript content goes here</div>,
+    },
+  ];
+
+  const handleCopy = () => {
+    // const text = entries
+    //   .map((entry) => `${entry.timestamp} ${entry.content}`)
+    //   .join("\n");
+    // navigator.clipboard.writeText(text);
+  };
 
   useEffect(() => {
     if (selectedFile) {
@@ -47,32 +95,6 @@ const SideProjectTabs = ({
   useEffect(() => {
     setTranscriptions(transcriptionEntries);
   }, [transcriptionEntries]);
-
-  const [audioPlayer, setAudioPlayer] = useState(null);
-
-  // Add this line
-  const audioPlayerRef = useRef(null);
-
-  const metrics = {
-    shareability: 10,
-    clickability: 15,
-    virality: 5,
-    engagement: 5,
-  };
-
-  const overallScore =
-    (metrics.shareability +
-      metrics.clickability +
-      metrics.virality +
-      metrics.engagement) /
-    4;
-
-  const recommendations = [
-    "Add a Hook: Start with something intriguing or attention-grabbing to capture viewers' interest.",
-    "Create a Narrative: Develop a story or message that viewers can relate to or find valuable.",
-    "Include a Call-to-Action: Encourage viewers to share, comment, or interact with the content.",
-    "Engage Emotionally: Incorporate elements that evoke emotions, whether it's humor, surprise, or inspiration.",
-  ];
 
   const handleContentUpdate = (index, newContent) => {
     const updatedEntries = [...transcriptionEntries];
@@ -97,206 +119,209 @@ const SideProjectTabs = ({
         parseFloat(endSeconds.replace(",", "."));
 
       audioPlayerRef?.current?.seekTo(startSecondsTotal, endSecondsTotal);
+      setIsAudioLoading(true);
+    }
+  };
+
+  const onDeleteTranscription = async (file: FileProps) => {
+    if (file && file?.transcriptions.length > 0) {
+      try {
+        await dispatch(
+          deleteTranscription({
+            projectId: file?.project_id?.toString(),
+            fileId: file?.id?.toString(),
+            transcriptionId: file?.transcriptions[0]?.id?.toString(),
+          })
+        ).unwrap();
+        // filter this transcript from the files transcriptions
+        // const filteredTranscriptions = file?.transcriptions?.filter(
+        //   (transcription) => transcription.id !== file?.transcriptions[0]?.id
+        // )
+
+        file.transcriptions = file.transcriptions.filter(
+          (t) => t.id !== file?.transcriptions[0]?.id
+        );
+        setCurrentFile(file);
+      } catch (error) {
+        console.error("Error deleting transcription:", error);
+      }
     }
   };
 
   return (
-    <div className="pb-20">
-      <div className="border-b-[1px] border-gray-200 flex justify-center bg-white flex-col pl-4 py-3 gap-2">
-        <div className="flex items-center py-2 border-b-[1px] border-gray-100 justify-between">
-          <div
-            className="text-gray-800 text-xl border-b-1 font-semibold truncate max-w-[400px]"
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+      className="pb-20 overflow-hidden  "
+    >
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="border-b-[1px] border-gray-100 flex justify-center bg-white flex-col pl-4 pb-1 gap-0"
+      >
+        <div className="flex items-center py-1 border-b-[1px] border-gray-50 justify-between">
+          <motion.div
+            initial={{ x: -20 }}
+            animate={{ x: 0 }}
+            className="text-gray-800 text-sm border-b-1 font-semibold truncate max-w-[400px]"
             title={selectedFile?.name || "Transcription"}
           >
             {selectedFile?.name || "Transcription"}
-          </div>
-          <div className="flex items-center justify-end gap-1">
-            <Button size={"sm"} variant={"outline"} className="w-10 h-10">
-              <span>
-                <Download size={16} className="text-gray-600" />
-              </span>
-            </Button>
-            <span>
-              <EllipsisVertical size={16} className="text-gray-600" />
-            </span>
-          </div>
+          </motion.div>
+          <motion.div
+            initial={{ x: 20 }}
+            animate={{ x: 0 }}
+            className="flex items-center justify-end gap-1"
+          >
+            
+
+            {/* <span>
+              <EllipsisVertical
+                size={16}
+                className="text-gray-600 cursor-pointer hover:text-gray-800 transition-colors"
+              />
+            </span> */}
+          </motion.div>
         </div>
-        <div className="flex gap-4 text-sm text-gray-500 min-w-[200px]">
-          <span className="flex items-center gap-1">
-            <Languages size={12} className="text-gray-600" /> English
-          </span>
-          <span className="py-1 rounded-md text-xs flex items-center gap-1">
-            <FileAudio size={12} className="text-gray-600" />{" "}
-            {selectedFileSizeMB.toFixed(2)} MB
-          </span>
-          <span className="py-1 rounded-md flex items-center gap-1 text-xs">
-            <Clock size={12} className="text-gray-600" />{" "}
-            {selectedFileDuration
-              ? `${Math.floor(selectedFileDuration / 60)}:${Math.floor(
-                  selectedFileDuration % 60
-                )}`
-              : "-"}
-          </span>
-          <span className="rounded-md flex items-center gap-1 text-xs">
-            <Clock size={12} className="text-gray-600" />{" "}
-            {selectedFile?.created_at
-              ? `${formatDate(selectedFile?.created_at)}`
-              : "-"}
-          </span>
-        </div>
-      </div>
-      <div className="py-4">
-        <Tabs defaultValue="transcriptions" className="p-2">
-          <TabsList>
-            <TabsTrigger
-              value="transcriptions"
-              className="flex items-center gap-1"
-            >
-              <span>
-                <List className="w-4 h-4" />
-              </span>{" "}
-              Transcription
-            </TabsTrigger>
-            <TabsTrigger value="magicai" className="flex items-center gap-1">
-              <span>
-                <Sparkles className="w-4 h-4" />
-              </span>{" "}
-              Magic AI
-            </TabsTrigger>
-            <TabsTrigger value="translate" disabled>
-              <span>
-                <Languages className="w-4 h-4" />
-              </span>{" "}
-              Translations
-            </TabsTrigger>
-            <TabsTrigger
-              value="subtitles"
-              disabled
-              className="flex items-center gap-1"
-            >
-              <span>
-                <Captions className="w-4 h-4" />
-              </span>{" "}
-              Subtitle
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="transcriptions">
-            {/* {JSON.stringify(transcriptionEntries)} */}
-            {selectedFile && selectedFile?.path && (
-              <div>
-                <div className="relative flex flex-col w-full h-[500px] bg-white rounded-lg border-[0.5px] border-gray-200 overflow-hidden pb-8">
-                  <div className="relative w-full h-[650px] p-4 overflow-auto">
-                    {transcriptionEntries && transcriptionEntries.length > 0 ? (
+      </motion.div>
+      <div className="pt-2 pb-4 h-[calc(100%-60px)]">
+        {selectedFile && selectedFile?.path && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="relative flex flex-col w-full h-[600px] overflow-hidden pb-8 ">
+              <div className="relative w-full h-[calc(100%-80px)] overflow-auto ">
+                <div className="flex items-center justify-between gap-4 flex-wrap px-0 pt-2 pb-4 pr-2 border-b-0 border-gray-200">
+                  <div className="relative">
+                    <Search
+                      className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      size={20}
+                    />
+                    <Input
+                      type="text"
+                      placeholder="Search"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-8 pr-4 py-1 w-64 rounded-full bg-gray-100 text-xs h-8"
+                    />
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCopy}
+                      className="border-gray-100 hover:bg-gray-100 transition-colors space-x-1"
+                    >
+                      <Copy size={14} />
+                      {/* <span className="text-xs font-semibold hidden md:block">
+                        Copy
+                      </span> */}
+                    </Button>
+
+                    <Button
+                      variant={"outline"}
+                      size="sm"
+                      className="w-8 h-8 border-gray-100 hover:bg-gray-100 transition-colors"
+                      onClick={() => {
+                        if (selectedFile) {
+                          onDeleteTranscription(selectedFile);
+                        }
+                      }}
+                    >
+                      <span>
+                        <Trash size={14} />
+                      </span>
+                    </Button>
+                    <ShareDialog />
+                    <TranscriptionDropdown file={selectedFile} />
+                    
+                  </div>
+                </div>
+                <AnimatePresence>
+                  {transcriptionEntries && transcriptionEntries.length > 0 ? (
+                    <motion.div
+                      key="transcription"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="text-sm"
+                    >
                       <EditableTranscriptionEntries
                         transcriptionEntries={transcriptions}
                         currentPlayingEntry={currentPlayingEntry}
                         handlePlayTimestamp={handlePlayTimestamp}
                         formatTimestamp={formatTimestamp}
                         handleContentUpdate={handleContentUpdate}
+                        currentTime={currentTime}
+                        isAudioPlaying={isAudioPlaying}
                       />
-                    ) : (
-                      <div className="flex flex-col items-center justify-center h-full bg-gray-100 rounded-lg text-gray-600">
-                        <span>No transcription yet</span>
-                        <Button
-                          className="mt-4 flex items-center gap-2"
-                          variant="outline"
-                          disabled={
-                            !selectedFile || !selectedFile?.path || transcribing
-                          }
-                          onClick={() => {
-                            if (selectedFile) {
-                              transcribeAudio(
-                                selectedFile?.project_id,
-                                selectedFile?.id
+                    </motion.div>
+                  ) : (
+                    <NoTranscription
+                      selectedFile={selectedFile}
+                      transcribing={transcribing}
+                      transcribeAudio={transcribeAudio}
+                    />
+                  )}
+                </AnimatePresence>
+              </div>
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="absolute bottom-0 left-0 w-full border-t-[1px] border-gray-200 bg-white flex flex-col items-center gap-2 justify-center py-2"
+              >
+                {/* <div className="flex gap-2 items-center text-xs text-gray-600 w-full">
+                  <div className="w-full">
+                    <div className="w-full flex items-center justify-center fixed bottom-0 left-0">
+                      {currentFile && currentFile?.path && (
+                        <CustomAudioPlayer
+                          src={currentFile?.path}
+                          ref={audioPlayerRef}
+                          isPlaying={isAudioPlaying}
+                          setIsPlaying={setIsAudioPlaying}
+                          // isAudioMuted={isMuted}
+                          isPaused={isAudioPaused}
+                          onTimeUpdate={(currentTime) => {
+                            setCurrentTime(currentTime);
+
+                            if (transcriptionEntries) {
+                              const currentEntry = transcriptionEntries.find(
+                                (entry) => {
+                                  const [start, end] =
+                                    entry.timestamp.split(" --> ");
+                                  const startTime = parseTimeToSeconds(start);
+                                  const endTime = parseTimeToSeconds(end);
+                                  return (
+                                    currentTime >= startTime &&
+                                    currentTime < endTime
+                                  );
+                                }
                               );
+                              if (
+                                currentEntry &&
+                                currentEntry !== currentPlayingEntry
+                              ) {
+                                setCurrentPlayingEntry(currentEntry);
+                              }
                             }
                           }}
-                        >
-                          <Captions size={16} />
-                          <span>
-                            {transcribing ? "Transcribing..." : "Transcribe"}
-                          </span>
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                  <div className="absolute bottom-0 left-0 w-full border-t-[1px] border-gray-200 bg-white flex flex-col items-center gap-2 justify-center py-2">
-                    <div className="flex gap-2 items-center text-xs text-gray-600 w-full">
-                      <div className="w-full">
-                        <div className="w-full flex items-center justify-center">
-                          {currentFile && currentFile?.path && (
-                            <CustomAudioPlayer
-                              src={currentFile?.path}
-                              ref={audioPlayerRef}
-                              onTimeUpdate={(currentTime) => {
-                                if (transcriptionEntries) {
-                                  const currentEntry =
-                                    transcriptionEntries.find((entry) => {
-                                      const [start, end] =
-                                        entry.timestamp.split(" --> ");
-                                      const startTime =
-                                        parseTimeToSeconds(start);
-                                      const endTime = parseTimeToSeconds(end);
-                                      return (
-                                        currentTime >= startTime &&
-                                        currentTime < endTime
-                                      );
-                                    });
-                                  if (
-                                    currentEntry &&
-                                    currentEntry !== currentPlayingEntry
-                                  ) {
-                                    setCurrentPlayingEntry(currentEntry);
-                                  }
-                                }
-                              }}
-                            />
-                          )}
-                        </div>
-                      </div>
+                        />
+                      )}
                     </div>
                   </div>
-                </div>
-                <div className="flex justify-between p-2 text-gray-600 text-xs">
-                  <div className="flex items-center gap-2">
-                    <div className="w-[1px] h-4 bg-gray-200" />
-                    <span className="flex items-center gap-1">
-                      <span>
-                        <Clock size={16} className="text-gray-600" />
-                      </span>{" "}
-                      Total Duration
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </TabsContent>
-          <TabsContent value="magicai">
-            <div className="py-4 flex flex-col gap-4">
-              <div className="flex flex-col">
-                {/* <span className="text-gray-600 text-sm">Metrics</span> */}
-                {/* <MetricsEvaluation metrics={metrics} /> */}
-              </div>
-              {/* <div className="flex flex-col">
-                <span className="text-gray-600 text-sm">Overall Score</span>
-                <OverallScore score={overallScore} />
-              </div> */}
-              {/* <div className="flex flex-col">
-                <span className="text-gray-600 text-sm">Recommendations</span>
-                <Recommendations recommendations={recommendations} />
-              </div> */}
-              <RenderVideo />
+                </div> */}
+              </motion.div>
             </div>
-          </TabsContent>
-          <TabsContent value="translate">
-            <div>Translation content coming soon.</div>
-          </TabsContent>
-          <TabsContent value="subtitles">
-            <div>Subtitle content coming soon.</div>
-          </TabsContent>
-        </Tabs>
+          </motion.div>
+        )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

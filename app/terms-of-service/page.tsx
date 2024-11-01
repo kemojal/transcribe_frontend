@@ -7,7 +7,9 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import ContentSidebar from "@/components/ContentSidebar";
 import TermSection from "@/components/TermSection";
-
+import Header from "@/components/sections/Header";
+import { ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 const TermsOfService: NextPage = () => {
   const sections = [
     "Introduction",
@@ -56,10 +58,74 @@ const TermsOfService: NextPage = () => {
 
   return (
     <>
-      <Head>
+      {/* <Head>
         <title>Terms of Service | kemzapps Inc.</title>
         <meta name="description" content="Terms of Service for kemzapps Inc." />
-      </Head>
+      </Head> */}
+      <motion.header
+        className="w-full border-b-[1px] border-primary/50 shadow-sm  z-50 backdrop-blur-md bg-primary fixed top-0 left-0 right-0"
+        initial="hidden"
+        animate="visible"
+        // variants={navItemVariants}
+      >
+        <div className="container mx-auto flex h-16 items-center justify-between px-4 lg:px-6">
+          {/* Animated Logo */}
+          <motion.div
+            className="flex items-center space-x-4"
+            // variants={logoVariants}
+          >
+            <Link className="flex items-center space-x-2" href="#">
+              <div className="h-8 w-8 rounded bg-white" />
+              <span className="text-xl font-bold text-white">TranscribeAI</span>
+            </Link>
+          </motion.div>
+
+          {/* Animated Navigation */}
+          <motion.nav
+            className="hidden md:flex space-x-6 text-secondary"
+            // variants={navItemVariants}
+          >
+            <Link
+              className="text-sm font-medium hover:text-white transition duration-300"
+              href="#features"
+            >
+              Features
+            </Link>
+            <Link
+              className="text-sm font-medium hover:text-white transition duration-300"
+              href="#how-it-works"
+            >
+              How It Works
+            </Link>
+            <Link
+              className="text-sm font-medium hover:text-white transition duration-300"
+              href="#pricing"
+            >
+              Pricing
+            </Link>
+            <Link
+              className="text-sm font-medium hover:text-white transition duration-300"
+              href="#faq"
+            >
+              FAQ
+            </Link>
+          </motion.nav>
+
+          {/* Sign In Button */}
+          <motion.div
+            className="flex items-center space-x-4"
+            // variants={signInButtonVariants}
+          >
+            <Link
+              className="inline-flex items-center space-x-1 text-sm font-medium text-white hover:text-gray-200 transition duration-300 bg-primary py-1 px-2 rounded-2xl"
+              href="/register"
+            >
+              <span>Sign In</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </motion.div>
+        </div>
+      </motion.header>
       <div className="flex flex-col min-h-screen bg-white ">
         <header className="bg-white border-b border-gray-50 shadow-xs sticky top-0 z-10">
           <div className="container mx-auto px-4 py-6">

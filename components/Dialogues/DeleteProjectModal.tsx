@@ -68,10 +68,10 @@ export const DeleteProjectModal = ({ item }) => {
           <span className="w-6 h-6 flex items-center justify-center text-gray-500 mr-2 rounded-xl bg-gray-100">
             <Trash2 className="h-3 w-3" />
           </span>
-          Delete Project
+          Delete Workspace
         </>
       }
-      title="Delete Project"
+      title="Delete Workspace"
       triggerStyle="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 !bg-transparent text-gray-500 "
       description={`Type "Delete ${item.name}" to confirm.`}
       open={open}

@@ -1,36 +1,30 @@
 "use client";
+
 import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
-import { BASEURL } from "@/constants";
-import Loader from "../Loader";
-import { Plus } from "lucide-react";
+import { Box, CirclePlus, PlusCircle } from "lucide-react";
 import { DialogueBase } from "./DialogueBase";
+import { BASEURL } from "@/constants";
+import type { ProjectProps } from "@/types/interfaces";
 
-export const ProjectDialogue = ({ onAddProject }) => {
+interface ProjectDialogueProps {
+  onAddProject: (project: ProjectProps) => void;
+}
+
+export function ProjectDialogue({ onAddProject }: ProjectDialogueProps) {
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [open, setOpen] = React.useState(false);
-  const [isButtonActive, setIsButtonActive] = useState(false);
+  const [open, setOpen] = useState(false);
 
-  const router = useRouter();
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
 
     const token = localStorage.getItem("token");
     if (!token) {
       console.error("No token found");
+      setSubmitting(false);
       return;
     }
 
@@ -48,58 +42,54 @@ export const ProjectDialogue = ({ onAddProject }) => {
         throw new Error("Network response was not ok");
       }
 
-      const data = await response.json();
-      setSubmitting(false);
+      const data: ProjectProps = await response.json();
+      onAddProject(data);
       setName("");
       setOpen(false);
-
-      setIsButtonActive(false);
-
-      console.log("Project created:", data);
-      console.log("Project created:", data);
-      onAddProject(data);
-      // router.push(`/projects/${data.id}`);
     } catch (error) {
       console.error("There was a problem with the fetch operation:", error);
+    } finally {
+      setSubmitting(false);
     }
-  };
-
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    setName(value);
-    setIsButtonActive(value.trim() !== ""); // Enable button if input is not empty
   };
 
   return (
     <DialogueBase
-      title="New Project"
-      description="Give your project a name"
+      title="New Workspace"
+      description="Give your workspace a name"
       trigger={
-        <>
-          <span>
-            <Plus className="w-4 h-4 mr-2" />
-          </span>
-          New Project
-        </>
+        <Button variant="default" className="bg-indigo-600 hover:bg-indigo-700">
+          <PlusCircle className="w-4 h-4 mr-2" />
+          New Workspace
+        </Button>
       }
-      triggerStyle="px-4 h-8 border-[1.5px] border-black bg-transparent text-black"
       open={open}
       setOpen={setOpen}
       footerButton={
-        <>
-          <Button
-            type="submit"
-            onClick={handleSubmit}
-            className="mt-4"
-            disabled={!isButtonActive || submitting}
-          >
-            {submitting ? " Creating Project..." : " Create Project"}
-          </Button>
-        </>
+        <Button
+          type="submit"
+          onClick={handleSubmit}
+          className="w-full bg-indigo-600 hover:bg-indigo-700"
+          disabled={!name.trim() || submitting}
+        >
+          {submitting ? "Creating Workspace..." : "Create Workspace"}
+        </Button>
       }
     >
-      <form onSubmit={handleSubmit} className="p-2 space-y-4">
-        <div className="mb-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="w-full flex flex-col items-center">
+          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center">
+            <span>
+              <Box size={30} strokeWidth={1} />
+            </span>
+          </div>
+        </div>
+
+        <div className="space-y-1 text-xs text-muted-foreground text-center">
+          A workspace is a place where files can be stored. To create a new
+          workspace, please enter a name.
+        </div>
+        <div>
           <label
             htmlFor="name"
             className="block text-sm font-medium text-gray-700"
@@ -111,21 +101,13 @@ export const ProjectDialogue = ({ onAddProject }) => {
             id="name"
             name="name"
             value={name}
-            onChange={handleInputChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            onChange={(e) => setName(e.target.value)}
+            className="mt-1 block w-full"
             required
             disabled={submitting}
           />
         </div>
       </form>
-      {submitting && (
-        // <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-xl opacity-50">
-        //   Submitting...
-        // </div>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Loader />
-        </div>
-      )}
     </DialogueBase>
   );
-};
+}

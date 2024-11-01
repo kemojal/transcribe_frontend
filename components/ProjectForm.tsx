@@ -31,13 +31,13 @@ const ProjectForm = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
-        <h2 className="text-2xl font-bold text-center">Create Project</h2>
+        <h2 className="text-2xl font-bold text-center">Create Workspace</h2>
         <div>
           <label
             htmlFor="name"
             className="block text-sm font-medium text-gray-700"
           >
-            Project Name
+            Create Workspace
           </label>
           <input
             type="text"
@@ -53,7 +53,7 @@ const ProjectForm = () => {
             onClick={handleCreateProject}
             className="w-full px-4 py-2 font-bold text-white bg-indigo-600 rounded hover:bg-indigo-700"
           >
-            Create Project
+            Create Workspace
           </button>
         </div>
       </div>

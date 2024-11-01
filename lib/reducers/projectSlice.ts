@@ -6,12 +6,14 @@ import { ProjectProps } from "@/types/interfaces";
 
 interface ProjectsState {
   projects: ProjectProps[];
+  currentProject: ProjectProps | null;
   isLoading: boolean;
   error: string | null;
 }
 
 const initialState: ProjectsState = {
   projects: [],
+  currentProject: null,
   isLoading: false,
   error: null,
 };
@@ -46,7 +48,6 @@ const projectsSlice = createSlice({
   initialState,
   reducers: {
     addProject: (state, action: PayloadAction<ProjectProps>) => {
-      
       state.projects.push(action.payload);
     },
     updateProject: (state, action: PayloadAction<ProjectProps>) => {
@@ -55,12 +56,24 @@ const projectsSlice = createSlice({
       );
       if (index !== -1) {
         state.projects[index] = action.payload;
+        if (
+          state.currentProject &&
+          state.currentProject.id === action.payload.id
+        ) {
+          state.currentProject = action.payload;
+        }
       }
     },
     deleteProject: (state, action: PayloadAction<string>) => {
       state.projects = state.projects.filter(
         (project) => project.id !== action.payload
       );
+      if (state.currentProject && state.currentProject.id === action.payload) {
+        state.currentProject = state.projects[0] || null;
+      }
+    },
+    setCurrentProject: (state, action: PayloadAction<ProjectProps | null>) => {
+      state.currentProject = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -71,6 +84,7 @@ const projectsSlice = createSlice({
       .addCase(fetchProjects.fulfilled, (state, action) => {
         state.isLoading = false;
         state.projects = action.payload;
+        state.currentProject = action.payload[0] || null;
       })
       .addCase(fetchProjects.rejected, (state, action) => {
         state.isLoading = false;
@@ -79,6 +93,6 @@ const projectsSlice = createSlice({
   },
 });
 
-export const { addProject, updateProject, deleteProject } =
+export const { addProject, updateProject, deleteProject, setCurrentProject } =
   projectsSlice.actions;
 export const projectReducer = projectsSlice.reducer;

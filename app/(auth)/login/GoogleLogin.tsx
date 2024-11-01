@@ -1,5 +1,6 @@
 "use client";
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import { Button } from "@/components/ui/button";
+import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
@@ -31,7 +32,9 @@ export default function GoogleLoginButton() {
   };
 
   return (
-    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
+    <GoogleOAuthProvider
+      clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}
+    >
       <GoogleLogin
         onSuccess={handleLoginSuccess}
         onError={handleLoginFailure}
@@ -39,3 +42,4 @@ export default function GoogleLoginButton() {
     </GoogleOAuthProvider>
   );
 }
+

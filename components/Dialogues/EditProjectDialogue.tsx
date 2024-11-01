@@ -19,8 +19,7 @@ import { DialogueBase } from "./DialogueBase";
 import { updateProject } from "@/lib/reducers/ProjectSlice";
 import { ProjectProps } from "@/types/interfaces";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { useToast } from "@/components/ui/use-toast"
-
+import { useToast } from "@/components/ui/use-toast";
 
 export const EditProjectDialogue = ({ item }) => {
   const [name, setName] = useState(item?.name || "");
@@ -33,7 +32,7 @@ export const EditProjectDialogue = ({ item }) => {
     (state) => state.project
   );
 
-  const { toast } = useToast()
+  const { toast } = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -64,10 +63,9 @@ export const EditProjectDialogue = ({ item }) => {
       // setOpen(false);
 
       toast({
-        title: "Project updated successfully",
+        title: "Workspace updated successfully",
         description: "Friday, February 10, 2023 at 5:57 PM",
-      })
-
+      });
 
       dispatch(updateProject(data));
       setTimeout(() => {
@@ -88,12 +86,12 @@ export const EditProjectDialogue = ({ item }) => {
           <span className="w-6 h-6 flex items-center justify-center text-gray-500 mr-2 rounded-xl bg-gray-100">
             <Pen className="h-3 w-3" />
           </span>
-          Edit project
+          Edit Workspace
         </>
       }
       triggerStyle="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm   transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 !bg-transparent text-gray-500 "
-      title="Edit Project"
-      description="Update your project name"
+      title="Edit Workspace"
+      description="Update your workspace name"
       open={open}
       setOpen={setOpen}
       footerButton={
@@ -104,7 +102,7 @@ export const EditProjectDialogue = ({ item }) => {
             disabled={submitting}
             onClick={handleSubmit}
           >
-            {submitting ? "Updating Project..." : "Update Project"}
+            {submitting ? "Updating Workspace..." : "Update Workspace"}
           </Button>
         </>
       }
@@ -129,7 +127,7 @@ export const EditProjectDialogue = ({ item }) => {
           />
         </div>
         {/* <Button type="submit" className="mt-4" disabled={submitting}>
-          {submitting ? "Updating Project..." : "Update Project"}
+          {submitting ? "Updating Workspace..." : "Update workspace"}
         </Button> */}
       </form>
       {submitting && (

@@ -1,19 +1,16 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import LandingPage from "./landing2/page";
 
 export default function Home() {
-  const router = useRouter();
+  // const router = useRouter();
 
-  useEffect(() => {
-    router.push("/login");
-  }, []);
+  // useEffect(() => {
+  //   router.push("/login");
+  // }, []);
 
-  return null;
+  // return null;
 
-  // return (
-  //   <main className="flex min-h-screen flex-col items-center justify-between p-24">
-  //     Hello
-  //   </main>
-  // );
+  return <LandingPage />;
 }

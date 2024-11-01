@@ -1,0 +1,68 @@
+// useEffect(() => {
+//   const fetchProjects = async () => {
+//     dispatch(fetchProjectsStart());
+//     try {
+//       const token = localStorage.getItem("token");
+//       const response = await axios.get(`${BASEURL}/projects/${id}`, {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//       });
+
+//       const data = await response.data;
+//       console.log("redux project resonse  = " + JSON.stringify(data));
+//       dispatch(fetchProjectsSuccess(data));
+//       const projectId = data[0].id;
+//       const filesResponse = await axios.get(
+//         `${BASEURL}/projects/${id}/files`,
+//         {
+//           headers: {
+//             Authorization: `Bearer ${token}`,
+//           },
+//         }
+//       );
+//       setFiles(filesResponse.data);
+//       setSelectedFile(filesResponse.data[0]);
+//       setSelectedFileSize(fileSizes[filesResponse.data[0].id] || 0);
+//       const entries = parseTranscriptionText(
+//         filesResponse?.data[0]?.transcriptions[0]?.transcription_text || ""
+//       );
+//       setTranscriptionEntries(entries);
+
+//       // Fetch durations for each file
+//       const durations = await Promise.all(
+//         filesResponse.data.map(async (file: any) => {
+//           const duration = await getAudioDuration(file.path);
+//           return { id: file.id, duration };
+//         })
+//       );
+
+//       const durationMap = durations.reduce(
+//         (acc: any, { id, duration }: any) => {
+//           acc[id] = duration;
+//           return acc;
+//         },
+//         {}
+//       );
+//       setFileDurations(durationMap);
+//       setSelectedFileDuration(durationMap[filesResponse.data[0].id] || 0);
+
+//       // Fetch file sizes for each file
+//       const sizes = await Promise.all(
+//         filesResponse.data.map(async (file: any) => {
+//           const size = await fetchFileSize(file.path);
+//           return { id: file.id, size };
+//         })
+//       );
+
+//       const sizeMap = sizes.reduce((acc: any, { id, size }: any) => {
+//         acc[id] = size;
+//         return acc;
+//       }, {});
+//       setFileSizes(sizeMap);
+//     } catch (err) {
+//       dispatch(fetchProjectsFailure("Failed to fetch projects"));
+//     }
+//   };
+//   fetchProjects();
+// }, [dispatch, id]);

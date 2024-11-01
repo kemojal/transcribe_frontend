@@ -8,12 +8,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/remix-dropdown-menu";
 // "@/components/ui/dropdown-menu";
-import { CreditCard, DollarSign, LogOut, User, Users } from "lucide-react";
+import {
+  ChevronDown,
+  CreditCard,
+  DollarSign,
+  LogOut,
+  User,
+  Users,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 
-const ProfileMenu = () => {
+const ProfileMenu = ({ isCollapsed }: { isCollapsed?: boolean }) => {
   const router = useRouter();
 
   const [userInfo, setUserInfo] = useState<{
@@ -84,10 +91,34 @@ const ProfileMenu = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="w-8 h-8  rounded-full flex items-center justify-center bg-gray-100 text-gray-500 text-xs">
-        K
+      <DropdownMenuTrigger className="w-full"
+      >
+        <div
+          className={`flex items-center gap-2 bg-gray-50 rounded-xl p-1 ${
+            isCollapsed ? "justify-center" : "justify-start"
+          }`}
+        >
+          <div className="rounded-full h-[2.25rem] w-[2.25rem] shrink-0 bg-gray-50 bg-gray-500 flex items-center justify-center text-white">
+            xc
+          </div>
+          <div className="flex items-center justify-between w-[calc(100%-2.25rem)]">
+            <div
+              className={`py-4 text-muted-foreground space-y-1 ${
+                isCollapsed ? "hidden" : "block"
+              }`}
+            >
+              <h3 className="text-sm font-medium leading-none text-left">
+                John Doe
+              </h3>
+              <p className="text-xs leading-none">wz5Y9@example.com</p>
+            </div>
+            <div>
+              <ChevronDown className="w-4 h-4 text-muted-foreground" />
+            </div>
+          </div>
+        </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="min-w-[160px] mr-2">
+      <DropdownMenuContent className="min-w-[230px] mr-2">
         <DropdownMenuLabel>
           {/* {
             JSON.stringify(userInfo)

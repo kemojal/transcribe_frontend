@@ -10,15 +10,8 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  QueryClient,
-  QueryClientProvider,
-} from "react-query";
-
-const queryClient = new QueryClient();
+import { QueryClient, QueryClientProvider } from "react-query";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 // Define the token payload structure
 interface TokenPayload {
@@ -33,12 +26,26 @@ const AuthWrapper = ({
   children: React.ReactNode;
   inter: any;
 }) => {
+  const queryClient = new QueryClient();
   const dispatch = useAppDispatch();
   const router = useRouter();
   const pathname = usePathname();
 
   const authState = useAppSelector((state) => state.auth.authState);
   const [loading, setLoading] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(true);
+  const toggleCollpased = () => setIsCollapsed(!isCollapsed);
+
+  const [fullUrl, setFullUrl] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const currentUrl = window.location.href;
+      // console.log("currentUrl = ", currentUrl);
+      localStorage.setItem("currentUrl", currentUrl);
+      setFullUrl(currentUrl);
+    }
+  }, [router]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -52,7 +59,7 @@ const AuthWrapper = ({
 
           if (decodedToken.exp > currentTime) {
             dispatch(setAuthState(true));
-            console.log("Current pathname: ", pathname);
+            // console.log("Current pathname: ", pathname);
             router.push(pathname || "/projects");
           } else {
             // Token has expired, try to refresh it
@@ -72,11 +79,14 @@ const AuthWrapper = ({
               localStorage.setItem("refresh_token", refreshData.refresh_token); // Update the refresh token
               dispatch(setAuthState(true));
               router.push(pathname || "/projects");
-              console.log("Current pathname: ", pathname);
+              // console.log("Current pathname: ", pathname);
               // return <p>Current pathname: {pathname}</p>;
             } else {
               dispatch(setAuthState(false));
+              // get the current path
+
               router.push("/login");
+              // router.push(`/login?redirect=${encodeURIComponent(fullUrl)}`);
             }
           }
         } catch (error) {
@@ -88,6 +98,7 @@ const AuthWrapper = ({
       } else {
         dispatch(setAuthState(false));
         router.push("/login");
+        // router.push(`/login?redirect=${encodeURIComponent(fullUrl)}`);
       }
 
       setTimeout(() => {
@@ -100,7 +111,10 @@ const AuthWrapper = ({
   }, [dispatch, router]);
 
   if (loading) {
-    return <Loader />;
+    return;
+    <div className="w-screen h-screen">
+      <Loader />;
+    </div>;
   }
 
   if (!authState) return;
@@ -108,11 +122,21 @@ const AuthWrapper = ({
   return (
     <QueryClientProvider client={queryClient}>
       <div className="h-screen flex flex-col overflow-hidden">
-        <AuthNavbar />
-        <div className="flex flex-1 mt-0">
-          <Sidebar />
-          <main className={`flex-1 px-6 ${inter.className}`}>{children}</main>
-        </div>
+        <TooltipProvider>
+          {/* <AuthNavbar /> */}
+          <div className="flex flex-1 mt-0 ">
+            <Sidebar
+              isCollapsed={isCollapsed}
+              toggleCollpased={toggleCollpased}
+            />
+            <main
+              className={`flex px-12 py-8  ${inter.className} 
+          ${isCollapsed ? "w-[calc(100vw-80px)]" : "w-[calc(100vw-256px)]"}`}
+            >
+              {children}
+            </main>
+          </div>
+        </TooltipProvider>
       </div>
     </QueryClientProvider>
   );

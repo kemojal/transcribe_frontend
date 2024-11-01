@@ -146,3 +146,149 @@
   }
 }
 
+/* audio loader */
+
+.loader2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+#wave {
+  height: 70px;
+  width: 70px;
+  fill: #fff;
+}
+#Line_1 {
+  animation: pulse 1s infinite;
+  animation-delay: 0.15s;
+}
+#Line_2 {
+  animation: pulse 1s infinite;
+  animation-delay: 0.3s;
+}
+#Line_3 {
+  animation: pulse 1s infinite;
+  animation-delay: 0.45s;
+}
+#Line_4 {
+  animation: pulse 1s infinite;
+  animation-delay: 0.6s;
+}
+#Line_5 {
+  animation: pulse 1s infinite;
+  animation-delay: 0.75s;
+}
+#Line_6 {
+  animation: pulse 1s infinite;
+  animation-delay: 0.9s;
+}
+#Line_7 {
+  animation: pulse 1s infinite;
+  animation-delay: 1.05s;
+}
+#Line_8 {
+  animation: pulse 1s infinite;
+  animation-delay: 1.2s;
+}
+#Line_9 {
+  animation: pulse 1s infinite;
+  animation-delay: 1.35s;
+}
+@keyframes pulse {
+  0% {
+    transform: scaleY(1);
+    transform-origin: 50% 50%;
+  }
+  50% {
+    transform: scaleY(0.7);
+    transform-origin: 50% 50%;
+  }
+  100% {
+    transform: scaleY(1);
+    transform-origin: 50% 50%;
+  }
+}
+
+/* loaderx */
+.loaderx {
+  --size: 5px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* gap: 10px; */
+  gap: calc(var(--size) / 2);
+
+  /* height: 100px; */
+  height: calc(var(--size) * 5);
+}
+
+.loaderx div {
+  /* width: 20px; */
+  width: var(--size);
+
+  /* height: 20px; */
+  height: var(--size);
+
+  /* border-radius: 20px; */
+  border-radius: var(--size);
+
+  background-color: #4192f7;
+  animation: wave 2s infinite ease-in-out;
+}
+
+@keyframes wave {
+  25% {
+    /* height: 100px; */
+    height: calc(var(--size) * 5);
+    background-color: #4192f7;
+  }
+
+  50% {
+    /* height: 20px; */
+    height: var(--size);
+    background-color: #4192f7;
+  }
+}
+
+.loaderx :nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loaderx :nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.loaderx :nth-child(4) {
+  animation-delay: 0.6s;
+}
+
+.loaderx :nth-child(5) {
+  animation-delay: 0.8s;
+}
+
+/* scrollbar **/
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px rgba(128, 128, 128, 0.452);
+  border-radius: 1px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #4193f7;
+  border-radius: 1px;
+  border: 1px solid #f1f1f1;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #4192f7;
+}

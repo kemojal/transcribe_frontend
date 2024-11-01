@@ -1,12 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-
 import {
   Table,
   TableBody,
@@ -15,7 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useRouter } from "next/navigation";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -24,55 +23,54 @@ interface DataTableProps<TData, TValue> {
   onDeleteClick: (item: TData) => void;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends { id: number }, TValue>({
   columns,
   data,
   onEditClick,
   onDeleteClick,
 }: DataTableProps<TData, TValue>) {
+  const router = useRouter();
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
 
-  const router = useRouter();
 
   return (
-    <div className="rounded-lg ">
-      <Table className="">
+    <div className="rounded-lg overflow-hidden border border-gray-200">
+      <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead
-                    key={header.id}
-                    className="text-gray-700 font-semibold"
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                );
-              })}
+            <TableRow key={headerGroup.id} className="bg-gray-50">
+              {headerGroup.headers.map((header) => (
+                <TableHead
+                  key={header.id}
+                  className="text-gray-700 font-semibold py-3 px-4"
+                >
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                </TableHead>
+              ))}
             </TableRow>
           ))}
         </TableHeader>
         <TableBody>
-          {table.getRowModel().rows?.length ? (
+          {table.getRowModel().rows.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
-                onClick={() => router.push(`/projects/${row.original.id}`)}
                 key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-                className="hover:bg-gray-100 cursor-pointer transition-colors duration-200"
+                className="hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
+                onClick={() => {
+                  router.push(`/projects/${row.original.id}`);
+                }}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="py-2">
+                  <TableCell key={cell.id} className="py-3 px-4">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}

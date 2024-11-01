@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   LayoutGrid,
   Mic,
@@ -14,46 +14,108 @@ import {
   ChevronsRight,
   ChevronsLeft,
   Boxes,
+  BoxIcon,
 } from "lucide-react";
 import Link from "next/link";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "./ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import ProfileMenu from "./ProfileMenu";
+import { SelectProjectOption } from "./SelectProjectOption";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { ProjectProps } from "@/types/interfaces";
+import { fetchProjects, setCurrentProject } from "@/lib/reducers/ProjectSlice";
+import { ProjectDialogue } from "./Dialogues/ProjectDialogue";
 
-const Sidebar: React.FC = () => {
+const Sidebar = ({
+  isCollapsed,
+  toggleCollpased,
+}: {
+  isCollapsed: boolean;
+  toggleCollpased: () => void;
+}) => {
   const pathname = usePathname();
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const { projects, currentProject, isLoading, error } = useAppSelector(
+    (state) => state.project
+  );
+  const dispatch = useAppDispatch();
+  const [selectedProjectOption, setSelectedProjectOption] =
+    useState<ProjectProps | null>(null);
+  const router = useRouter();
 
   const menuItems = [
     { label: "Projects", icon: LayoutGrid, href: "/projects" },
 
-    { label: "Files", icon: FileMusic, href: "/files" },
+    // { label: "Files", icon: FileMusic, href: "/files" },
     { label: "Workspaces", icon: Boxes, href: "/projects" },
     { label: "Rewards", icon: Gift, href: "/rewards" },
-    // { label: "Recordings", icon: Mic, href: "/recordings" },
-    // { label: "Workspaces", icon: Layout, href: "/workspaces" },
     { label: "Analytics", icon: Layout, href: "/analytics" },
     { label: "Settings", icon: Settings, href: "/settings" },
     { label: "Upgrade", icon: Gem, href: "/upgrade" },
-    // { label: "Rewards", icon: Gift, href: "/rewards" },
-    // { label: "Analytics", icon: Users, href: "/analytics" },
   ];
+
+  const handleProjectOptionChange = (project: ProjectProps) => {
+    setSelectedProjectOption(project);
+    dispatch(setCurrentProject(project));
+    router.push(`/projects?projectId=${project}`);
+    if (typeof window !== "undefined") {
+      const currentUrl = window.location.href;
+      console.log("currentUrl = ", window.location.href);
+      console.log("currentUrlDD = ", currentUrl);
+      localStorage.setItem("currentUrl", currentUrl);
+    }
+  };
+
+  useEffect(() => {
+    dispatch(fetchProjects());
+  }, [dispatch]);
 
   return (
     <aside
-      className={`relative bg-white shadow-md ${
+      className={`relative bg-[#F9F9F9] shadow-md flex flex-col items-center space-y-4 py-8 ${
         isCollapsed ? "w-20" : "w-64"
       } transition-width duration-300`}
     >
+      <div className="px-2 w-full ">
+        <a href="#" className="text-xl font-bold text-muted-foreground ">
+          {isCollapsed ? (
+            <span className="w-12 h-12 bg-gray-50 rounded-full text-center flex items-center justify-center ">
+              T
+            </span>
+          ) : (
+            <span>Transcriber</span>
+          )}
+        </a>
+      </div>
       <div
-        className={`flex flex-col items-center  justify-center relative ${
-          isCollapsed ? "px-2" : "px-6"
+        className={` w-full flex flex-col items-center  justify-center relative ${
+          isCollapsed ? "px-2" : "px-2"
         } py-4`}
       >
+        <div className="flex flex-col items-center justify-between w-full space-y-2 py-2">
+          <div className="flex flex-col justify-center space-y-2 text-sm text-gray-600 w-full">
+            <Link
+              href="/projects"
+              className="hover:text-indigo-600 flex items-center"
+            >
+              <Boxes size={16} className="mr-1" />
+              Workspaces
+            </Link>
+            <div className="flex w-auto py-1">
+              <SelectProjectOption
+                placeholder="Select project"
+                options={projects.map((p) => ({ value: p.id, label: p.name }))}
+                onValueChange={handleProjectOptionChange}
+                defaultValue={currentProject?.id}
+              />
+            </div>
+          </div>
+        </div>
         <Button
           variant={"outline"}
           size={"sm"}
-          onClick={() => setIsCollapsed(!isCollapsed)}
+          onClick={toggleCollpased}
           className="absolute  top-1/2 rounded-full flex items-center justify-center right-[-16px] w-8 h-8 p-0 border-gray-50 bg-white"
         >
           {isCollapsed ? (
@@ -62,7 +124,7 @@ const Sidebar: React.FC = () => {
             <ChevronsLeft className="w-4 h-4" />
           )}
         </Button>
-        <ul className="space-y-2 text-sm flex flex-col items-center">
+        <ul className="space-y-2 text-sm flex flex-col items-center w-full ">
           {menuItems.map((item, index) => (
             <li key={index} className="w-full">
               <Link
@@ -85,6 +147,23 @@ const Sidebar: React.FC = () => {
             </li>
           ))}
         </ul>
+      </div>
+
+      <div className=" absolute bottom-0 w-full z-50 text-blue-500 h-40 p-2">
+        <ProfileMenu isCollapsed={isCollapsed} />
+
+        {/* <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              href="#"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+            >
+              <Settings className="h-5 w-5" />
+              <span className="sr-only">Settings</span>
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent side="right">Settings</TooltipContent>
+        </Tooltip> */}
       </div>
     </aside>
   );

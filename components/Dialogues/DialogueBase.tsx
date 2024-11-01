@@ -54,7 +54,7 @@ export const DialogueBase = ({
         }}
       >
         <DialogHeader
-          className="border-b-[1px] border-gray-100 pt-4 pb-2 px-4"
+          className="border-b-[1px] border-gray-100 pt-4 pb-2 px-8"
           //   style={{ backgroundColor: "red !important" }}
         >
           <div className="flex items-center gap-2">
@@ -81,9 +81,9 @@ export const DialogueBase = ({
             </DialogHeader>
           ))} */}
 
-        <div className="p-4">{children}</div>
+        <div className="px-8 py-4 w-full">{children}</div>
 
-        <DialogFooter className=" border-t-[1px] border-gray-200 pb-4 px-4">
+        <DialogFooter className=" border-t-[1px] border-gray-200 py-4 px-8">
           {
             <div className="flex items-center justify-end gap-2">
               {footerButton}

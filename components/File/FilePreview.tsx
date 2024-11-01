@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { FileDropzone } from "@/components/FileDropzone";
 import ContinousLoader from "@/components/ContinousLoader";
 import { handleFileUpload } from "@/utils/api";
+import AudioUploader from "../AudioUploader";
 
 const FilePreview = ({ selectedFile }) => {
   const [submitting, setSubmitting] = useState(false);
@@ -45,9 +46,14 @@ const FilePreview = ({ selectedFile }) => {
                 </Button>
               </div>
               {submitting && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-200 bg-opacity-50 rounded-lg">
-                  Uploading...
-                  <ContinousLoader />
+                // <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-200 bg-opacity-50 rounded-lg">
+                //   Uploading...
+                //   <ContinousLoader />
+                // </div>
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-xl opacity-50 w-[calc(100%+24px)] -left-6 -top-6 h-[calc(100%+24px)]">
+                  <div className="h-full w-full flex flex-col space-y-2 items-center justify-center">
+                    <AudioUploader isSubmitting={submitting} />
+                  </div>
                 </div>
               )}
             </div>

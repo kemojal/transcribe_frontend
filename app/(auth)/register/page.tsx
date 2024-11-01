@@ -36,7 +36,7 @@ const Register = () => {
       className={`flex items-center justify-center min-h-screen  ${fadeClass}`}
     >
       <section className="gap-8 pb-8 pt-6 md:py-8 container flex h-[100dvh] w-full flex-col items-center justify-center max-w-lg overflow-hidden">
-        <div className="bg-white text-gray-900 rounded-lg border border-gray-200 w-full p-8">
+        <div className="bg-white text-gray-900 rounded-lg border border-gray-50 w-full p-8">
           <div className="flex flex-col p-6 space-y-4">
             <h3 className="font-bold text-3xl">Create Account</h3>
             <p className="text-gray-500 text-sm">
@@ -132,7 +132,8 @@ const Register = () => {
           )}
 
           <div className="text-center text-xs text-gray-500 my-6">
-            By clicking "Sign In with Google", you agree to our{" "}
+            By clicking "Sign In with Google", or registering with an email, you
+            agree to our{" "}
             <a
               href="/terms-of-service"
               className="text-blue-500 underline hover:text-blue-600"

@@ -1,7 +1,8 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Player } from "@/components/AudioPlayer";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -18,77 +19,76 @@ import { BASEURL } from "@/constants";
 import { ProjectDropdown } from "@/components/Dropdowns/ProjectDropdown";
 import { FileDialogue } from "@/components/Dialogues/File/FileDialogue";
 import { FileDropzone } from "@/components/FileDropzone";
-import { bytesToMegabytes, formatDate } from "@/utils";
+import {
+  bytesToMegabytes,
+  fetchFileSize,
+  fetchProjectData,
+  formatDate,
+  getAudioDuration,
+  parseTranscriptionText,
+} from "@/utils";
 import SideProjectTabs from "@/components/SideProjecTabs/SideProjectTabs";
 import ContinousLoader from "@/components/ContinousLoader";
 import FileItem from "@/components/File/FileItem";
 import FileUploader from "@/components/File/FileUploader";
 import FileList from "@/components/File/FileList";
 import { Input } from "@/components/ui/input";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
 
-const getAudioDuration = (url: string): Promise<number> => {
-  return new Promise((resolve, reject) => {
-    const audio = new Audio(url);
-    audio.onloadedmetadata = () => {
-      resolve(audio.duration); // Duration in seconds
-    };
-    audio.onerror = () => reject(new Error("Failed to load audio"));
-  });
-};
+import { FileProps } from "@/types/interfaces";
 
-const fetchFileSize = async (url: string): Promise<number> => {
-  try {
-    const response = await axios.get(url, {
-      responseType: "blob",
-    });
-    return response.headers["content-length"] / 1024 / 1024; // Size in MB
-  } catch (error) {
-    console.error("Error fetching file size:", error);
-    return 0; // Return 0 if there's an error
-  }
-};
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import {
+  fetchFiles,
+  addFile,
+  deleteFile,
+  editFile,
+  getFileById,
+} from "@/lib/reducers/fileSlice";
+import {
+  fetchProjectDetail,
+  updateProjectName,
+} from "@/lib/reducers/projectDetailSlice";
+import Loader from "@/components/Loader";
+import { SideTabs } from "@/components/SideProjecTabs/tabs";
 
-// Function to parse the transcription text
-const parseTranscriptionText = (text: string) => {
-  const regex = /(\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3})\s*(.*)/g;
-  const entries = [];
-  let match;
-
-  while ((match = regex.exec(text)) !== null) {
-    const [fullMatch, timestamp, content] = match;
-    entries.push({ timestamp, content });
-  }
-
-  return entries;
-};
+// import { fetchProjectDetails } from "@/utils/api";
+// import { fetchProject, updateProjectName } from './projectSlice';
 
 const ProjectDetail = ({ params }: { params: { id: string } }) => {
   const id = params.id;
-  const router = useRouter();
-  const [project, setProject] = useState<any>(null);
-  const [files, setFiles] = useState<any[]>([]);
 
-  const [fileDurations, setFileDurations] = useState<{ [key: string]: number }>(
-    {}
-  );
+  const dispatch = useAppDispatch();
+
+  const project = useAppSelector((state) => state.projectDetail.data);
+  const {
+    data: files,
+    fetchStatus,
+
+    status,
+    error,
+  } = useAppSelector((state) => state.files);
+
+  // const { data, isLoading, isError, error } = useProjectData(id);
+
+  // const dispatch = useAppDispatch();
+  const router = useRouter();
+  // const [project, setProject] = useState<any>(null);
+  // const [files, setFiles] = useState<any[]>([]);
+
   const [fileSizes, setFileSizes] = useState<{ [key: string]: number }>({});
 
   const [acceptedFiles, setAcceptedFiles] = useState<any[]>([]);
-
-  // const [uploadProgress, setUploadProgress] = useState<{
-  //   [key: string]: number;
-  // }>({});
-
-  //   const transcriptionText =
-  //     files?.[0]?.transcriptions?.[0]?.transcription_text || "";
-
-  //   const transcriptionEntries = parseTranscriptionText(transcriptionText);
 
   const [transcriptionEntries, setTranscriptionEntries] = useState<any[]>([]);
 
   const [currentTranscription, setCurrentTranscription] = useState(null);
 
-  const [selectedFile, setSelectedFile] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<FileProps | null>(null);
   const [selectedFileSize, setSelectedFileSize] = useState(0);
   const [selectedFileDuration, setSelectedFileDuration] = useState(0);
   const [transcribing, setTranscribing] = useState(false);
@@ -97,6 +97,72 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
   const [filterTypeFilter, setFilterTypeFilter] = useState("all");
+
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [newProjectName, setNewProjectName] = useState("");
+
+  const searchParams = useSearchParams();
+  const currentFileId = searchParams.get("file_id");
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchProjectDetail(id));
+      dispatch(fetchFiles(id));
+    }
+  }, [id, dispatch]);
+
+  // useEffect(() => {
+  //   if (currentFileId) {
+  //     dispatch(getFileById(id, currentFileId));
+  //   }
+  // }, [currentFileId]);
+  useEffect(() => {
+    // console.log("Files:", files);
+    // console.log("Current File ID:", currentFileId);
+
+    if (files.length > 0) {
+      if (currentFileId) {
+        // If file_id is present, find the corresponding file
+        const filteredFile = files.find((file) => file.id === currentFileId);
+
+        if (filteredFile) {
+          setSelectedFile(filteredFile);
+          setSelectedFileSize(fileSizes[filteredFile.id] || 0);
+          const entries = parseTranscriptionText(
+            filteredFile.transcriptions[0]?.transcription_text || ""
+          );
+          setTranscriptionEntries(entries);
+        } else {
+          console.warn("No matching file found for file_id:", currentFileId);
+        }
+      } else {
+        // Default to the first file if no file_id is present
+        const defaultFile = files[0];
+        if (defaultFile) {
+          setSelectedFile(defaultFile);
+          setSelectedFileSize(fileSizes[defaultFile.id] || 0);
+          const entries = parseTranscriptionText(
+            defaultFile.transcriptions[0]?.transcription_text || ""
+          );
+          setTranscriptionEntries(entries);
+          router.push(`/projects/${id}?file_id=${defaultFile.id}`);
+        }
+      }
+    }
+  }, [files, currentFileId, router]);
+
+  const handleSaveProjectName = () => {
+    if (project && newProjectName !== project.name) {
+      dispatch(updateProjectName({ id, name: newProjectName }));
+    }
+    setIsEditingName(false);
+  };
+
+  useEffect(() => {
+    if (project) {
+      setNewProjectName(project.name);
+    }
+  }, [project]);
 
   // Function to handle search input change
   const handleSearchChange = (e) => {
@@ -109,177 +175,34 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
   };
 
   // Function to apply filter based on selection
-  const handleFilterSelect = (filterTypeFilter) => {
+  const handleFilterSelect = (filterTypeFilter: string) => {
     // Implement filtering logic here
-    console.log("Selected filter:", filterTypeFilter);
+    // console.log("Selected filter:", filterTypeFilter);
     setFilterTypeFilter(filterTypeFilter);
     setFilterOpen(false); // Close dropdown after selection
   };
 
-  // Filter and search logic
-  const filteredFiles = files.filter((file) => {
-    const matchesSearch = file.name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    const matchesFilter =
-      filterTypeFilter === "all" || file.type === filterTypeFilter;
-    return matchesSearch && matchesFilter;
-  });
-
-  const AddFileOptions = [
-    {
-      title: <FileDialogue id={id} />,
-      description:
-        "Convert any audio file (mp3, mp4, wav, aac, m4a, webm,...) or video file to text",
-      icon: <FileUpIcon size={28} strokeWidth={1} />,
-      onClick: () => {
-        // setOpen(true);
-      },
-    },
-    {
-      title: "Record Audio",
-      description:
-        "Convert any audio file (mp3, mp4, wav, aac, m4a, webm,...) or video file to text",
-      icon: <Mic size={28} strokeWidth={1} />,
-      onClick: () => {
-        // setOpen(true);
-      },
-    },
-    {
-      title: "Audio from Youtube or Cloud",
-      description:
-        "Transcribe audio or video from Youtube link or any cloud storage (Google Drive, One Drive, Dropbox).",
-      icon: (
-        <CloudUpload
-          size={28}
-          className="text-muted-foreground "
-          strokeWidth={1}
-        />
-      ),
-      onClick: () => {
-        // setOpen(true);
-      },
-    },
-    {
-      title: "Smart Meeting Recorder",
-      description:
-        "Connect your calendar or share URL to automatically record and transcribe meetings.",
-      icon: <Video size={28} strokeWidth={1} />,
-      onClick: () => {
-        // setOpen(true);
-      },
-    },
-  ];
-
-  const handleFileClick = (file) => {
-    // const file = files.find((file: any) => file.id === fileId);
+  const handleFileClick = (file: FileProps) => {
     if (file) {
       setSelectedFile(file);
       setSelectedFileSize(fileSizes[file.id] || 0);
-      //   setTranscriptionText(file.transcriptions?.[0]?.transcription_text || "");
       const entries = parseTranscriptionText(
         file?.transcriptions[0]?.transcription_text || ""
       );
       setTranscriptionEntries(entries);
+      router.push(`/projects/${id}?file_id=${file.id}`);
     }
   };
 
-  // const handleTimeUpdate = (currentTime) => {
-  //   if (transcriptionEntries.length > 0) {
-  //     const currentEntry = transcriptionEntries.find(
-  //       (entry) => currentTime >= entry.start && currentTime <= entry.end
-  //     );
-  //     setCurrentTranscription(currentEntry);
-  //   }
-  // };
-
-  useEffect(() => {
-    if (id) {
-      const fetchProject = async () => {
-        try {
-          const token = localStorage.getItem("token");
-          const projectResponse = await axios.get(`${BASEURL}/projects/${id}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          // console.log("projectResponse = ", projectResponse.status);
-          //   projectResponse.catch(function (error) {
-          //     if (error.response) {
-          //       console.log(error.response.data);
-          //       console.log(error.response.status);
-          //       console.log(error.response.headers);
-          //     }
-          //   })
-          setProject(projectResponse.data);
-
-          const filesResponse = await axios.get(
-            `${BASEURL}/projects/${id}/files`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          setFiles(filesResponse.data);
-          setSelectedFile(filesResponse.data[0]);
-          setSelectedFileSize(fileSizes[filesResponse.data[0].id] || 0);
-          const entries = parseTranscriptionText(
-            filesResponse?.data[0]?.transcriptions[0]?.transcription_text || ""
-          );
-          setTranscriptionEntries(entries);
-
-          // Fetch durations for each file
-          const durations = await Promise.all(
-            filesResponse.data.map(async (file: any) => {
-              const duration = await getAudioDuration(file.path);
-              return { id: file.id, duration };
-            })
-          );
-
-          const durationMap = durations.reduce(
-            (acc: any, { id, duration }: any) => {
-              acc[id] = duration;
-              return acc;
-            },
-            {}
-          );
-          setFileDurations(durationMap);
-          setSelectedFileDuration(durationMap[filesResponse.data[0].id] || 0);
-
-          // Fetch file sizes for each file
-          const sizes = await Promise.all(
-            filesResponse.data.map(async (file: any) => {
-              const size = await fetchFileSize(file.path);
-              return { id: file.id, size };
-            })
-          );
-
-          const sizeMap = sizes.reduce((acc: any, { id, size }: any) => {
-            acc[id] = size;
-            return acc;
-          }, {});
-          setFileSizes(sizeMap);
-        } catch (error) {
-          console.error(error);
-        }
-      };
-
-      fetchProject();
-    }
-  }, [id]);
-
-  //   useEffect(() => {
-  //     if (selectedFile) {
-  //       handleFileClick(selectedFile);
-  //     }
-  //   }, [selectedFile]);
-
   if (!project) {
-    return <div>Loading...</div>;
+    return (
+      <div className="w-full h-full flex justify-center items-center">
+        <Loader />
+      </div>
+    );
   }
 
-  const transcribeAudio = async (projectId, fileId) => {
+  const transcribeAudio = async (projectId: number, fileId: number) => {
     setTranscribing(true);
     try {
       const token = localStorage.getItem("token");
@@ -298,7 +221,6 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
         }
       );
 
-      console.log("response = ", response);
       if (response.status === 200) {
         alert("Transcription created successfully");
         setTranscribing(false);
@@ -312,46 +234,30 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
     }
   };
 
-  const handleUpload = async (file) => {
-    const formData = new FormData();
-    formData.append("file", file);
-
+  const handleUpload = async (file: FileProps) => {
     setSubmitting(true);
-
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        console.error("No token found");
-        return;
-      }
-      const response = await fetch(`${BASEURL}/projects/${id}/files`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      await dispatch(
+        addFile({ projectId: file.project_id.toString(), file })
+      ).unwrap();
 
-      if (!response.ok) {
-        throw new Error("Failed to upload file");
-      } else {
-        // setOpen(false);
-      }
+      setSubmitting(false);
 
-      console.log("responseXXX = ", response);
-
-      const data = await response.json();
-      console.log("File uploaded successfully:", data);
+      // Optionally, you can show a success message here
     } catch (error) {
       console.error("Error uploading file:", error);
+      // Optionally, you can show an error message here
+      setSubmitting(false);
     }
-
-    setSubmitting(false);
   };
 
+  if (error) return <div>{error.message}</div>;
+
+  if (status === "loading") return <Loader />;
+
   return (
-    <div className="min-h-screen ">
-      <div className="container px-4 pb-8 mx-auto">
+    <div className="min-h-screen  w-full">
+      <div className="w-full px-4 pb-8 mx-auto">
         <div className="flex items-center gap-3 ">
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-1">
@@ -383,135 +289,135 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
           </div>
         </div>
 
-        {/* <div className="grid grid-cols-4 gap-4 pt-6">
-          {AddFileOptions.map((option) => (
-            <div
-              key={option.title}
-              className="flex flex-col items-center gap-4 border border-gray-200 hover:border-gray-300 p-0 rounded-lg shadow-xs  transition-shadow duration-300 ease-in-out overflow-hidden cursor-pointer "
-            >
-              <div className="w-full flex items-center justify-center bg-gray-50  p-6">
-                {option.icon}
-              </div>
-              <div className="flex flex-col  items-center px-4 pb-4">
-                <h2 className="text-lg font-semibold text-gray-600 border-b-[0.5px] border-gray-50 w-full pb-1 text-center">
-                  {option.title}
-                </h2>
-                <p className="text-xs text-muted-foreground text-center pt-1">
-                  {option.description}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div> */}
-
         <div className=" w-full">
           <div className="py-4 rounded relative w-full">
             {files && files.length > 0 ? (
-              <div>
-                <div className="flex items-center justify-between border-b-[0.5px] border-gray-200 pb-2">
-                  <h2 className="font-medium">Files</h2>
-                </div>
-                <div className="flex items-center gap-1 py-3">
-                  {/* Search Input */}
-                  <div className="relative flex-grow max-w-6xl z-50 min-w-[420px]">
-                    <input
-                      type="text"
-                      placeholder="Search files..."
-                      className="w-full py-2 px-4 rounded-md border border-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
-                  {/* Filter Dropdown */}
-                  <div className="relative z-50">
-                    <Button
-                      type="button"
-                      disabled
-                      className="flex items-center py-2 px-4 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200"
-                      onClick={() => setFilterOpen(!filterOpen)}
-                    >
-                      Filter
-                      <ChevronRight size={16} className="ml-2" />
-                    </Button>
-                    {/* Dropdown Menu */}
-                    {filterOpen && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg">
-                        <a
-                          href="#"
-                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                          onClick={() => setFilterTypeFilter("all")}
-                        >
-                          All Files
-                        </a>
-                        <a
-                          href="#"
-                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                          onClick={() => setFilterTypeFilter("audio")}
-                        >
-                          Audio Files
-                        </a>
-                        <a
-                          href="#"
-                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                          onClick={() => setFilterTypeFilter("video")}
-                        >
-                          Video Files
-                        </a>
-                        <a
-                          href="#"
-                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                          onClick={() => setFilterTypeFilter("document")}
-                        >
-                          Documents
-                        </a>
+              <ResizablePanelGroup direction="horizontal" className="gap-0">
+                <ResizablePanel
+                  defaultSize={60}
+                  minSize={40}
+                  className=" flex flex-col gap-1 px-0 "
+                >
+                  <div className="flex items-center justify-between border-b-[0.5px] border-gray-200 pb-2 ">
+                    {/* <h2 className="font-medium">Files</h2> */}
+                    {files && files.length > 0 ? (
+                      <div>
+                        <div className="flex items-center gap-1 py-3 flex-wrap gap-2">
+                          {/* Search Input */}
+                          <div className="relative flex-grow max-w-6xl z-50 min-w-[310px]">
+                            <input
+                              type="text"
+                              placeholder="Search files..."
+                              className=" w-full py-2 px-4 rounded-md border border-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200"
+                              value={searchQuery}
+                              onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                          </div>
+                          {/* Filter Dropdown */}
+                          <div className="relative z-50">
+                            {/* <Button
+                            size={"sm"}
+                            disabled
+                            className="flex items-center px-4 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200 text-sm"
+                            onClick={() => setFilterOpen(!filterOpen)}
+                          >
+                            Filter
+                            <ChevronRight size={16} className="ml-2" />
+                          </Button> */}
+                            {/* Dropdown Menu */}
+                            {filterOpen && (
+                              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg">
+                                <a
+                                  href="#"
+                                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                  onClick={() => setFilterTypeFilter("all")}
+                                >
+                                  All Files
+                                </a>
+                                <a
+                                  href="#"
+                                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                  onClick={() => setFilterTypeFilter("audio")}
+                                >
+                                  Audio Files
+                                </a>
+                                <a
+                                  href="#"
+                                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                  onClick={() => setFilterTypeFilter("video")}
+                                >
+                                  Video Files
+                                </a>
+                                <a
+                                  href="#"
+                                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                  onClick={() =>
+                                    setFilterTypeFilter("document")
+                                  }
+                                >
+                                  Documents
+                                </a>
+                              </div>
+                            )}
+                          </div>
+                          <FileDialogue id={id} />
+                        </div>
                       </div>
+                    ) : (
+                      <>loading files...</>
                     )}
                   </div>
-                  <FileDialogue id={id} />
-                </div>
-              </div>
-            ) : (
-              <></>
-            )}
+                  {/* {JSON.stringify(filesX)} */}
+                  <FileList
+                    files={files.filter(
+                      (file) =>
+                        file.name
+                          .toLowerCase()
+                          .includes(searchQuery.toLowerCase()) &&
+                        (filterTypeFilter === "all" ||
+                          (filterTypeFilter === "audio" &&
+                            file.path.endsWith(".mp3")) ||
+                          (filterTypeFilter === "video" &&
+                            file.path.endsWith(".mp4")) ||
+                          (filterTypeFilter === "document" &&
+                            file.path.endsWith(".pdf")))
+                    )}
+                    fileLength={files.length}
+                    selectedFile={selectedFile}
+                    acceptedFiles={acceptedFiles}
+                    submitting={submitting}
+                    setAcceptedFiles={setAcceptedFiles}
+                    handleUpload={handleUpload}
+                    handleFileClick={handleFileClick}
+                    fetchStatus={fetchStatus}
+                    // handleDeleteFile={handleDeleteFile}
+                    // handleEditFile={handleEditFile}
+                    bytesToMegabytes={bytesToMegabytes}
+                  />
+                </ResizablePanel>
+                <ResizableHandle withHandle />
 
-            <div className="grid grid-cols-6 grid-rows-1 gap-4 ">
-              <FileList
-                files={files.filter(
-                  (file) =>
-                    file.name
-                      .toLowerCase()
-                      .includes(searchQuery.toLowerCase()) &&
-                    (filterTypeFilter === "all" ||
-                      (filterTypeFilter === "audio" &&
-                        file.path.endsWith(".mp3")) ||
-                      (filterTypeFilter === "video" &&
-                        file.path.endsWith(".mp4")) ||
-                      (filterTypeFilter === "document" &&
-                        file.path.endsWith(".pdf")))
-                )}
-                fileLength={files.length}
-                selectedFile={selectedFile}
-                fileSizes={fileSizes}
-                fileDurations={fileDurations}
+                <ResizablePanel defaultSize={40} minSize={40} className="px-4">
+                  <SideTabs
+                    selectedFile={selectedFile}
+                    transcriptionEntries={transcriptionEntries}
+                    currentTranscription={currentTranscription}
+                    transcribeAudio={transcribeAudio}
+                    transcribing={transcribing}
+                    selectedFileSizeMB={selectedFileSize}
+                    selectedFileDuration={selectedFileDuration}
+                  />
+                </ResizablePanel>
+              </ResizablePanelGroup>
+            ) : (
+              <FileUploader
                 acceptedFiles={acceptedFiles}
                 submitting={submitting}
                 setAcceptedFiles={setAcceptedFiles}
                 handleUpload={handleUpload}
-                handleFileClick={handleFileClick}
                 bytesToMegabytes={bytesToMegabytes}
               />
-              <div className="col-span-4 col-start-3 ">
-                <SideProjectTabs
-                  selectedFile={selectedFile}
-                  transcriptionEntries={transcriptionEntries}
-                  currentTranscription={currentTranscription}
-                  transcribeAudio={transcribeAudio}
-                  transcribing={transcribing}
-                  selectedFileSizeMB={selectedFileSize}
-                  selectedFileDuration={selectedFileDuration}
-                />
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

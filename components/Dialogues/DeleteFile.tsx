@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Loader } from "lucide-react";
+import { Loader, Trash2 } from "lucide-react";
 
 interface DeleteConfirmModalProps {
   isOpen: boolean;
@@ -40,13 +40,25 @@ const DeleteConfirmModal: FC<DeleteConfirmModalProps> = ({
           </AlertDialogHeader>
         ) : (
           <>
-            <AlertDialogHeader>
+            <AlertDialogHeader className="w-full px-8 border-b-[0.5px] border-gray-100">
               <AlertDialogTitle>Delete forever ?</AlertDialogTitle>
             </AlertDialogHeader>
-            <p className="text-gray-500 text-sm">
-              <span className="">"{file.name}"</span> will be deleted forever
-              and you won't be able to recover it.
-            </p>
+            <AlertDialogDescription className="w-full flex flex-col px-8">
+              <div className="w-full flex flex-col items-center w-full">
+                <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center">
+                  <span>
+                    <Trash2 size={30} strokeWidth={1} />
+                  </span>
+                </div>
+              </div>
+              <p className="text-gray-500 text-sm py-4 text-center">
+                <span className="text-red-500 font-italic max-w-[100px] overflow-hidden ellipsis">
+                  "{file.name}"
+                </span>{" "}
+                will be deleted forever and you won't be able to recover it.
+              </p>
+            </AlertDialogDescription>
+
             <AlertDialogFooter>
               <AlertDialogCancel
                 onClick={(e) => {

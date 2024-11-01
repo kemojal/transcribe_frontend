@@ -48,7 +48,7 @@ const TableDropdown = ({ item,  }) => {
             {/* <span className="w-6 h-6 flex items-center justify-center text-gray-500 mr-2 rounded-xl bg-gray-100">
               <Pen className=" h-3 w-3" />
             </span>
-            Rename Project */}
+            Rename Workspace */}
             <EditProjectDialogue item={item} />
           </DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -56,7 +56,7 @@ const TableDropdown = ({ item,  }) => {
             <span className="w-6 h-6 flex items-center justify-center text-gray-500 mr-2 rounded-xl bg-gray-100">
               <UserPlus className=" h-3 w-3" />
             </span>
-            Project access
+            Workspace access
           </DropdownMenuItem>
           <DropdownMenuItem
           onClick={(e) => {

@@ -1,13 +1,20 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { authReducer } from "./reducers/authSlice";
 import { projectReducer } from "./reducers/ProjectSlice";
+import { fileReducer } from "./reducers/fileSlice";
+import { ProjectDetailReducer } from "./reducers/projectDetailSlice";
+import { userFilesReducer } from "./reducers/userFilesSlice";
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       auth: authReducer,
-      project:projectReducer
+      project: projectReducer,
+      projectDetail: ProjectDetailReducer,
+      files: fileReducer,
+      userFiles: userFilesReducer,
     },
+
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({ serializableCheck: false }),
   });

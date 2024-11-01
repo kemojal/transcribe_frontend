@@ -62,7 +62,7 @@ export function ProjectDialogue({ onAddProject }: ProjectDialogueProps) {
       trigger={
         <Button
           variant="default"
-          className="bg-indigo-600 hover:bg-indigo-700 w-full"
+          className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 w-full"
         >
           <PlusCircle className="w-4 h-4 mr-2" />
           New Space
@@ -83,7 +83,7 @@ export function ProjectDialogue({ onAddProject }: ProjectDialogueProps) {
           <Button
             type="submit"
             onClick={handleSubmit}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-sm rounded-2xl"
+            className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-sm rounded-2xl"
             size="sm"
             disabled={!name.trim() || submitting}
           >
@@ -120,18 +120,14 @@ export function ProjectDialogue({ onAddProject }: ProjectDialogueProps) {
         <h2 className="font-semibold tracking-tight text-sm">Privacy</h2>
         <RadioGroup defaultValue="open" className="space-y-1 font-normal">
           <div className="flex items-center space-x-1">
-            <RadioGroupItem value="open" id="open" 
-            disabled
-            />
+            <RadioGroupItem value="open" id="open" disabled />
             <Label htmlFor="open" className="text-sm font-normal">
               <span className="font-semibold">Open</span> - Anyone at
               Kemo&apos;s Workspace can join
             </Label>
           </div>
           <div className="flex items-center space-x-1">
-            <RadioGroupItem value="closed" id="closed" 
-            disabled
-            />
+            <RadioGroupItem value="closed" id="closed" disabled />
             <Label htmlFor="closed" className="text-sm font-normal">
               <span className="font-semibold">Closed</span> - Only invited
               people can join

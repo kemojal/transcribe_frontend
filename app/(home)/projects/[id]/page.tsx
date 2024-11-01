@@ -411,6 +411,7 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
               </ResizablePanelGroup>
             ) : (
               <FileUploader
+                projectId={id}
                 acceptedFiles={acceptedFiles}
                 submitting={submitting}
                 setAcceptedFiles={setAcceptedFiles}

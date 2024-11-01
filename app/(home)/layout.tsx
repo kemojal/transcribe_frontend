@@ -7,7 +7,7 @@ import AuthWrapper from "./AuthWrapper";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Transcriber",
+  title: "Transcribai",
   description: "Transcribe audio files and video to text",
 };
 

@@ -45,10 +45,10 @@ const Sidebar = ({
   const router = useRouter();
 
   const menuItems = [
-    { label: "Projects", icon: LayoutGrid, href: "/projects" },
+    { label: "Home", icon: LayoutGrid, href: "/projects" },
 
     // { label: "Files", icon: FileMusic, href: "/files" },
-    { label: "Workspaces", icon: Boxes, href: "/projects" },
+    // { label: "Workspaces", icon: Boxes, href: "/projects" },
     { label: "Rewards", icon: Gift, href: "/rewards" },
     { label: "Analytics", icon: Layout, href: "/analytics" },
     { label: "Settings", icon: Settings, href: "/settings" },
@@ -84,7 +84,7 @@ const Sidebar = ({
               T
             </span>
           ) : (
-            <span>Transcriber</span>
+            <span>Transcribai</span>
           )}
         </a>
       </div>
@@ -97,14 +97,20 @@ const Sidebar = ({
           <div className="flex flex-col justify-center space-y-2 text-sm text-gray-600 w-full">
             <Link
               href="/projects"
-              className="hover:text-indigo-600 flex items-center"
+              className={`hover:text-indigo-600 flex items-center flex items-center justify-center w-full  space-x-2 ${
+                isCollapsed
+                  ? "w-10 h-10 rounded-xl !justify-center bg-gray-100"
+                  : "w-full !justify-start"
+              }`}
             >
-              <Boxes size={16} className="mr-1" />
-              Spaces
+              <Boxes size={isCollapsed ? 20 : 16} className="" />
+              {!isCollapsed && (
+                <span className="font-bold"> Browse Spaces</span>
+              )}
             </Link>
             <div className="flex w-auto py-1">
               <SelectProjectOption
-              isCollapsed={isCollapsed}
+                isCollapsed={isCollapsed}
                 placeholder="No space"
                 options={projects.map((p) => ({ value: p.id, label: p.name }))}
                 onValueChange={handleProjectOptionChange}

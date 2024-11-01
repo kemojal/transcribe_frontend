@@ -20,6 +20,7 @@ interface FileUploaderProps {
   setAcceptedFiles: (files: File[]) => void;
   handleUpload: (file: File) => void;
   bytesToMegabytes: (bytes: number) => number;
+  projectId: string;
 }
 
 export default function FileUploader({
@@ -28,6 +29,7 @@ export default function FileUploader({
   setAcceptedFiles,
   handleUpload,
   bytesToMegabytes,
+  projectId,
 }: FileUploaderProps) {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isRecordingOrHasAudio, setIsRecordingOrHasAudio] = useState(false);
@@ -110,7 +112,7 @@ export default function FileUploader({
               />
             </motion.div>
           </div> */}
-          <NoFilesSection />
+          <NoFilesSection projectId={projectId} />
         </motion.div>
       </div>
     </motion.div>

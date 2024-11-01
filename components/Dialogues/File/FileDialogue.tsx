@@ -526,8 +526,6 @@ export const FileDialogue = ({ id }) => {
           )}
         </AnimatePresence>
 
-        {/* <ExampleComponent /> */}
-
         {submitting && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-xl opacity-50 w-[calc(100%+24px)] -left-6 -top-6 h-[calc(100%+24px)]">
             <div className="h-full w-full flex flex-col space-y-2 items-center justify-center">

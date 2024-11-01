@@ -60,6 +60,7 @@ const FileList: FC<FileSectionProps> = ({
         </AnimatePresence>
       ) : (
         <FileUploader
+        projectId={id}
           acceptedFiles={acceptedFiles}
           submitting={submitting}
           setAcceptedFiles={setAcceptedFiles}

@@ -25,6 +25,7 @@ import { useAppDispatch } from "@/lib/hooks";
 import { addFile } from "@/lib/reducers/fileSlice";
 import AudioUploader from "@/components/AudioUploader";
 import { motion } from "framer-motion";
+import { BsRecordCircleFill } from "react-icons/bs";
 
 export const FileRecordDialogue = ({ id }) => {
   const [open, setOpen] = useState(false);
@@ -202,7 +203,7 @@ export const FileRecordDialogue = ({ id }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <Upload className="mr-2" /> Upload Audio
+          <BsRecordCircleFill className="mr-2" /> Record Audio
         </Button>
       </DialogTrigger>
       <DialogContent className={`${recordedAudio ? "sm:max-w-[600px]" : ""}`}>

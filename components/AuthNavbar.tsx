@@ -8,7 +8,7 @@ const AuthNavbar: React.FC = () => {
     <nav className="bg-white text-black shadow-xs py-2 px-0 ">
       <div className="px-4 py-2 flex justify-between items-center">
         <a href="#" className="text-xl font-semibold">
-          Transcriber
+          Transcribai
         </a>
         <div className="flex items-center gap-4">
           <div className="  text-gray-500 text-xs cursor-pointer">

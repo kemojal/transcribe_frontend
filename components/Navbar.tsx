@@ -6,7 +6,7 @@ const Navbar: React.FC = () => {
     <nav className="bg-gray-800 text-white shadow-md">
       <div className="container mx-auto px-4 py-2 flex justify-between items-center">
         <a href="#" className="text-2xl font-bold">
-          Transcriber
+          Transcribai
         </a>
         <div className="hidden md:flex space-x-4">
           <a href="#" className="hover:text-gray-400">

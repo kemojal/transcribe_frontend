@@ -133,7 +133,7 @@ const ProjectList = () => {
             </Avatar>
           </div>
         </div>
-        <div className=" p-6 mb-6">
+        <div className=" py-6 mb-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold text-gray-700 flex items-center">
               <Box size={20} className="mr-2" />

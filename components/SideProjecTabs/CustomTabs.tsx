@@ -43,7 +43,11 @@ export default function CustomTabs(
         ))}
       </TabsList>
       {items.map((item) => (
-        <TabsContent key={item.label} value={item.label} className="mt-1">
+        <TabsContent
+          key={item.label}
+          value={item.label}
+          className="mt-1"
+        >
           {item.content}
         </TabsContent>
       ))}

@@ -35,7 +35,7 @@ export const SideTabs = ({
       content: (
         <>
           {transcription && transcription?.summary_text ? (
-            <div className="text-sm prose prose-slate leading-5 h-[660px] overflow-y-auto py-8 px-4">
+            <div className="text-sm prose prose-slate leading-5 h-[660px] overflow-y-auto py-8 px-4  dark:bg-orange-900 !max-w-[100%]">
               <ReactMarkdown
                 components={{
                   h2: ({ children }) => (

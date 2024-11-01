@@ -1,22 +1,26 @@
 "use client";
 
-import * as React from "react";
+
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { ReactNode, useState } from "react";
 
 interface TabItem {
   label: string;
-  content: React.ReactNode;
+  content: ReactNode;
 }
 
 interface CustomTabsProps {
   items: TabItem[];
   defaultValue?: string;
+  endTabItem?: ReactNode;
+
+
 }
 
 export default function CustomTabs(
-  { items, defaultValue }: CustomTabsProps = { items: [] }
+  { items, defaultValue, endTabItem }: CustomTabsProps = { items: [] }
 ) {
-  const [activeTab, setActiveTab] = React.useState(
+  const [activeTab, setActiveTab] = useState(
     defaultValue || items[0]?.label
   );
 
@@ -26,12 +30,12 @@ export default function CustomTabs(
       onValueChange={setActiveTab}
       className="w-full"
     >
-      <TabsList className="flex h-10 items-center justify-start p-0 bg-transparent">
+      <TabsList className="flex h-10 items-center justify-start p-0 bg-transparent space-x-2">
         {items.map((item) => (
           <TabsTrigger
             key={item.label}
             value={item.label}
-            className={`px-4 h-full data-[state=active]:text-primary data-[state=active]:font-semibold relative
+            className={`px-1 h-full text-sm data-[state=active]:text-primary data-[state=active]:font-semibold relative
               ${
                 activeTab === item.label
                   ? "after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary"
@@ -41,6 +45,7 @@ export default function CustomTabs(
             {item.label}
           </TabsTrigger>
         ))}
+        {endTabItem}
       </TabsList>
       {items.map((item) => (
         <TabsContent

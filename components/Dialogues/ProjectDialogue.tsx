@@ -7,6 +7,8 @@ import { Box, CirclePlus, PlusCircle } from "lucide-react";
 import { DialogueBase } from "./DialogueBase";
 import { BASEURL } from "@/constants";
 import type { ProjectProps } from "@/types/interfaces";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { Label } from "../ui/label";
 
 interface ProjectDialogueProps {
   onAddProject: (project: ProjectProps) => void;
@@ -55,10 +57,13 @@ export function ProjectDialogue({ onAddProject }: ProjectDialogueProps) {
 
   return (
     <DialogueBase
-      title="New Space"
+      title="Create a new Space"
       description="Give your workspace a name"
       trigger={
-        <Button variant="default" className="bg-indigo-600 hover:bg-indigo-700">
+        <Button
+          variant="default"
+          className="bg-indigo-600 hover:bg-indigo-700 w-full"
+        >
           <PlusCircle className="w-4 h-4 mr-2" />
           New Space
         </Button>
@@ -66,25 +71,28 @@ export function ProjectDialogue({ onAddProject }: ProjectDialogueProps) {
       open={open}
       setOpen={setOpen}
       footerButton={
-        <Button
-          type="submit"
-          onClick={handleSubmit}
-          className="w-full bg-indigo-600 hover:bg-indigo-700"
-          disabled={!name.trim() || submitting}
-        >
-          {submitting ? "Creating space..." : "Create space"}
-        </Button>
+        <div className="flex justify-end space-x-1">
+          <Button
+            size="sm"
+            variant={"outline"}
+            type="button"
+            onClick={() => setOpen(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            onClick={handleSubmit}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-sm rounded-2xl"
+            size="sm"
+            disabled={!name.trim() || submitting}
+          >
+            {submitting ? "Creating space..." : "Create space"}
+          </Button>
+        </div>
       }
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="w-full flex flex-col items-center">
-          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center">
-            <span>
-              <Box size={30} strokeWidth={1} />
-            </span>
-          </div>
-        </div>
-
         <div className="space-y-1 text-xs text-muted-foreground text-center">
           A workspace is a place where files can be stored. To create a new
           workspace, please enter a name.
@@ -108,6 +116,29 @@ export function ProjectDialogue({ onAddProject }: ProjectDialogueProps) {
           />
         </div>
       </form>
+      <div className="pt-6 space-y-3 bg-gray-50 rounded-2xl mt-4 p-2 text-muted-foreground opacity-80">
+        <h2 className="font-semibold tracking-tight text-sm">Privacy</h2>
+        <RadioGroup defaultValue="open" className="space-y-1 font-normal">
+          <div className="flex items-center space-x-1">
+            <RadioGroupItem value="open" id="open" 
+            disabled
+            />
+            <Label htmlFor="open" className="text-sm font-normal">
+              <span className="font-semibold">Open</span> - Anyone at
+              Kemo&apos;s Workspace can join
+            </Label>
+          </div>
+          <div className="flex items-center space-x-1">
+            <RadioGroupItem value="closed" id="closed" 
+            disabled
+            />
+            <Label htmlFor="closed" className="text-sm font-normal">
+              <span className="font-semibold">Closed</span> - Only invited
+              people can join
+            </Label>
+          </div>
+        </RadioGroup>
+      </div>
     </DialogueBase>
   );
 }

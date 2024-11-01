@@ -21,6 +21,7 @@ interface SelectOptionProps {
   options?: Option[];
   onValueChange?: (project: ProjectProps) => void;
   defaultValue?: number | undefined;
+  isCollapsed?: boolean;
 }
 
 export const SelectProjectOption = ({
@@ -28,6 +29,7 @@ export const SelectProjectOption = ({
   options = [],
   onValueChange,
   defaultValue,
+  isCollapsed,
 }: SelectOptionProps) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedValue, setSelectedValue] = useState<number | undefined>(
@@ -61,10 +63,17 @@ export const SelectProjectOption = ({
     <Select value={selectedValue} onValueChange={handleValueChange}>
       <SelectTrigger className="py-6 text-sm focus:ring-0 outline-gray-50 flex items-center gap-1">
         <div className="flex space-x-1 items-center">
-          <span className="">
+          
+          {isCollapsed ? (
+            <span className="text-gray-500">W</span>
+          ) : (
+            <>
+            <span className="">
             <Box size={16} strokeWidth={1} />
           </span>
-          <SelectValue placeholder={placeholder || "No Space"} />
+            <SelectValue placeholder={placeholder || "No Space"} />
+            </>
+          )}
         </div>
       </SelectTrigger>
       <SelectContent onClick={(e) => e.stopPropagation()}>

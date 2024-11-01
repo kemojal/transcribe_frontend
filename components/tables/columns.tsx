@@ -26,8 +26,8 @@ export const ProjectColumns: ColumnDef<ProjectProps>[] = [
       return (
         <div className="min-w-[40vw] text-gray-900 font-medium flex items-center">
           <span className="mr-1">
-                  <Box size={16} strokeWidth={1}/>
-                </span>
+            <Box size={16} strokeWidth={1} />
+          </span>
           {row.getValue("name")}
         </div>
       );
@@ -35,15 +35,18 @@ export const ProjectColumns: ColumnDef<ProjectProps>[] = [
   },
   {
     accessorKey: "user",
-    header: "Owner",
+    header: "Members",
     cell: ({ row }) => {
       const user = row.getValue("user");
       return (
         <div className="flex items-center text-xs gap-1">
-          <span className="w-6 h-6 rounded-full bg-gray-300 text-center flex items-center justify-center">
+          {/* <span className="w-6 h-6 rounded-full bg-gray-300 text-center flex items-center justify-center">
             {(user && user?.username?.substring(0, 1).toUpperCase()) || "-"}
           </span>
-          <span className="text-gray-600">{(user && user?.email) || "-"}</span>
+          <span className="text-gray-600">{(user && user?.email) || "-"}</span> */}
+          <span className="flex items-center gap-1">
+            1 Member
+          </span>
         </div>
       );
     },

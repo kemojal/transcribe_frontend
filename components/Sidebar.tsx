@@ -104,6 +104,7 @@ const Sidebar = ({
             </Link>
             <div className="flex w-auto py-1">
               <SelectProjectOption
+              isCollapsed={isCollapsed}
                 placeholder="No space"
                 options={projects.map((p) => ({ value: p.id, label: p.name }))}
                 onValueChange={handleProjectOptionChange}

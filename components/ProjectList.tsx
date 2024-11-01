@@ -13,11 +13,9 @@ import Loader from "./Loader";
 import { ProjectProps } from "@/types/interfaces";
 
 import { SelectProjectOption } from "@/components/SelectProjectOption";
-import { Box, Boxes, ChevronRight } from "lucide-react";
+import { Box, Boxes, ChevronRight, Search } from "lucide-react";
 import { ProjectDropdown } from "@/components/Dropdowns/ProjectDropdown";
 
-// import { DeleteProjectModal } from "./Dialogues/DeleteProjectModal";
-// import { EditProjectDialogue } from "./Dialogues/EditProjectDialogue";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
   fetchProjects,
@@ -31,6 +29,7 @@ import { EditProjectDialogue } from "./Dialogues/EditProjectDialogue";
 import { DeleteProjectModal } from "./Dialogues/DeleteProjectModal";
 import Link from "next/link";
 import { FileColumns } from "./tables/FileColumns";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 const ProjectList = () => {
   const router = useRouter();
 
@@ -101,8 +100,6 @@ const ProjectList = () => {
     dispatch(addProject(newProject));
   };
 
- 
-
   useEffect(() => {
     if (selectedProjectOption) {
       console.log("selectedProjectOption", selectedProjectOption);
@@ -120,40 +117,29 @@ const ProjectList = () => {
   return (
     <div className="min-h-screen">
       <div className=" mx-auto">
-        <div className=" p-6 mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">
-            Welcome back!
-          </h1>
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <Link
-                href="/projects"
-                className="hover:text-indigo-600 flex items-center"
-              >
-                <Boxes size={16} className="mr-1" />
-                Workspaces
-              </Link>
-              <ChevronRight size={16} />
-              <SelectProjectOption
-                placeholder="Select project"
-                options={projects.map((p) => ({ value: p.id, label: p.name }))}
-                onValueChange={handleProjectOptionChange}
-                defaultValue={currentProject?.id}
-              />
-              <span className="flex items-center">
-                <Box size={16} className="mr-1" />
-                {projects.length}
-              </span>
-            </div>
-            <ProjectDropdown />
+        <div className="flex items-center justify-between mb-8">
+          <div className="relative flex-1 max-w-2xl">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            
+            <Input placeholder="Search spaces..." className="pl-10 h-11 rounded-full bg-background"/>
           </div>
+          <div className="flex items-center gap-4">
+            <Button variant="outline" className="rounded-full">
+              Upgrade
+            </Button>
+            <Avatar>
+              <AvatarImage src="/placeholder.svg" />
+              <AvatarFallback>U</AvatarFallback>
+            </Avatar>
+          </div>
+        </div>
+        <div className=" p-6 mb-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold text-gray-700 flex items-center">
               <Box size={20} className="mr-2" />
-              {selectedProject ? selectedProject.name : "All Projects"}
+              {selectedProject ? selectedProject.name : "Browse Spaces"}
             </h2>
             <div className="flex items-center space-x-4">
-              <Input placeholder="Search projects..." className="max-w-xs" />
               <ProjectDialogue onAddProject={handleAddProject} />
             </div>
           </div>

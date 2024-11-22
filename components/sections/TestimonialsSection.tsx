@@ -1,304 +1,182 @@
-// components/TestimonialsSection.tsx
-// import { Star } from "lucide-react";
-// import Marquee from "../ui/marquee";
-// import { cn } from "@/lib/utils";
+"use client";
 
-// const testimonials = [
-//   {
-//     name: "Jane Doe",
-//     title: "Marketing Manager",
-//     feedback:
-//       "The transcription service is fantastic! It saves us countless hours in turning our webinars into written content.",
-//     image: "/images/jane.jpg",
-//     rating: 5,
-//   },
-//   {
-//     name: "John Smith",
-//     title: "Podcast Host",
-//     feedback:
-//       "Super easy to use and very accurate. The AI transcription is better than anything I’ve used before.",
-//     image: "/images/john.jpg",
-//     rating: 4,
-//   },
-//   {
-//     name: "Emma Johnson",
-//     title: "Freelance Writer",
-//     feedback:
-//       "I love the time-stamping feature. It makes editing so much easier. Highly recommended!",
-//     image: "/images/emma.jpg",
-//     rating: 5,
-//   },
-//   // Add more testimonials as needed...
-// ];
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
+import { Star, Quote } from "lucide-react";
 
-// const reviews = [
-//   {
-//     name: "Jack",
-//     username: "@jack",
-//     title: "Marketing Manager",
-//     body: "The transcription service is fantastic! It saves us countless hours in turning our webinars into written content.",
-//     img: "https://avatar.vercel.sh/jack",
-//   },
-//   {
-//     name: "Jill",
-//     username: "@jill",
-//     title: "Marketing Manager",
-//     body: "Super easy to use and very accurate. The AI transcription is better than anything I’ve used before.",
-//     img: "https://avatar.vercel.sh/jill",
-//   },
-//   {
-//     name: "John",
-//     username: "@john",
-//     body: "I love the time-stamping feature. It makes editing so much easier. Highly recommended!",
-//     img: "https://avatar.vercel.sh/john",
-//   },
-//   {
-//     name: "Jane",
-//     username: "@jane",
-//     title: "Marketing Manager",
-//     body: "I'm at a loss for words. This is amazing. I love it.",
-//     img: "https://avatar.vercel.sh/jane",
-//   },
-//   {
-//     name: "Jenny",
-//     username: "@jenny",
-//     title: "Marketing Manager",
-//     body: "I'm at a loss for words. This is amazing. I love it.",
-//     img: "https://avatar.vercel.sh/jenny",
-//   },
-//   {
-//     name: "James",
-//     username: "@james",
-//     title: "Marketing Manager",
-//     body: "I'm at a loss for words. This is amazing. I love it.",
-//     img: "https://avatar.vercel.sh/james",
-//   },
-// ];
-
-// const firstRow = reviews.slice(0, reviews.length / 2);
-// const secondRow = reviews.slice(reviews.length / 2);
-
-// const ReviewCard = ({
-//   img,
-//   name,
-//   username,
-//   body,
-// }: {
-//   img: string;
-//   name: string;
-//   username: string;
-//   body: string;
-// }) => {
-//   return (
-//     <figure
-//       className={cn(
-//         "relative w-64 cursor-pointer overflow-hidden rounded-xl border p-4",
-//         // light styles
-//         "border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05]",
-//         // dark styles
-//         "dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]"
-//       )}
-//     >
-//       <div className="flex flex-row items-center gap-2">
-//         <img className="rounded-full" width="32" height="32" alt="" src={img} />
-//         <div className="flex flex-col">
-//           <figcaption className="text-sm font-medium dark:text-white">
-//             {name}
-//           </figcaption>
-//           <p className="text-xs font-medium dark:text-white/40">{username}</p>
-//         </div>
-//       </div>
-//       <blockquote className="mt-2 text-sm">{body}</blockquote>
-//     </figure>
-//   );
-// };
-
-// const TestimonialsSection = () => {
-//   return (
-//     <section className="py-16 bg-white ">
-//       <div className="max-w-6xl mx-auto px-6">
-//         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-//           What Our Users Say
-//         </h2>
-
-//         <div className="relative flex  flex-col items-center justify-center overflow-hidden rounded-lg bg-background ">
-//           <Marquee pauseOnHover className="[--duration:20s]">
-//             {firstRow.map((review) => (
-//               <ReviewCard key={review.username} {...review} />
-//             ))}
-//           </Marquee>
-//           <Marquee reverse pauseOnHover className="[--duration:20s]">
-//             {secondRow.map((review) => (
-//               <ReviewCard key={review.username} {...review} />
-//             ))}
-//           </Marquee>
-//           <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-white dark:from-background"></div>
-//           <div className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-white dark:from-background"></div>
-//         </div>
-//       </div>
-//     </section>
-//   );
-// };
-
-// export default TestimonialsSection;
-import { Star } from "lucide-react";
-import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
-import Marquee from "@/components/ui/marquee";
-
-const reviews = [
+const testimonials = [
   {
-    name: "Jack",
-    username: "@jack",
-    title: "Marketing Manager",
-    body: "The transcription service is fantastic! It saves us countless hours in turning our webinars into written content.",
-    img: "https://avatar.vercel.sh/jack",
+    name: "Sarah Johnson",
+    role: "Content Creator",
+    company: "CreativeMinds Studios",
+    image: "/testimonials/sarah.jpg",
+    content:
+      "The accuracy of the transcriptions is incredible. It's saved me countless hours of manual work.",
     rating: 5,
   },
   {
-    name: "Jill",
-    username: "@jill",
-    title: "Content Creator",
-    body: "Super easy to use and very accurate. The AI transcription is better than anything I've used before.",
-    img: "https://avatar.vercel.sh/jill",
-    rating: 4,
-  },
-  {
-    name: "John",
-    username: "@john",
-    title: "Podcast Host",
-    body: "I love the time-stamping feature. It makes editing so much easier. Highly recommended!",
-    img: "https://avatar.vercel.sh/john",
+    name: "Michael Chen",
+    role: "Podcast Host",
+    company: "TechTalk Daily",
+    image: "/testimonials/michael.jpg",
+    content:
+      "This platform has revolutionized our podcast production workflow. The AI is remarkably accurate.",
     rating: 5,
   },
   {
-    name: "Jane",
-    username: "@jane",
-    title: "Freelance Writer",
-    body: "I'm at a loss for words. This is amazing. The accuracy and speed are unparalleled.",
-    img: "https://avatar.vercel.sh/jane",
+    name: "Emily Rodriguez",
+    role: "Journalist",
+    company: "Global News Network",
+    image: "/testimonials/emily.jpg",
+    content:
+      "Fast, accurate, and incredibly user-friendly. It's become an essential tool in my reporting workflow.",
     rating: 5,
   },
   {
-    name: "Jenny",
-    username: "@jenny",
-    title: "Video Producer",
-    body: "This tool has revolutionized our post-production workflow. It's a game-changer!",
-    img: "https://avatar.vercel.sh/jenny",
+    name: "David Kim",
+    role: "Research Director",
+    company: "Academic Institute",
+    image: "/testimonials/david.jpg",
+    content:
+      "The accuracy in technical and academic content is outstanding. A game-changer for research interviews.",
     rating: 5,
-  },
-  {
-    name: "James",
-    username: "@james",
-    title: "Researcher",
-    body: "The multilingual support is impressive. It's been invaluable for our international projects.",
-    img: "https://avatar.vercel.sh/james",
-    rating: 4,
   },
 ];
 
-const firstRow = reviews.slice(0, reviews.length / 2);
-const secondRow = reviews.slice(reviews.length / 2);
+const TestimonialsSection = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"],
+  });
 
-type ReviewCardProps = {
-  img: string;
-  name: string;
-  username: string;
-  body: string;
-  rating: number;
-};
-
-const ReviewCard = ({ img, name, username, body, rating }: ReviewCardProps) => {
-  return (
-    <motion.figure
-      whileHover={{ y: -5 }}
-      className={cn(
-        "relative w-72 cursor-pointer overflow-hidden rounded-xl border p-6 transition-colors duration-300 ease-in-out",
-        "border-gray-200 bg-white shadow-sm hover:bg-gray-50",
-        "dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
-      )}
-    >
-      <div className="flex flex-row items-center gap-4">
-        <img
-          className="rounded-full"
-          width="48"
-          height="48"
-          alt={`Avatar of ${name}`}
-          src={img}
-        />
-        <div className="flex flex-col">
-          <figcaption className="text-base font-semibold text-gray-900 dark:text-white">
-            {name}
-          </figcaption>
-          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            {username}
-          </p>
-        </div>
-      </div>
-      <blockquote className="mt-4 text-sm text-gray-600 dark:text-gray-300">
-        {body}
-      </blockquote>
-      <div className="mt-4 flex items-center">
-        {Array.from({ length: 5 }).map((_, index) => (
-          <Star
-            key={index}
-            className={cn(
-              "h-4 w-4",
-              index < rating
-                ? "text-yellow-400"
-                : "text-gray-300 dark:text-gray-600"
-            )}
-            fill={index < rating ? "currentColor" : "none"}
-          />
-        ))}
-      </div>
-    </motion.figure>
+  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
+  const scale = useTransform(
+    scrollYProgress,
+    [0, 0.2, 0.8, 1],
+    [0.8, 1, 1, 0.8]
   );
-};
 
-export default function TestimonialsSection() {
   return (
     <section
-      className="py-12 bg-gray-50 dark:bg-gray-900"
-      aria-labelledby="testimonials-title"
+      ref={containerRef}
+      className="py-24 relative overflow-hidden"
+      id="testimonials"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2
-          id="testimonials-title"
-          className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900 dark:text-white"
-        >
-          What Our Users Say
-        </h2>
-        <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-lg bg-transparent">
-          <Marquee
-            pauseOnHover
-            className="[--duration:30s] mb-8"
-            aria-label="Testimonials row 1"
-          >
-            {firstRow.map((review) => (
-              <ReviewCard key={review.username} {...review} />
-            ))}
-          </Marquee>
-          <Marquee
-            reverse
-            pauseOnHover
-            className="[--duration:30s]"
-            aria-label="Testimonials row 2"
-          >
-            {secondRow.map((review) => (
-              <ReviewCard key={review.username} {...review} />
-            ))}
-          </Marquee>
-          <div
-            className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-gray-50 dark:from-gray-900"
-            aria-hidden="true"
-          ></div>
-          <div
-            className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-gray-50 dark:from-gray-900"
-            aria-hidden="true"
-          ></div>
-        </div>
+      {/* Animated Background Pattern */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-transparent to-background" />
       </div>
+
+      <motion.div style={{ opacity, scale }} className="max-w-7xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+          >
+            What Our Users Say
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="text-lg text-muted-foreground max-w-2xl mx-auto"
+          >
+            Join thousands of satisfied users who have transformed their
+            workflow with our AI transcription platform.
+          </motion.p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {testimonials.map((testimonial, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.2 }}
+              className="relative group"
+            >
+              <div className="relative bg-background/50 backdrop-blur-sm border border-primary/10 p-8 rounded-3xl group-hover:border-primary/20 transition-all duration-300">
+                {/* Quote Icon */}
+                <div className="absolute -top-4 -left-4 w-8 h-8 rounded-full bg-background flex items-center justify-center border border-primary/20">
+                  <Quote className="w-4 h-4 text-primary" />
+                </div>
+
+                {/* Rating */}
+                <div className="flex items-center gap-1 mb-4">
+                  {Array.from({ length: testimonial.rating }).map((_, i) => (
+                    <Star
+                      key={i}
+                      className="w-5 h-5 fill-primary text-primary"
+                    />
+                  ))}
+                </div>
+
+                {/* Content */}
+                <p className="text-lg mb-6 text-muted-foreground">
+                  "{testimonial.content}"
+                </p>
+
+                {/* Author */}
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-secondary p-[2px]">
+                    <div className="w-full h-full rounded-full overflow-hidden">
+                      <img
+                        src={testimonial.image}
+                        alt={testimonial.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold">{testimonial.name}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {testimonial.role}, {testimonial.company}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Hover Effect */}
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Decorative Elements */}
+        <motion.div
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.1, 0.2, 0.1],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            repeatType: "reverse",
+          }}
+          className="absolute top-1/2 -left-48 w-96 h-96 bg-primary/10 rounded-full blur-3xl"
+        />
+        <motion.div
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.1, 0.2, 0.1],
+          }}
+          transition={{
+            duration: 8,
+            delay: 4,
+            repeat: Infinity,
+            repeatType: "reverse",
+          }}
+          className="absolute bottom-1/2 -right-48 w-96 h-96 bg-secondary/10 rounded-full blur-3xl"
+        />
+      </motion.div>
     </section>
   );
-}
+};
+
+export default TestimonialsSection;

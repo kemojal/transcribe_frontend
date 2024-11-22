@@ -1,196 +1,178 @@
-// components/Header.tsx
-// import { Mic } from "lucide-react";
-// import Link from "next/link";
-
-// const Header = () => {
-//   return (
-//     <header className="bg-primary/100 shadow-xs fixed top-0 left-0 right-0 z-10 px-4 lg:px-6 h-16 flex items-center backdrop-blur-sm ">
-//       <Link className="flex items-center" href="#">
-//         <Mic className="h-8 w-8 text-primary" />
-//         <span className="ml-2 text-2xl font-bold text-white">TranscribeAI</span>
-//       </Link>
-//       <nav className="ml-auto flex gap-6">
-//         <Link
-//           className="text-sm font-medium text-gray-700 hover:text-primary transition duration-300"
-//           href="#features"
-//         >
-//           Features
-//         </Link>
-//         <Link
-//           className="text-sm font-medium text-gray-700 hover:text-primary transition duration-300"
-//           href="#how-it-works"
-//         >
-//           How It Works
-//         </Link>
-//         <Link
-//           className="text-sm font-medium text-gray-700 hover:text-primary transition duration-300"
-//           href="#pricing"
-//         >
-//           Pricing
-//         </Link>
-//         <Link
-//           className="text-sm font-medium text-gray-700 hover:text-primary transition duration-300"
-//           href="#faq"
-//         >
-//           FAQ
-//         </Link>
-//       </nav>
-//     </header>
-//   );
-// };
-
-// export default Header;
-// import Link from "next/link";
-// import { ArrowRight } from "lucide-react";
-
-// export default function Header() {
-//   return (
-//     <header className="w-full border-b bg-primary/100 shadow-sm fixed top-0 left-0 right-0 z-10">
-//       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-//         <div className="flex items-center space-x-4">
-//           <Link className="flex items-center space-x-2" href="#">
-//             <div className="h-8 w-8 rounded bg-white" />
-//             <span className="text-xl font-bold text-white">TranscribeAI</span>
-//           </Link>
-//           <nav className="hidden space-x-4 md:flex text-secondary">
-//             <Link className="text-sm font-medium  hover:text-gray-900" href="#">
-//               MacOS
-//             </Link>
-//             <Link className="text-sm font-medium  hover:text-gray-900" href="#">
-//               Web
-//             </Link>
-//             <Link className="text-sm font-medium  hover:text-gray-900" href="#">
-//               iOS
-//             </Link>
-//             <Link className="text-sm font-medium  hover:text-gray-900" href="#">
-//               Android
-//             </Link>
-//           </nav>
-//         </div>
-//         <div className="flex items-center space-x-4">
-//           <nav className="hidden space-x-4 md:flex text-secondary">
-//             <Link className="text-sm font-medium  hover:text-gray-900" href="#">
-//               Updates
-//             </Link>
-//             <Link className="text-sm font-medium  hover:text-gray-900" href="#">
-//               Pricing
-//             </Link>
-//           </nav>
-//           <Link
-//             className="inline-flex items-center space-x-1 text-sm font-medium text-white hover:text-white"
-//             href="/register"
-//           >
-//             <span>Sign In</span>
-//             <ArrowRight className="h-4 w-4" />
-//           </Link>
-//         </div>
-//       </div>
-//     </header>
-//   );
-// }
 "use client";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { motion } from "framer-motion";
 
-export default function Header() {
-  // Animation variants
-  const logoVariants = {
-    hidden: { opacity: 0, x: -50 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: { type: "spring", stiffness: 50, delay: 0.2 },
-    },
+import { useState, useEffect } from "react";
+import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { Button } from "../ui/button";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Menu, X } from "lucide-react";
+
+const Header = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+  const { scrollY } = useScroll();
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setIsScrolled(latest > 50);
+  });
+
+  const menuItems = [
+    { label: "Features", href: "#features" },
+    { label: "How it Works", href: "#how-it-works" },
+    { label: "Pricing", href: "#pricing" },
+    { label: "Testimonials", href: "#testimonials" },
+  ];
+
+  const headerVariants = {
+    initial: { y: -100 },
+    animate: { y: 0 },
+    exit: { y: -100 },
   };
 
-  const navItemVariants = {
-    hidden: { opacity: 0, y: -20 },
-    visible: {
-      opacity: 1,
-      y: 0,
+  const menuVariants = {
+    closed: {
+      opacity: 0,
+      height: 0,
       transition: {
-        type: "spring",
-        stiffness: 50,
-        delay: 0.4,
-        staggerChildren: 0.2,
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
+    open: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
       },
     },
   };
 
-  const signInButtonVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: { type: "spring", stiffness: 100, delay: 0.6 },
-    },
-  };
-
   return (
-    <motion.header
-      className="w-full border-b-[1px] border-primary/50 shadow-sm  z-50 backdrop-blur-md absolute top-0 left-0 right-0"
-      initial="hidden"
-      animate="visible"
-      variants={navItemVariants}
-    >
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 lg:px-6">
-        {/* Animated Logo */}
-        <motion.div
-          className="flex items-center space-x-4"
-          variants={logoVariants}
-        >
-          <Link className="flex items-center space-x-2" href="#">
-            <div className="h-8 w-8 rounded bg-white" />
-            <span className="text-xl font-bold text-white">TranscribeAI</span>
-          </Link>
-        </motion.div>
+    <>
+      <motion.header
+        variants={headerVariants}
+        initial="initial"
+        animate="animate"
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isScrolled
+            ? "bg-background/80 backdrop-blur-lg shadow-md"
+            : "bg-transparent"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <nav className="flex items-center justify-between">
+            {/* Logo */}
+            <Link href="/" className="flex items-center space-x-2">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+              >
+                Transcribe
+              </motion.div>
+            </Link>
 
-        {/* Animated Navigation */}
-        <motion.nav
-          className="hidden md:flex space-x-6 text-secondary"
-          variants={navItemVariants}
-        >
-          <Link
-            className="text-sm font-medium hover:text-white transition duration-300"
-            href="#features"
-          >
-            Features
-          </Link>
-          <Link
-            className="text-sm font-medium hover:text-white transition duration-300"
-            href="#how-it-works"
-          >
-            How It Works
-          </Link>
-          <Link
-            className="text-sm font-medium hover:text-white transition duration-300"
-            href="#pricing"
-          >
-            Pricing
-          </Link>
-          <Link
-            className="text-sm font-medium hover:text-white transition duration-300"
-            href="#faq"
-          >
-            FAQ
-          </Link>
-        </motion.nav>
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-8">
+              {menuItems.map((item) => (
+                <motion.a
+                  key={item.label}
+                  href={item.href}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                >
+                  {item.label}
+                </motion.a>
+              ))}
+            </div>
 
-        {/* Sign In Button */}
+            {/* Desktop CTA Buttons */}
+            <div className="hidden md:flex items-center space-x-4">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button
+                  variant="ghost"
+                  onClick={() => router.push("/login")}
+                  className="text-sm font-medium"
+                >
+                  Sign In
+                </Button>
+              </motion.div>
+
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button
+                  onClick={() => router.push("/register")}
+                  className="text-sm font-medium bg-gradient-to-r from-primary to-secondary hover:opacity-90"
+                >
+                  Get Started
+                </Button>
+              </motion.div>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setIsOpen(!isOpen)}
+              className="md:hidden p-2"
+            >
+              {isOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </motion.button>
+          </nav>
+        </div>
+
+        {/* Mobile Menu */}
         <motion.div
-          className="flex items-center space-x-4"
-          variants={signInButtonVariants}
+          initial="closed"
+          animate={isOpen ? "open" : "closed"}
+          variants={menuVariants}
+          className="md:hidden overflow-hidden bg-background/80 backdrop-blur-lg"
         >
-          <Link
-            className="inline-flex items-center space-x-1 text-sm font-medium text-white hover:text-gray-200 transition duration-300 bg-primary py-1 px-2 rounded-2xl"
-            href="/register"
-          >
-            <span>Sign In</span>
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          <div className="px-6 py-4 space-y-4">
+            {menuItems.map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                className="block text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                onClick={() => setIsOpen(false)}
+              >
+                {item.label}
+              </a>
+            ))}
+            <div className="pt-4 space-y-4">
+              <Button
+                variant="ghost"
+                onClick={() => router.push("/login")}
+                className="w-full text-sm font-medium"
+              >
+                Sign In
+              </Button>
+              <Button
+                onClick={() => router.push("/register")}
+                className="w-full text-sm font-medium bg-gradient-to-r from-primary to-secondary hover:opacity-90"
+              >
+                Get Started
+              </Button>
+            </div>
+          </div>
         </motion.div>
-      </div>
-    </motion.header>
+      </motion.header>
+
+      {/* Spacer for fixed header */}
+      <div className="h-20" />
+    </>
   );
-}
+};
+
+export default Header;

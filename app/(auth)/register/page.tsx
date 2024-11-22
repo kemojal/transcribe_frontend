@@ -135,7 +135,7 @@ const Register = () => {
             By clicking "Sign In with Google", or registering with an email, you
             agree to our{" "}
             <a
-              href="/terms-of-service"
+              href="/terms"
               className="text-blue-500 underline hover:text-blue-600"
               aria-label="Terms of Service"
             >
@@ -143,7 +143,7 @@ const Register = () => {
             </a>{" "}
             and{" "}
             <a
-              href="/privacy-policy"
+              href="/privacy"
               className="text-blue-500 underline hover:text-blue-600"
               aria-label="Privacy Policy"
             >

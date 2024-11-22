@@ -1,173 +1,246 @@
-// import Link from "next/link";
+"use client";
 
-// export default function Footer() {
-//   const transcribeLinks = [
-//     { name: "Home", href: "#" },
-//     { name: "Updates", href: "#" },
-//     { name: "Pricing", href: "#" },
-//     { name: "Careers", href: "#" },
-//     { name: "Suggestions", href: "#" },
-//     { name: "Help Center", href: "#" },
-//   ];
-
-//   const appLinks = [
-//     { name: "Go Pro ✨", href: "#" },
-//     { name: "Open Source", href: "#" },
-//     { name: "Cookies", href: "#" },
-//     { name: "Privacy", href: "#" },
-//     { name: "Terms", href: "#" },
-//     { name: "Contact", href: "#" },
-//   ];
-
-//   const socialLinks = [
-//     { name: "Mac", href: "#" },
-//     { name: "Web", href: "#" },
-//     { name: "iOS", href: "#" },
-//     { name: "Android", href: "#" },
-//     { name: "Sign in", href: "#" },
-//   ];
-
-//   const updatesLinks = [
-//     { name: "GitHub", href: "#" },
-//     { name: "LinkedIn", href: "#" },
-//     { name: "Instagram", href: "#" },
-//     { name: "X", href: "#" },
-//   ];
-
-//   const renderLinks = (links) =>
-//     links.map((link, index) => (
-//       <li key={index}>
-//         <Link href={link.href}>{link.name}</Link>
-//       </li>
-//     ));
-
-//   return (
-//     <footer className="text-gray-300 py-12 px-4 bg-white">
-//       <div className="container mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-//         <div>
-//           <h3 className="text-red-400 font-semibold mb-4">Transcribeai</h3>
-//           <ul className="space-y-2">{renderLinks(transcribeLinks)}</ul>
-//         </div>
-//         <div>
-//           <h3 className="text-blue-400 font-semibold mb-4">App</h3>
-//           <ul className="space-y-2">{renderLinks(appLinks)}</ul>
-//         </div>
-//         <div>
-//           <h3 className="text-green-400 font-semibold mb-4">Social</h3>
-//           <ul className="space-y-2">{renderLinks(socialLinks)}</ul>
-//         </div>
-//         <div>
-//           <h3 className="text-purple-400 font-semibold mb-4">Updates</h3>
-//           <ul className="space-y-2">{renderLinks(updatesLinks)}</ul>
-//         </div>
-//       </div>
-//       <div className="text-center mt-8 text-sm text-gray-500">
-//         © Transcribeai 2024
-//       </div>
-//     </footer>
-//   );
-// }
-import Link from "next/link";
 import { motion } from "framer-motion";
-import { Github, Linkedin, Instagram, Twitter } from "lucide-react";
+import Link from "next/link";
+import {
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Github,
+  Mail,
+} from "lucide-react";
 
-const footerSections = [
-  {
-    title: "Transcribeai",
-    links: [
-      { name: "Home", href: "/" },
-      { name: "Updates", href: "/updates" },
-      { name: "Pricing", href: "/pricing" },
-      { name: "Careers", href: "/careers" },
-      { name: "Suggestions", href: "/suggestions" },
-      { name: "Help Center", href: "/help" },
-    ],
-  },
-  {
-    title: "App",
-    links: [
-      { name: "Go Pro ✨", href: "/pro" },
-      { name: "Open Source", href: "/open-source" },
-      { name: "Cookies", href: "/cookies" },
-      { name: "Privacy", href: "/privacy" },
-      { name: "Terms", href: "/terms" },
-      { name: "Contact", href: "/contact" },
-    ],
-  },
-  {
-    title: "Platforms",
-    links: [
-      { name: "Mac", href: "/mac" },
-      { name: "Web", href: "/web" },
-      { name: "iOS", href: "/ios" },
-      { name: "Android", href: "/android" },
-      { name: "Sign in", href: "/signin" },
-    ],
-  },
-];
+const footerLinks = {
+  product: [
+    { name: "Features", href: "#features" },
+    { name: "Pricing", href: "#pricing" },
+    { name: "How It Works", href: "#how-it-works" },
+    { name: "FAQ", href: "#faq" },
+  ],
+  company: [
+    { name: "About Us", href: "/about" },
+    { name: "Blog", href: "/blog" },
+    { name: "Careers", href: "/careers" },
+    { name: "Contact", href: "/contact" },
+  ],
+  resources: [
+    { name: "Documentation", href: "/docs" },
+    { name: "API Reference", href: "/api" },
+    { name: "Support", href: "/support" },
+    { name: "Status", href: "/status" },
+  ],
+  legal: [
+    { name: "Privacy Policy", href: "/privacy" },
+    { name: "Terms of Service", href: "/terms" },
+    { name: "Cookie Policy", href: "/cookies" },
+    { name: "GDPR", href: "/gdpr" },
+  ],
+};
 
 const socialLinks = [
-  { name: "GitHub", href: "https://github.com", icon: Github },
-  { name: "LinkedIn", href: "https://linkedin.com", icon: Linkedin },
-  { name: "Instagram", href: "https://instagram.com", icon: Instagram },
-  { name: "Twitter", href: "https://twitter.com", icon: Twitter },
+  { name: "Facebook", icon: Facebook, href: "#" },
+  { name: "Twitter", icon: Twitter, href: "#" },
+  { name: "Instagram", icon: Instagram, href: "#" },
+  { name: "LinkedIn", icon: Linkedin, href: "#" },
+  { name: "GitHub", icon: Github, href: "#" },
 ];
 
-export default function Footer() {
+const Footer = () => {
   return (
-    <footer className="bg-gray-50 dark:bg-gray-900 text-gray-600 dark:text-gray-400">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mb-8">
-          {footerSections.map((section) => (
-            <div key={section.title}>
-              <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                {section.title}
-              </h3>
-              <ul className="space-y-2">
-                {section.links.map((link) => (
-                  <li key={link.name}>
-                    <Link
-                      href={link.href}
-                      className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
-                    >
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-          <div>
-            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-              Connect
+    <footer className="relative overflow-hidden border-t border-primary/10 bg-background/50 backdrop-blur-xl">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:48px_48px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/0 via-background/50 to-background" />
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-6 pt-16 pb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-16">
+          {/* Product Links */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h3 className="text-lg font-semibold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Product
             </h3>
-            <div className="flex space-x-4">
-              {socialLinks.map((link) => (
-                <a
+            <ul className="space-y-3">
+              {footerLinks.product.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Company Links */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+          >
+            <h3 className="text-lg font-semibold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Company
+            </h3>
+            <ul className="space-y-3">
+              {footerLinks.company.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Resources Links */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
+            <h3 className="text-lg font-semibold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Resources
+            </h3>
+            <ul className="space-y-3">
+              {footerLinks.resources.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Legal Links */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+          >
+            <h3 className="text-lg font-semibold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Legal
+            </h3>
+            <ul className="space-y-3">
+              {footerLinks.legal.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        </div>
+
+        {/* Newsletter Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.4 }}
+          className="mt-16 pt-8 border-t border-primary/10"
+        >
+          <div className="max-w-md">
+            <h3 className="text-lg font-semibold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Subscribe to our newsletter
+            </h3>
+            <p className="text-muted-foreground mb-4">
+              Stay updated with our latest features and releases.
+            </p>
+            <form className="flex gap-2">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="flex-1 px-4 py-2 rounded-lg bg-background border border-primary/10 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-200"
+              />
+              <button className="px-6 py-2 rounded-lg bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-opacity duration-200">
+                Subscribe
+              </button>
+            </form>
+          </div>
+        </motion.div>
+
+        {/* Bottom Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.5 }}
+          className="mt-16 pt-8 border-t border-primary/10 flex flex-col md:flex-row justify-between items-center gap-8"
+        >
+          {/* Copyright */}
+          <p className="text-muted-foreground text-sm">
+            {new Date().getFullYear()} Transcribe AI. All rights reserved.
+          </p>
+
+          {/* Social Links */}
+          <div className="flex gap-6">
+            {socialLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link
                   key={link.name}
                   href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors duration-200"
+                  className="text-muted-foreground hover:text-primary transition-colors duration-200"
                   aria-label={link.name}
                 >
-                  <link.icon className="h-6 w-6" />
-                </a>
-              ))}
-            </div>
+                  <Icon className="w-5 h-5" />
+                </Link>
+              );
+            })}
           </div>
-        </div>
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-8 mt-8 text-center">
-          <motion.p
-            className="text-sm text-gray-500 dark:text-gray-400"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            © {new Date().getFullYear()} Transcribeai. All rights reserved.
-          </motion.p>
-        </div>
+        </motion.div>
+
+        {/* Decorative Elements */}
+        <motion.div
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.1, 0.2, 0.1],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            repeatType: "reverse",
+          }}
+          className="absolute top-1/4 -left-48 w-96 h-96 bg-primary/10 rounded-full blur-3xl"
+        />
+        <motion.div
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.1, 0.2, 0.1],
+          }}
+          transition={{
+            duration: 8,
+            delay: 4,
+            repeat: Infinity,
+            repeatType: "reverse",
+          }}
+          className="absolute bottom-1/4 -right-48 w-96 h-96 bg-secondary/10 rounded-full blur-3xl"
+        />
       </div>
     </footer>
   );
-}
+};
+
+export default Footer;

@@ -1,181 +1,189 @@
-// "use client";
-// import Image from "next/image";
-// import { Button } from "../ui/button";
-// import { useRouter } from "next/navigation";
+'use client';
 
-// // components/HeroSection.tsx
-// const HeroSection = () => {
-//   const router = useRouter();
-//   return (
-//     <section className="flex flex-col space-y-12 items-center justify-center px-6 py-12 md:py-24 bg-gradient-to-b from-primary to-secondary text-white">
-//       <div className="max-w-3xl flex flex-col items-center md:items-start text-center md:text-left">
-//         <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
-//           Transform Audio Into Text Seamlessly
-//         </h1>
-//         <p className="mb-8 text-lg md:text-xl max-w-2xl text-gray-200 ">
-//           AI-powered transcription that automates your audio to text process
-//           with over 99% accuracy. Save time, boost productivity, and unlock the
-//           power of your spoken content.
-//         </p>
-
-//         <div className="flex flex-col md:flex-row items-center gap-4">
-//           <Button
-//             className=" text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:bg-accent-dark transition duration-300 transform hover:scale-105"
-//             onClick={() => {
-//               router.push("/register");
-//             }}
-//           >
-//             Get Started
-//           </Button>
-//           <Button
-//             className=" bg-accent border border-white text-primary font-semibold px-8 py-4 rounded-lg shadow-lg hover:bg-white hover:text-primary transition duration-300 transform hover:scale-105"
-//             onClick={() => {
-//               router.push("/login");
-//             }}
-//           >
-//             Request Demo
-//           </Button>
-//         </div>
-//       </div>
-//       <div className="hidden md:flex flex-1 justify-center items-center mt-8 md:mt-0 w-full">
-//         <div className="flex w-full max-w-5xl bg-red-5 p-6 bg-gray-50 rounded-2xl">
-//           <Image
-//             src="/_SAASBG.png" // Replace with your hero image
-//             alt="Transcription Hero"
-//             className="transform transition-transform duration-300 hover:scale-105 opacity-50"
-//             width={1440}
-//             height={776}
-//           />
-//         </div>
-//       </div>
-//     </section>
-//   );
-// };
-
-// export default HeroSection;
-
-"use client";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion"; // Importing Framer Motion
-import CircleEffectEffect from "../CircleEffect";
-import Header from "./Header";
-import { BackgroundLines } from "@/effects/background-lines";
+import { motion } from "framer-motion";
+import { ArrowRight, Wand2 } from "lucide-react";
 
 const HeroSection = () => {
   const router = useRouter();
 
-  // Animation variants
   const containerVariants = {
-    hidden: { opacity: 0, y: 50 },
+    hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      y: 0,
       transition: {
-        type: "spring",
-        stiffness: 50,
-        delay: 0.2,
         staggerChildren: 0.2,
       },
     },
   };
 
-  const buttonVariants = {
-    hover: {
-      scale: 1.1,
-      transition: { duration: 0.3, type: "spring", stiffness: 200 },
-    },
-  };
-
-  const imageVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
-      scale: 1,
-      transition: { duration: 1, ease: "easeInOut" },
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut",
+      },
     },
   };
 
   return (
-    <motion.section
-      className="w-full relative flex flex-col  items-center justify-center  pt-28 md:pb-24 bg-gradient-to-b from-primary to-[#1f1f2e] via-[#3d3d60] to-[#23222b] text-white relative overflow-hidden"
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-    >
-      <div className="absolute inset-0 z-[-1] bg-opacity-60 pointer-events-none"></div>
-      <CircleEffectEffect />
-      <Header />
+    <section className="relative min-h-screen flex items-center justify-center px-6 py-24 overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 z-0">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 0.1, scale: 1 }}
+          transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
+          className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary rounded-full blur-3xl"
+        />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 0.1, scale: 1 }}
+          transition={{ duration: 2, delay: 1, repeat: Infinity, repeatType: "reverse" }}
+          className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-secondary rounded-full blur-3xl"
+        />
+      </div>
 
-      {/* <BackgroundLines> */}
+      <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col space-y-8"
+        >
+          <motion.div variants={itemVariants} className="space-y-4">
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20">
+              <Wand2 className="w-4 h-4 mr-2" />
+              <span className="text-sm font-medium">AI-Powered Transcription</span>
+            </div>
+            <h1 className="text-5xl md:text-6xl font-bold leading-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Transform Audio Into Text Seamlessly
+            </h1>
+          </motion.div>
 
-      <div className="flex flex-col flex-1 justify-center items-center mt-8 md:mt-0 w-full space-y-12">
-        {/* Animated Text */}
-        <motion.div className="max-w-3xl flex flex-col items-center md:items-start text-center md:text-left z-10 px-6">
-          <motion.h1
-            className="text-5xl md:text-7xl font-extrabold mb-6 leading-tight tracking-tight text-white"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
-          >
-            Transform Audio Into Text{" "}
-            <span className="text-accent">Seamlessly</span>
-          </motion.h1>
           <motion.p
-            className="mb-8 text-lg md:text-xl max-w-2xl text-gray-300 leading-relaxed"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+            variants={itemVariants}
+            className="text-xl text-muted-foreground leading-relaxed"
           >
-            AI-powered transcription that automates your audio-to-text process
-            with over 99% accuracy. Save time, boost productivity, and unlock
-            the power of your spoken content.
+            Experience industry-leading accuracy with our AI-powered transcription. 
+            Save time, boost productivity, and unlock the power of your spoken content 
+            with over 99% accuracy.
           </motion.p>
 
-          {/* Animated Buttons */}
-          <div className="flex flex-col md:flex-row items-center gap-6">
-            <motion.div variants={buttonVariants} whileHover="hover">
-              <Button
-                className="bg-accent text-primary font-semibold px-8 py-4 rounded-full shadow-xl transition duration-300 hover:text-white"
-                onClick={() => {
-                  router.push("/register");
-                }}
+          <motion.div
+            variants={itemVariants}
+            className="flex flex-col sm:flex-row gap-4"
+          >
+            <Button
+              size="lg"
+              className="group relative overflow-hidden px-8 py-6"
+              onClick={() => router.push("/register")}
+            >
+              <span className="relative z-10">Get Started Free</span>
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-primary to-secondary opacity-0 group-hover:opacity-100 transition-opacity"
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+              />
+              <ArrowRight className="w-5 h-5 ml-2 inline-block group-hover:translate-x-1 transition-transform" />
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="lg"
+              className="group px-8 py-6 border-2 hover:bg-primary/5"
+              onClick={() => router.push("/login")}
+            >
+              Watch Demo
+              <motion.span
+                className="ml-2"
+                initial={{ scale: 1 }}
+                whileHover={{ scale: 1.1 }}
               >
-                Get Started
-              </Button>
-            </motion.div>
-            <motion.div variants={buttonVariants} whileHover="hover">
-              <Button
-                className="bg-transparent border border-white text-white font-semibold px-8 py-4 rounded-full shadow-xl hover:bg-white hover:text-primary hover:border-transparent transition duration-300"
-                onClick={() => {
-                  router.push("/login");
-                }}
-              >
-                Request Demo
-              </Button>
-            </motion.div>
-          </div>
+                ▶
+              </motion.span>
+            </Button>
+          </motion.div>
+
+          <motion.div
+            variants={itemVariants}
+            className="flex items-center gap-4 text-muted-foreground"
+          >
+            <div className="flex -space-x-2">
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className="w-8 h-8 rounded-full border-2 border-background bg-primary/10"
+                />
+              ))}
+            </div>
+            <p className="text-sm">
+              Trusted by <span className="font-bold text-primary">10,000+</span> professionals
+            </p>
+          </motion.div>
         </motion.div>
 
-        {/* Animated Image */}
         <motion.div
-          className="hidden md:flex flex-1 justify-center items-center mt-12 md:mt-0 w-full"
-          variants={imageVariants}
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className="relative"
         >
-          <div className="w-full max-w-5xl bg-opacity-90 rounded-2xl overflow-hidden shadow-2xl">
-            <Image
-              src="/_SAASBG.png" // Replace with your hero image
-              alt="Transcription Hero"
-              className="object-cover w-full h-auto opacity-80 filter brightness-95"
-              width={1440}
-              height={776}
-            />
+          <div className="relative aspect-square max-w-xl mx-auto">
+            <div className="absolute inset-0 rounded-3xl overflow-hidden shadow-2xl">
+              <Image
+                src="/demo-screenshot.png"
+                alt="Transcription Interface"
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
+            
+            {/* Floating Elements */}
+            <motion.div
+              animate={{
+                y: [0, -10, 0],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                repeatType: "reverse",
+              }}
+              className="absolute -top-8 -right-8 p-4 bg-background/80 backdrop-blur-sm rounded-xl shadow-lg border border-primary/10"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 rounded-full bg-green-400 animate-pulse" />
+                <span className="text-sm font-medium">99% Accuracy</span>
+              </div>
+            </motion.div>
+
+            <motion.div
+              animate={{
+                y: [0, 10, 0],
+              }}
+              transition={{
+                duration: 4,
+                delay: 1,
+                repeat: Infinity,
+                repeatType: "reverse",
+              }}
+              className="absolute -bottom-8 -left-8 p-4 bg-background/80 backdrop-blur-sm rounded-xl shadow-lg border border-primary/10"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 rounded-full bg-blue-400 animate-pulse" />
+                <span className="text-sm font-medium">Real-time Processing</span>
+              </div>
+            </motion.div>
           </div>
         </motion.div>
       </div>
-      {/* </BackgroundLines> */}
-    </motion.section>
+    </section>
   );
 };
 

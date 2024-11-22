@@ -1,240 +1,172 @@
-// // components/FAQSection.tsx
+"use client";
 
-// import { Minus, Plus } from "lucide-react";
-// import {
-//   Accordion,
-//   AccordionContent,
-//   AccordionItem,
-//   AccordionTrigger,
-// } from "../ui/accordion";
-// // import { HiPlus, HiMinus } from "react-icons/hi"; // Example icon library
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef, useState } from "react";
+import { Plus, Minus } from "lucide-react";
 
-// const faqItems = [
-//   {
-//     id: "item-1",
-//     question: "How accurate is the transcription?",
-//     answer:
-//       "Our AI-powered transcription boasts up to 99% accuracy for clear audio. Factors like audio quality, accents, and background noise can affect accuracy.",
-//   },
-//   {
-//     id: "item-2",
-//     question: "What file formats do you support?",
-//     answer:
-//       "We support a wide range of audio and video formats, including MP3, WAV, MP4, AVI, and more. If you have a specific format, please contact our support team.",
-//   },
-//   {
-//     id: "item-3",
-//     question: "How secure is my data?",
-//     answer:
-//       "We take data security seriously. All files are encrypted during transfer and storage. We adhere to strict privacy policies and never share your data with third parties.",
-//   },
-//   {
-//     id: "item-4",
-//     question: "Can I edit the transcriptions?",
-//     answer:
-//       "Yes, we provide an easy-to-use editor where you can review and make changes to your transcriptions before finalizing them.",
-//   },
-//   {
-//     id: "item-5",
-//     question: "Do you offer an API for integration?",
-//     answer:
-//       "Yes, we offer API access for seamless integration with your existing workflows. This feature is available on our Enterprise plan.",
-//   },
-// ];
-
-// const FAQSection = () => {
-//   return (
-//     <section id="faq" className="w-full py-12 md:py-24 lg:py-32 bg-gray-50">
-//       <div className="container px-4 md:px-6">
-//         <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl text-center mb-12 text-gray-800">
-//           Frequently Asked Questions
-//         </h2>
-//         <Accordion
-//           type="single"
-//           collapsible
-//           className="w-full max-w-3xl mx-auto bg-white px-6 py-8 rounded-2xl"
-//         >
-//           {faqItems.map((item) => (
-//             <AccordionItem key={item.id} value={item.id}>
-//               <AccordionTrigger className="flex justify-between items-center p-4 bg-white   duration-300">
-//                 <span className="text-lg font-semibold text-gray-800">
-//                   {item.question}
-//                 </span>
-//                 {/* <span>
-//                   <Plus className="w-5 h-5 text-gray-500 transition-transform duration-200 transform" />
-//                   <Minus className="w-5 h-5 text-gray-500 transition-transform duration-200 transform hidden" />
-//                 </span> */}
-//               </AccordionTrigger>
-//               <AccordionContent className="p-4 bg-gray-50 text-gray-700 border border-t-0 border-gray-200 transition-opacity duration-300">
-//                 {item.answer}
-//               </AccordionContent>
-//             </AccordionItem>
-//           ))}
-//         </Accordion>
-//       </div>
-//     </section>
-//   );
-// };
-
-// export default FAQSection;
-
-import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
-import { cn } from "@/lib/utils";
-
-const faqItems = [
+const faqs = [
   {
-    id: "item-1",
-    question: "How accurate is the transcription?",
+    question: "How accurate is the AI transcription?",
     answer:
-      "Our AI-powered transcription boasts up to 99% accuracy for clear audio. Factors like audio quality, accents, and background noise can affect accuracy.",
+      "Our AI transcription service achieves over 95% accuracy across multiple languages and accents. The accuracy improves even further with clear audio input and professional recording conditions.",
   },
   {
-    id: "item-2",
-    question: "What file formats do you support?",
+    question: "What file formats are supported?",
     answer:
-      "We support a wide range of audio and video formats, including MP3, WAV, MP4, AVI, and more. If you have a specific format, please contact our support team.",
+      "We support all major audio and video formats including MP3, WAV, MP4, M4A, AAC, and many more. Files can be uploaded directly or imported from cloud storage services.",
   },
   {
-    id: "item-3",
+    question: "How long does transcription take?",
+    answer:
+      "Most files are transcribed in less than their actual duration. For example, a 60-minute audio file typically takes 30-45 minutes to transcribe, depending on audio quality and server load.",
+  },
+  {
+    question: "What languages are supported?",
+    answer:
+      "We currently support over 30 languages including English, Spanish, French, German, Chinese, Japanese, and many more. Our AI models are continuously trained to improve accuracy across all supported languages.",
+  },
+  {
     question: "How secure is my data?",
     answer:
-      "We take data security seriously. All files are encrypted during transfer and storage. We adhere to strict privacy policies and never share your data with third parties.",
+      "We employ bank-level encryption for all file transfers and storage. Your files are encrypted at rest and in transit. We are GDPR compliant and never share your data with third parties.",
   },
   {
-    id: "item-4",
     question: "Can I edit the transcriptions?",
     answer:
-      "Yes, we provide an easy-to-use editor where you can review and make changes to your transcriptions before finalizing them.",
-  },
-  {
-    id: "item-5",
-    question: "Do you offer an API for integration?",
-    answer:
-      "Yes, we offer API access for seamless integration with your existing workflows. This feature is available on our Enterprise plan.",
+      "Yes, our platform includes a full-featured editor that allows you to make corrections, add speaker labels, and format your transcript. Changes are saved automatically and can be exported in multiple formats.",
   },
 ];
 
-const FAQItem = ({
-  item,
-  isOpen,
-  onToggle,
-}: {
-  item: (typeof faqItems)[0];
-  isOpen: boolean;
-  onToggle: () => void;
-}) => {
-  return (
-    <motion.div
-      initial={false}
-      animate={{
-        backgroundColor: isOpen
-          ? "var(--accordion-active-bg)"
-          : "var(--accordion-bg)",
-      }}
-      className={cn(
-        "border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden mb-4",
-        "transition-shadow duration-300 ease-in-out",
-        isOpen ? "shadow-lg" : "shadow-sm hover:shadow-md"
-      )}
-    >
-      <motion.button
-        className="w-full text-left p-6 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-        onClick={onToggle}
-        aria-expanded={isOpen}
-        initial={false}
-        animate={{
-          backgroundColor: isOpen
-            ? "var(--accordion-active-bg)"
-            : "var(--accordion-bg)",
-        }}
-      >
-        <div className="flex justify-between items-center">
-          <motion.span
-            className="text-lg font-semibold text-gray-900 dark:text-white"
-            animate={{
-              color: isOpen
-                ? "var(--accordion-active-text)"
-                : "var(--accordion-text)",
-            }}
-          >
-            {item.question}
-          </motion.span>
-          <motion.div
-            animate={{ rotate: isOpen ? 180 : 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-          >
-            <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-          </motion.div>
-        </div>
-      </motion.button>
-      <AnimatePresence initial={false}>
-        {isOpen && (
-          <motion.div
-            key="content"
-            initial="collapsed"
-            animate="open"
-            exit="collapsed"
-            variants={{
-              open: { opacity: 1, height: "auto" },
-              collapsed: { opacity: 0, height: 0 },
-            }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-          >
-            <div className="p-6 pt-0 text-gray-700 dark:text-gray-300">
-              {item.answer}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-};
+const FAQSection = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
-export default function FAQSection() {
-  const [openItem, setOpenItem] = React.useState<string | null>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"],
+  });
+
+  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
+  const scale = useTransform(
+    scrollYProgress,
+    [0, 0.2, 0.8, 1],
+    [0.8, 1, 1, 0.8]
+  );
 
   return (
     <section
+      ref={containerRef}
+      className="py-24 relative overflow-hidden"
       id="faq"
-      className="w-full py-16 md:py-24 lg:py-32 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800"
     >
-      <div className="container px-4 md:px-6 mx-auto max-w-5xl">
-        <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl text-center mb-12 text-gray-900 dark:text-white">
-          Frequently Asked Questions
-        </h2>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          {faqItems.map((item) => (
-            <FAQItem
-              key={item.id}
-              item={item}
-              isOpen={openItem === item.id}
-              onToggle={() =>
-                setOpenItem(openItem === item.id ? null : item.id)
-              }
-            />
-          ))}
-        </motion.div>
+      {/* Animated Background Pattern */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-transparent to-background" />
       </div>
-      <style jsx global>{`
-        :root {
-          --accordion-bg: #ffffff;
-          --accordion-text: #1a202c;
-          --accordion-active-bg: #f7fafc;
-          --accordion-active-text: #2b6cb0;
-        }
-        .dark {
-          --accordion-bg: #2d3748;
-          --accordion-text: #e2e8f0;
-          --accordion-active-bg: #2a4365;
-          --accordion-active-text: #63b3ed;
-        }
-      `}</style>
+
+      <motion.div style={{ opacity, scale }} className="max-w-4xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+          >
+            Frequently Asked Questions
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="text-lg text-muted-foreground max-w-2xl mx-auto"
+          >
+            Everything you need to know about our AI transcription service.
+          </motion.p>
+        </div>
+
+        <div className="space-y-4">
+          {faqs.map((faq, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              className="relative group"
+            >
+              <button
+                onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                className="w-full text-left"
+              >
+                <div className="relative bg-background/50 backdrop-blur-sm border border-primary/10 p-6 rounded-2xl group-hover:border-primary/20 transition-all duration-300">
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-semibold text-lg pr-8">
+                      {faq.question}
+                    </h3>
+                    <div className="absolute right-6 top-6">
+                      {openIndex === index ? (
+                        <Minus className="w-5 h-5 text-primary" />
+                      ) : (
+                        <Plus className="w-5 h-5 text-primary" />
+                      )}
+                    </div>
+                  </div>
+
+                  <motion.div
+                    initial={false}
+                    animate={{
+                      height: openIndex === index ? "auto" : 0,
+                      opacity: openIndex === index ? 1 : 0,
+                      marginTop: openIndex === index ? 16 : 0,
+                    }}
+                    transition={{
+                      duration: 0.3,
+                      ease: "easeInOut",
+                    }}
+                    className="overflow-hidden"
+                  >
+                    <p className="text-muted-foreground">{faq.answer}</p>
+                  </motion.div>
+
+                  {/* Hover Effect */}
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </div>
+              </button>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Decorative Elements */}
+        <motion.div
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.1, 0.2, 0.1],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            repeatType: "reverse",
+          }}
+          className="absolute top-1/2 -left-48 w-96 h-96 bg-primary/10 rounded-full blur-3xl"
+        />
+        <motion.div
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.1, 0.2, 0.1],
+          }}
+          transition={{
+            duration: 8,
+            delay: 4,
+            repeat: Infinity,
+            repeatType: "reverse",
+          }}
+          className="absolute bottom-1/2 -right-48 w-96 h-96 bg-secondary/10 rounded-full blur-3xl"
+        />
+      </motion.div>
     </section>
   );
-}
+};
+
+export default FAQSection;

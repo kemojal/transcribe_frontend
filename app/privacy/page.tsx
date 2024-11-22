@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-// pages/privacy-policy.tsx
+// pages/privacy.tsx
 import { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";

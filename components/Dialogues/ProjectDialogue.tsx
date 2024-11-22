@@ -58,7 +58,7 @@ export function ProjectDialogue({ onAddProject }: ProjectDialogueProps) {
   return (
     <DialogueBase
       title="Create a new Space"
-      description="Give your workspace a name"
+      description="Give your space a name"
       trigger={
         <Button
           variant="default"
@@ -94,8 +94,8 @@ export function ProjectDialogue({ onAddProject }: ProjectDialogueProps) {
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1 text-xs text-muted-foreground text-center">
-          A workspace is a place where files can be stored. To create a new
-          workspace, please enter a name.
+          A space is a place where files can be stored. To create a new
+          space, please enter a name.
         </div>
         <div>
           <label

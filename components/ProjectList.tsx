@@ -14,6 +14,7 @@ import { ProjectProps } from "@/types/interfaces";
 
 import { SelectProjectOption } from "@/components/SelectProjectOption";
 import {
+  AudioLinesIcon,
   Box,
   Boxes,
   ChevronRight,
@@ -21,8 +22,10 @@ import {
   Grid,
   LogsIcon,
   Rows4,
+  ScrollText,
   Search,
   Table,
+  UserPlus2Icon,
 } from "lucide-react";
 import { ProjectDropdown } from "@/components/Dropdowns/ProjectDropdown";
 
@@ -44,31 +47,90 @@ import NoProjectsSection from "./NoProjectsSection";
 import CustomTabs from "./SideProjecTabs/CustomTabs";
 import EmptyTabs from "./SideProjecTabs/EmptyTabs";
 import { Card } from "./ui/card";
+import TableDropdown from "./Dropdowns/TableDropdown";
+
+import { motion } from "framer-motion";
+import { formatDate } from "@/utils";
 
 // GridView component for rendering projects in grid mode
 const GridView = ({ data }: { data: ProjectProps[] }) => {
   return (
-    <div className="grid grid-cols-4 gap-4 py-4">
+    <div className="grid grid-cols-6 gap-4 py-4">
       {data.map((project) => (
-        <Card className=" h-60 bg-background shadow-xl rounded-3xl p-6 transition-transform transform hover:scale-105" key={project.id}>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-primary/10" />
-            <div className="h-3 w-28 bg-muted rounded-md" />
-          </div>
-          <div className="space-y-3">
-            <div className="h-3 w-36 bg-muted rounded-md" />
-            <div className="h-3 w-full bg-muted rounded-md" />
-          </div>
-          <div className="flex gap-3 mt-6">
-            <div className="h-3 w-10 bg-muted rounded-md" />
-            <div className="h-3 w-10 bg-muted rounded-md" />
-            <div className="h-3 w-10 bg-muted rounded-md" />
-          </div>
-          <div  className="bg-white p-4 shadow rounded-lg mt-4">
-            <h3 className="text-lg font-semibold">{project.name}</h3>
-            {/* You can add more project details here */}
-          </div>
-        </Card>
+        <Link key={project.id} href={`/projects/${project?.id}`}>
+          <Card
+            className="group h-60 bg-background shadow-xl rounded-2xl p-1 transition-transform transform hover:border-primary"
+            key={project.id}
+          >
+            <div className="bg-gray-500/20 w-full rounded-xl py-10 flex items-center justify-center relative group-hover:bg-gray-500/30">
+
+              <Button className="group-hover:block hidden transition-opacity duration-200 text-xs">View Space</Button>
+              <AudioLinesIcon size={40} className="block text-gray-500 group-hover:hidden transition-opacity duration-200" />
+              <div
+                className=" absolute top-0 right-2 z-10 rounded-full p-1 text-gray-500
+                
+              ` text-xs font-bold"
+              >
+                <TableDropdown item={project} />
+              </div>
+              <span className="absolute bottom-2 right-2 z-10 rounded-full py-1 px-2 bg-gray-500 text-white text-xs font-semibold">
+                {project?.files?.length > 0
+                  ? `${project?.files?.length} files`
+                  : "Empty"}
+              </span>
+            </div>
+            <div className="space-y-4 py-4 px-2">
+              <div className="flex flex-col space-y-1">
+                <h3 className="text-sm font-semibold">{project.name}</h3>
+                <span className="text-xs text-muted-foreground">
+                  {formatDate(project.created_at)}
+                </span>
+              </div>
+
+              <div
+                // variants={itemVariants}
+                className="flex items-center gap-2 mb-16 mt-8 "
+              >
+                {/* <div className="flex -space-x-3">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 260,
+                        damping: 20,
+                        delay: 0.1 * i,
+                      }}
+                    >
+                      <Avatar className="border-2 border-gray-50 bg-gray-100 w-8 h-8">
+                        <AvatarImage
+                          src={`/placeholder.svg?height=32&width=32`}
+                        />
+                      </Avatar>
+                    </motion.div>
+                  ))}
+                </div> */}
+                <Button
+                size={"sm"}
+                variant="outline"
+                className="rounded-full w-8 h-8 border-2 border-gray-50 bg-gray-100"
+
+                >
+                  <span
+                    // variants={itemVariants}
+                    className="text-gray-600 text-sm"
+                  >
+                    <UserPlus2Icon size={16} />
+                  </span>
+                </Button>
+              </div>
+            </div>
+
+            {/* User Avatars */}
+          </Card>
+        </Link>
       ))}
     </div>
   );
@@ -143,15 +205,22 @@ const ProjectList = () => {
       content: (
         <>
           <EmptyTabs
-            title="No archived Spaces"
-            description="Spaces that are archived will appear here."
+            title="No closed Spaces"
+            description="Spaces that are closed will appear here."
           />
         </>
       ),
     },
     {
       label: "Archived",
-      content: <></>,
+      content: (
+        <>
+          <EmptyTabs
+            title="No archived Spaces"
+            description="Spaces that are archived will appear here."
+          />
+        </>
+      ),
     },
   ];
 
@@ -228,7 +297,7 @@ const ProjectList = () => {
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold text-gray-700 flex items-center">
                 <Box size={20} className="mr-2" />
-                {selectedProject ? selectedProject.name : "Browse Spaces"}
+                {selectedProject ? selectedProject.name : "Spaces"}
               </h2>
               <div className="flex items-center space-x-4">
                 <ProjectDialogue onAddProject={handleAddProject} />
@@ -248,27 +317,29 @@ const ProjectList = () => {
                     items={tabItems}
                     defaultValue="Open"
                     endTabItem={
-                      <div className="flex justify-end space-x-2">
+                      <div className="flex justify-end space-x-1">
                         {/* Buttons to toggle view mode */}
                         <Button
-                          className="h-6 w-6 rounded  border-gray-50"
+                          className=" h-6 flex items-center justify-center rounded-xl  border-gray-50 space-x-1 text-xs  px-2 py-2"
                           size={"sm"}
                           variant={viewMode === "table" ? "default" : "outline"}
                           onClick={() => toggleViewMode("table")}
                         >
                           <span>
-                            <LogsIcon size={12} />
-                          </span>
+                            <LogsIcon size={14} />
+                          </span>{" "}
+                          <span>table</span>
                         </Button>
                         <Button
-                          className="h-6 w-6 rounded  border-gray-50"
+                          className="h-6 flex items-center justify-center rounded-xl  border-gray-50 space-x-1 text-xs  px-2 py-2"
                           size={"sm"}
                           variant={viewMode === "grid" ? "default" : "outline"}
                           onClick={() => toggleViewMode("grid")}
                         >
                           <span>
-                            <Columns4 size={12} />
+                            <Columns4 size={14} />
                           </span>
+                          <span>grid</span>
                         </Button>
                       </div>
                     }

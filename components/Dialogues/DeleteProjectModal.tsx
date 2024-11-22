@@ -68,7 +68,7 @@ export const DeleteProjectModal = ({ item }) => {
           <span className="w-6 h-6 flex items-center justify-center text-gray-500 mr-2 rounded-xl bg-gray-100">
             <Trash2 className="h-3 w-3" />
           </span>
-          Delete Workspace
+          Delete
         </>
       }
       title="Delete Workspace"

@@ -100,6 +100,17 @@ export const parseTranscriptionText = (text: string) => {
   return entries;
 };
 
+export const mergeTranscriptionEntries = (
+  entries: { timestamp: string; content: string }[]
+) => {
+  let mergedText = "";
+  entries.forEach((entry, index) => {
+    // Index + 1 gives the line number, since arrays are 0-indexed
+    mergedText += `${index + 1}\n${entry.timestamp}\n${entry.content}\n\n`;
+  });
+  return mergedText;
+};
+
 // export const fetchProjectData = async (id: string) => {
 //   const token = localStorage.getItem("token");
 //   const projectResponse = await axios.get(`${BASEURL}/projects/${id}`, {
@@ -132,5 +143,3 @@ export const fetchProjectData = async (
     files: filesResponse.data,
   };
 };
-
-

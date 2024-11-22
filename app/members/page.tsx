@@ -160,7 +160,7 @@ const MembersPage: React.FC = () => {
 
         <div className="mt-8 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-2">Allowed email domains</h2>
-          <p className="text-gray-600 mb-4">Emails from these domains get automatic workspace access.</p>
+          <p className="text-gray-600 mb-4">Emails from these domains get automatic space access.</p>
           <button className="bg-white text-purple-600 px-4 py-2 rounded-md hover:bg-gray-50 transition duration-150 ease-in-out">
             Add a domain
           </button>

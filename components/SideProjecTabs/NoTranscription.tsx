@@ -15,12 +15,15 @@ export default function NoTranscription({
   transcribeAudio,
   cancelTranscription,
   transcriptionError = false,
+  onTranscriptionComplete,
 }) {
   const [isHovered, setIsHovered] = useState(false);
   const [progress, setProgress] = useState(0);
 
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [isTranscribingError, setIsTranscribingError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const dispatch = useAppDispatch();
   const { toast } = useToast();
 
@@ -30,47 +33,90 @@ export default function NoTranscription({
 
   const handleTranscribeFile = async (file: FileProps, projectId: string) => {
     setIsTranscribing(true);
+    setIsTranscribingError(false);
+    setErrorMessage("");
     try {
-      await dispatch(
+      const result = await dispatch(
         addTranscription({
           projectId,
           file,
           transcription: {}, // Add an empty object or initial transcription data
         })
       ).unwrap();
+      if (onTranscriptionComplete) {
+        onTranscriptionComplete(result);
+      }
 
       toast({
         title: "Transcription created successfully",
       });
     } catch (error) {
       console.error("Error transcribing file:", error);
+      console.error("Error transcribing file:", error);
+      setErrorMessage(
+        error?.message || "Failed to create transcription. Please try again."
+      );
 
       setIsTranscribingError(true);
-      // Handle error (e.g., show error toast)
+      toast({
+        title: "Transcription failed",
+        description:
+          error?.message || "An error occurred while transcribing the file.",
+        variant: "destructive",
+      });
     } finally {
       setIsTranscribing(false);
+      setIsTranscribing(false);
+      setProgress(0);
     }
   };
 
+  // useEffect(() => {
+  //   if (isTranscribing) {
+  //     // Simulate progress for demo purposes
+  //     const interval = setInterval(() => {
+  //       setProgress((prev) => (prev < 100 ? prev + 10 : 100));
+  //     }, 1000);
+  //     return () => clearInterval(interval);
+  //   }
+  //   setProgress(0);
+  // }, [isTranscribing]);
   useEffect(() => {
+    let intervalId;
     if (isTranscribing) {
-      // Simulate progress for demo purposes
-      const interval = setInterval(() => {
-        setProgress((prev) => (prev < 100 ? prev + 10 : 100));
+      intervalId = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 95) {
+            clearInterval(intervalId);
+            return prev;
+          }
+          return prev + 5;
+        });
       }, 1000);
-      return () => clearInterval(interval);
     }
-    setProgress(0);
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
   }, [isTranscribing]);
+
+  const handleRetry = () => {
+    setIsTranscribingError(false);
+    setErrorMessage("");
+    if (selectedFile) {
+      handleTranscribeFile(selectedFile, selectedFile?.project_id);
+    }
+  };
 
   return (
     <motion.div
-      className="relative w-full h-96 rounded-xl overflow-hidden"
+      className="relative w-full h-[32rem] rounded-2xl overflow-hidden bg-gradient-to-br from-gray-150 via-gray-100 to-gray-50"
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
-      <div className="relative h-full flex flex-col items-center justify-center p-8 text-gray-200">
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-soft-light"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-blue-500/10 via-transparent to-transparent"></div>
+      <div className="relative h-full flex flex-col items-center justify-center p-8 text-gray-100">
         <AnimatePresence mode="wait">
           {!isTranscribing && !isTranscribingError ? (
             <motion.div
@@ -81,24 +127,27 @@ export default function NoTranscription({
               transition={{ duration: 0.3 }}
               className="flex flex-col items-center"
             >
-              <Captions className="w-16 h-16 mb-4 text-blue-400" />
-              <h2 className="text-2xl font-bold mb-2">No Transcription Yet</h2>
-              <p className="text-gray-400 mb-6 text-center max-w-md">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Captions className="w-20 h-20 mb-6 text-blue-400 drop-shadow-lg" />
+              </motion.div>
+              <h2 className="text-xl font-semibold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">
+                No transcription yet
+              </h2>
+              <p className="text-gray-300 mb-8 text-center max-w-md text-sm leading-relaxed">
                 Transform your audio into text with just a click. Our AI-powered
                 transcription is ready when you are.
               </p>
               <Button
-                className="group relative overflow-hidden rounded-full px-8 py-3 bg-blue-500 hover:bg-blue-600 text-white transition-colors duration-300"
-                disabled={!selectedFile || !selectedFile?.path || transcribing}
+                className="group relative overflow-hidden rounded-full px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!selectedFile || !selectedFile?.path || isTranscribing}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 onClick={() => {
                   if (selectedFile) {
-                    // transcribeAudio(selectedFile.project_id, selectedFile.id);
-                    handleTranscribeFile(
-                      selectedFile,
-                      selectedFile?.project_id
-                    );
+                    handleTranscribeFile(selectedFile, selectedFile?.project_id)
                   }
                 }}
                 aria-label="Start transcription"
@@ -109,13 +158,13 @@ export default function NoTranscription({
                   animate={{ x: isHovered ? "0%" : "100%" }}
                   transition={{ duration: 0.3 }}
                 />
-                <span className="relative flex items-center gap-2">
-                  <Captions size={18} />
+                <span className="relative flex items-center gap-3 text-lg font-semibold">
+                  <Captions size={22} />
                   <span>Start Transcription</span>
                 </span>
               </Button>
             </motion.div>
-          ) : transcribing && !transcriptionError ? (
+          ) : isTranscribing ? (
             <motion.div
               key="transcribing"
               initial={{ opacity: 0, scale: 0.9 }}
@@ -127,7 +176,6 @@ export default function NoTranscription({
               <motion.div
                 animate={{
                   scale: [1, 1.2, 1],
-                  rotate: [0, 360],
                 }}
                 transition={{
                   duration: 2,
@@ -135,32 +183,36 @@ export default function NoTranscription({
                   ease: "easeInOut",
                 }}
               >
-                <AudioLines className="w-16 h-16 mb-4 text-blue-400" />
+                <AudioLines className="w-20 h-20 mb-6 text-blue-400 drop-shadow-lg" />
               </motion.div>
-              <h2 className="text-2xl font-bold mb-2">Transcribing...</h2>
-              <p className="text-gray-400 text-center max-w-md">
+              <h2 className="text-3xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">
+                Transcribing...
+              </h2>
+              <p className="text-gray-300 text-center max-w-md text-lg leading-relaxed mb-8">
                 Our AI is working its magic. Your transcription will be ready
                 shortly.
               </p>
               <motion.div
-                className="mt-8 h-2 w-48 bg-gray-700 rounded-full overflow-hidden"
+                className="mb-8 h-3 w-64 bg-gray-700 rounded-full overflow-hidden shadow-inner"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
                 aria-label="Transcription progress"
               >
                 <motion.div
-                  className="h-full bg-blue-500"
+                  className="h-full bg-gradient-to-r from-blue-400 to-blue-600"
                   style={{ width: `${progress}%` }}
                   transition={{ duration: 0.5, ease: "linear" }}
                 />
               </motion.div>
-              <Button
-                className="mt-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full"
-                onClick={cancelTranscription}
-              >
-                Cancel Transcription
-              </Button>
+              {cancelTranscription && (
+                <Button
+                  className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 text-lg font-semibold"
+                  onClick={cancelTranscription}
+                >
+                  Cancel Transcription
+                </Button>
+              )}
             </motion.div>
           ) : (
             <motion.div
@@ -171,23 +223,24 @@ export default function NoTranscription({
               transition={{ duration: 0.3 }}
               className="flex flex-col items-center"
             >
-              <XCircle className="w-16 h-16 mb-4 text-red-400" />
-              <h2 className="text-2xl font-bold mb-2 text-red-500">Error</h2>
-              <p className="text-gray-400 mb-6 text-center max-w-md">
-                Oops! Something went wrong during transcription. Please try
-                again.
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <XCircle className="w-20 h-20 mb-6 text-red-400 drop-shadow-lg" />
+              </motion.div>
+              <h2 className="text-3xl font-bold mb-3 text-red-500">Error</h2>
+              <p className="text-gray-300 mb-8 text-center max-w-md text-lg leading-relaxed">
+                {errorMessage ||
+                  "Something went wrong during transcription. Please try again."}
               </p>
               <Button
-                className="group relative overflow-hidden rounded-full px-8 py-3 bg-blue-500 hover:bg-blue-600 text-white transition-colors duration-300"
-                disabled={transcribing}
-                onClick={() => {
-                  if (selectedFile) {
-                    transcribeAudio(selectedFile.project_id, selectedFile.id);
-                  }
-                }}
+                className="group relative overflow-hidden rounded-full px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                disabled={isTranscribing}
+                onClick={handleRetry}
               >
-                <span className="relative flex items-center gap-2">
-                  <Captions size={18} />
+                <span className="relative flex items-center gap-3 text-lg font-semibold">
+                  <Captions size={22} />
                   <span>Retry Transcription</span>
                 </span>
               </Button>

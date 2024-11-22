@@ -32,7 +32,7 @@ const RewardsPage = () => {
         <div className="flex justify-between items-start">
           <div>
             <h2 className="text-2xl font-bold mb-2">
-              Invite to this workspace,
+              Invite to this space,
               <br />
               earn free videos
             </h2>

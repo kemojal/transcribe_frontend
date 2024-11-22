@@ -1,6 +1,5 @@
 "use client";
 
-
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ReactNode, useState } from "react";
 
@@ -13,16 +12,12 @@ interface CustomTabsProps {
   items: TabItem[];
   defaultValue?: string;
   endTabItem?: ReactNode;
-
-
 }
 
 export default function CustomTabs(
   { items, defaultValue, endTabItem }: CustomTabsProps = { items: [] }
 ) {
-  const [activeTab, setActiveTab] = useState(
-    defaultValue || items[0]?.label
-  );
+  const [activeTab, setActiveTab] = useState(defaultValue || items[0]?.label);
 
   return (
     <Tabs
@@ -35,7 +30,7 @@ export default function CustomTabs(
           <TabsTrigger
             key={item.label}
             value={item.label}
-            className={`px-1 h-full text-sm data-[state=active]:text-primary data-[state=active]:font-semibold relative
+            className={` px-1 h-full text-sm data-[state=active]:text-primary data-[state=active]:font-semibold relative
               ${
                 activeTab === item.label
                   ? "after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary"
@@ -48,11 +43,7 @@ export default function CustomTabs(
         {endTabItem}
       </TabsList>
       {items.map((item) => (
-        <TabsContent
-          key={item.label}
-          value={item.label}
-          className="mt-1"
-        >
+        <TabsContent key={item.label} value={item.label} className="mt-1">
           {item.content}
         </TabsContent>
       ))}

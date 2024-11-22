@@ -86,12 +86,12 @@ export const EditProjectDialogue = ({ item }) => {
           <span className="w-6 h-6 flex items-center justify-center text-gray-500 mr-2 rounded-xl bg-gray-100">
             <Pen className="h-3 w-3" />
           </span>
-          Edit Workspace
+          Edit
         </>
       }
       triggerStyle="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm   transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 !bg-transparent text-gray-500 "
       title="Edit Workspace"
-      description="Update your workspace name"
+      description="Update yourspace name"
       open={open}
       setOpen={setOpen}
       footerButton={
@@ -127,7 +127,7 @@ export const EditProjectDialogue = ({ item }) => {
           />
         </div>
         {/* <Button type="submit" className="mt-4" disabled={submitting}>
-          {submitting ? "Updating Workspace..." : "Update workspace"}
+          {submitting ? "Updating Workspace..." : "Update space"}
         </Button> */}
       </form>
       {submitting && (

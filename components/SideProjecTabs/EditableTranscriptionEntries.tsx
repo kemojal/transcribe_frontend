@@ -19,6 +19,9 @@ const EditableTranscriptionEntries = ({
   const [editedContent, setEditedContent] = useState("");
   const [highlightedWords, setHighlightedWords] = useState([]);
 
+  const [copied, setCopied] = useState(false);
+  const [copiedIndex, setCopiedIndex] = useState(null);
+
   const entryRefs = useRef([]);
 
   const startEditing = (index, content) => {
@@ -35,6 +38,22 @@ const EditableTranscriptionEntries = ({
     handleContentUpdate(index, editedContent);
     setEditingEntryIndex(null);
     setEditedContent("");
+  };
+
+  const copyToClipboard = async (content: { text: string; index: number }) => {
+    await navigator.clipboard.writeText(content.text).then(
+      () => {
+        setCopied(true);
+        setCopiedIndex(content?.index);
+        setTimeout(() => {
+          setCopied(false);
+        }, 1000);
+      },
+      (err) => {
+        console.error("Failed to copy text: ", err);
+        setCopied(false);
+      }
+    );
   };
 
   // for highlighting words
@@ -177,7 +196,15 @@ const EditableTranscriptionEntries = ({
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.3 }}
         >
-          <motion.div className="font-normal w-[calc(100%-200px)] flex items-center  text-pretty">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className={`font-normal ${
+              editingEntryIndex === index ? "w-full" : "w-[calc(100%-200px)]"
+            } flex items-center  text-pretty`}
+          >
             {editingEntryIndex === index ? (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -234,76 +261,90 @@ const EditableTranscriptionEntries = ({
               </motion.div>
             )}
           </motion.div>
-          <motion.div className="flex items-center flex-wrap text-xs space-x-2   justify-between opacity-20 group-hover:opacity-100 transition-opacity duration-200 rounded-xl">
-            <motion.div
-              className={`flex items-center gap-1 text-xs ${
-                currentPlayingEntry === entry
-                  ? "text-blue-600"
-                  : "text-blue-500"
-              }`}
-            >
-              <AlarmClock size={12} />
-              <span>
-                {extractMMSS(
-                  formatTimestamp(entry.timestamp.split(" --> ")[0])
-                )}
-              </span>
-              {/* <span>-</span>
-              <span>
-                {extractMMSS(
-                  formatTimestamp(entry.timestamp.split(" --> ")[1])
-                )}
-              </span> */}
-            </motion.div>
 
-            <div className="max-w-[150px]">
-              <Button
-                size="sm"
-                variant={"ghost"}
-                className=" group-hover:opacity-100 transition-opacity duration-200 w-8 h-8"
-                onClick={() => startEditing(index, entry.content)}
-              >
-                <span>
-                  <Edit2
-                    size={12}
-                    className="text-gray-500 hover:text-gray-700"
-                  />
-                </span>
-              </Button>
-              <Button
-                size="sm"
-                variant={"ghost"}
-                className=" group-hover:opacity-100 transition-opacity duration-200 w-8 h-8"
-                onClick={() => startEditing(index, entry.content)}
-                disabled
-              >
-                <span>
-                  <Copy
-                    size={12}
-                    className="text-gray-500 hover:text-gray-700"
-                  />
-                </span>
-              </Button>
-              <Button
-                size="sm"
-                variant={"ghost"}
-                className={` transition-colors duration-200 w-8 h-8 ${
+          {!(editingEntryIndex === index) && (
+            <motion.div className="flex items-center flex-wrap text-xs space-x-2   justify-between opacity-20 group-hover:opacity-100 transition-opacity duration-200 rounded-xl relative z-50">
+              <motion.div
+                className={`flex items-center gap-1 text-xs ${
                   currentPlayingEntry === entry
-                    ? "text-blue-600 hover:text-blue-700"
-                    : "text-gray-500 hover:text-gray-700"
+                    ? "text-blue-600"
+                    : "text-blue-500"
                 }`}
-                onClick={() => handlePlayTimestamp(entry.timestamp)}
               >
+                <AlarmClock size={12} />
                 <span>
-                  {currentPlayingEntry === entry ? (
-                    <Pause size={12} />
-                  ) : (
-                    <Play size={12} />
+                  {extractMMSS(
+                    formatTimestamp(entry.timestamp.split(" --> ")[0])
                   )}
                 </span>
-              </Button>
-            </div>
-          </motion.div>
+                {/* <span>-</span>
+                <span>
+                  {extractMMSS(
+                    formatTimestamp(entry.timestamp.split(" --> ")[1])
+                  )}
+                </span> */}
+              </motion.div>
+
+              <div className="max-w-[150px]">
+                <Button
+                  size="sm"
+                  variant={"ghost"}
+                  className=" group-hover:opacity-100 transition-opacity duration-200 w-8 h-8"
+                  onClick={() => startEditing(index, entry.content)}
+                >
+                  <span>
+                    <Edit2
+                      size={12}
+                      className="text-gray-500 hover:text-gray-700"
+                    />
+                  </span>
+                </Button>
+                <Button
+                  size="sm"
+                  variant={"ghost"}
+                  className=" group-hover:opacity-100 transition-opacity duration-200 w-8 h-8"
+                  onClick={() =>
+                    copyToClipboard({
+                      text: entry.content,
+                      index: index,
+                    })
+                  }
+                >
+                  {copied && copiedIndex === index ? (
+                    <>
+                      <span>
+                        <Check size={12} />
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span>
+                        <Copy size={12} />
+                      </span>
+                    </>
+                  )}
+                </Button>
+                <Button
+                  size="sm"
+                  variant={"ghost"}
+                  className={` transition-colors duration-200 w-8 h-8 ${
+                    currentPlayingEntry === entry
+                      ? "text-blue-600 hover:text-blue-700"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                  onClick={() => handlePlayTimestamp(entry.timestamp)}
+                >
+                  <span>
+                    {currentPlayingEntry === entry ? (
+                      <Pause size={12} />
+                    ) : (
+                      <Play size={12} />
+                    )}
+                  </span>
+                </Button>
+              </div>
+            </motion.div>
+          )}
         </motion.div>
       ))}
     </AnimatePresence>

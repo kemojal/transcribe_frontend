@@ -276,19 +276,22 @@
 }
 
 /* Track */
-::-webkit-scrollbar-track {
+*::-webkit-scrollbar-track {
   box-shadow: inset 0 0 5px rgba(128, 128, 128, 0.452);
   border-radius: 1px;
 }
 
 /* Handle */
-::-webkit-scrollbar-thumb {
+*::-webkit-scrollbar-thumb {
   background: #4193f7;
   border-radius: 1px;
   border: 1px solid #f1f1f1;
 }
 
 /* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
+*::-webkit-scrollbar-thumb:hover {
   background: #4192f7;
 }
+
+
+

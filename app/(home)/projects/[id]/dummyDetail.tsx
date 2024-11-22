@@ -350,7 +350,7 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                 <span className="mr-1">
                   <Boxes size={16} strokeWidth={1} />
                 </span>
-                workspaces
+                spaces
               </Link>
               <span>
                 <span>

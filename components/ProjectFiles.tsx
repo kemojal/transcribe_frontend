@@ -18,7 +18,7 @@ import { BASEURL } from "@/constants";
 import { ProjectDropdown } from "@/components/Dropdowns/ProjectDropdown";
 import { FileDialogue } from "@/components/Dialogues/File/FileDialogue";
 import { FileDropzone } from "@/components/FileDropzone";
-import { bytesToMegabytes, formatDate } from "@/utils";
+import { bytesToMegabytes, formatDate, parseTranscriptionText } from "@/utils";
 import SideProjectTabs from "@/components/SideProjecTabs/SideProjectTabs";
 import ContinousLoader from "@/components/ContinousLoader";
 import FileItem from "@/components/File/FileItem";
@@ -49,21 +49,20 @@ const fetchFileSize = async (url: string): Promise<number> => {
 };
 
 // Function to parse the transcription text
-const parseTranscriptionText = (text: string) => {
-  const regex = /(\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3})\s*(.*)/g;
-  const entries = [];
-  let match;
+// const parseTranscriptionText = (text: string) => {
+//   const regex = /(\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3})\s*(.*)/g;
+//   const entries = [];
+//   let match;
 
-  while ((match = regex.exec(text)) !== null) {
-    const [fullMatch, timestamp, content] = match;
-    entries.push({ timestamp, content });
-  }
+//   while ((match = regex.exec(text)) !== null) {
+//     const [fullMatch, timestamp, content] = match;
+//     entries.push({ timestamp, content });
+//   }
 
-  return entries;
-};
+//   return entries;
+// };
 
-const ProjectFiles = ({ id }:  { id: string } ) => {
-    
+const ProjectFiles = ({ id }: { id: string }) => {
   const router = useRouter();
   const [project, setProject] = useState<any>(null);
   const [files, setFiles] = useState<any[]>([]);
@@ -337,7 +336,7 @@ const ProjectFiles = ({ id }:  { id: string } ) => {
                 <span className="mr-1">
                   <Boxes size={16} strokeWidth={1} />
                 </span>
-                workspaces
+                spaces
               </Link>
               <span>
                 <span>

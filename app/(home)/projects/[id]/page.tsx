@@ -7,6 +7,7 @@ import { Player } from "@/components/AudioPlayer";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import {
+  AudioLines,
   Box,
   Boxes,
   ChevronRight,
@@ -55,6 +56,8 @@ import {
 } from "@/lib/reducers/projectDetailSlice";
 import Loader from "@/components/Loader";
 import { SideTabs } from "@/components/SideProjecTabs/tabs";
+import { FileRecordDialogue } from "@/components/Dialogues/File/FileRecordDialogue";
+import TableDropdown from "@/components/Dropdowns/TableDropdown";
 
 // import { fetchProjectDetails } from "@/utils/api";
 // import { fetchProject, updateProjectName } from './projectSlice';
@@ -259,7 +262,7 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
     <div className="min-h-screen  w-full">
       <div className="w-full px-4 pb-8 mx-auto">
         <div className="flex items-center gap-3 ">
-          <div className="flex items-center justify-between w-full">
+          <div className="flex items-center justify-between w-full border-b-[1px] pb-1 border-gray-100">
             <div className="flex items-center gap-1">
               <Link
                 className="text-gray-500 hover:text-indigo-800 flex items-center font-medium"
@@ -268,7 +271,7 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                 <span className="mr-1">
                   <Boxes size={16} strokeWidth={1} />
                 </span>
-                workspaces
+                spaces
               </Link>
               <span>
                 <span>
@@ -282,9 +285,11 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                 {project.name}
               </span>
             </div>
+            
 
             <div>
-              <ProjectDropdown />
+              <TableDropdown item={project} />
+              {/* <ProjectDropdown /> */}
             </div>
           </div>
         </div>
@@ -304,7 +309,7 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                       <div>
                         <div className="flex items-center gap-1 py-3 flex-wrap gap-2">
                           {/* Search Input */}
-                          <div className="relative flex-grow max-w-6xl z-50 min-w-[310px]">
+                          <div className="relative flex-grow max-w-6xl z-50 min-w-[310px] px-1">
                             <input
                               type="text"
                               placeholder="Search files..."
@@ -360,7 +365,9 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                               </div>
                             )}
                           </div>
+
                           <FileDialogue id={id} />
+                          <FileRecordDialogue id={id} />
                         </div>
                       </div>
                     ) : (

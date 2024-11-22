@@ -31,7 +31,7 @@ export const TestDropdown = () => {
           <DropdownMenuSeparator />
 
           <DropdownMenuGroup>
-            <DropdownMenuItem hint="Pro">Manage workspace</DropdownMenuItem>
+            <DropdownMenuItem hint="Pro">Manage space</DropdownMenuItem>
 
             <DropdownMenuItem shortcut="⌘T">New Workspace</DropdownMenuItem>
           </DropdownMenuGroup>

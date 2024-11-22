@@ -25,7 +25,7 @@ import { useAppDispatch } from "@/lib/hooks";
 import { addFile } from "@/lib/reducers/fileSlice";
 import AudioUploader from "@/components/AudioUploader";
 import { motion } from "framer-motion";
-import { BsRecordCircleFill } from "react-icons/bs";
+import { BsFillRecordFill, BsRecordCircleFill } from "react-icons/bs";
 
 export const FileRecordDialogue = ({ id }) => {
   const [open, setOpen] = useState(false);
@@ -201,10 +201,16 @@ export const FileRecordDialogue = ({ id }) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <BsRecordCircleFill className="mr-2" /> Record Audio
-        </Button>
+      <DialogTrigger className="flex items-center justify-center gap-1 max-w-[120px] border-[1px] border-gray-300 rounded-md py-2 px-4 text-red-500 hover:bg-gray-100 p-2 rounded-xl text-sm font-normal">
+        {/* <Button> */}
+        {/* <span>
+          <BsRecordCircleFill color="#ff0000" className="mr-2 " />{" "}
+        </span> */}
+        <span>
+          <BsFillRecordFill color="#ff0000" className="" />{" "}
+        </span>
+        Record
+        {/* </Button> */}
       </DialogTrigger>
       <DialogContent className={`${recordedAudio ? "sm:max-w-[600px]" : ""}`}>
         <DialogHeader>
@@ -215,8 +221,7 @@ export const FileRecordDialogue = ({ id }) => {
           </DialogTitle>
         </DialogHeader>
         <div className="flex flex-col items-center py-4">
-          {recordedAudio ? 
-          (
+          {recordedAudio ? (
             <div className="relative rounded-xl w-full">
               <AudioFileDetails
                 fileName={fileName}

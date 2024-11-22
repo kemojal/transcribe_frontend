@@ -82,16 +82,7 @@ export default function NoFilesSection({ projectId }: { projectId: string }) {
             Upload file
           </Button>
         </FileDialogue>
-        <FileRecordDialogue id={projectId}>
-          <Button
-            size="lg"
-            variant="outline"
-            className="border-purple-200 text-purple-600 hover:bg-purple-50"
-          >
-            <AudioLines className="mr-2 h-4 w-4" />
-            Record audio
-          </Button>
-        </FileRecordDialogue>
+        <FileRecordDialogue id={projectId} />
       </div>
 
       <div className="mt-12 grid grid-cols-3 gap-6">

@@ -25,8 +25,16 @@ import {
   Copy,
   FileDown,
   CloudDownload,
+  X,
+  ScrollTextIcon,
 } from "lucide-react";
-import { formatDate, formatTimestamp, parseTimeToSeconds } from "@/utils";
+import {
+  formatDate,
+  formatTimestamp,
+  mergeTranscriptionEntries,
+  parseTimeToSeconds,
+  parseTranscriptionText,
+} from "@/utils";
 import { OverallScore } from "../Analysis/OverallScore";
 import Recommendations from "../Analysis/Recommendations";
 import EditableTranscriptionEntries from "./EditableTranscriptionEntries";
@@ -40,6 +48,10 @@ import { FileProps } from "@/types/interfaces";
 import { deleteTranscription } from "@/lib/reducers/fileSlice";
 import { useAppDispatch } from "@/lib/hooks";
 import { Input } from "../ui/input";
+import SearchNotFound from "../SearchNotFound";
+import Searchbar from "../Searchbar";
+import DeleteButton from "../DeleteButton";
+import AudioEditor from "../AudioEditor";
 
 const SideProjectTabs = ({
   selectedFile,
@@ -55,6 +67,7 @@ const SideProjectTabs = ({
   const [transcriptions, setTranscriptions] = useState(
     [] || transcriptionEntries
   );
+
   const [currentTime, setCurrentTime] = useState(0); //to see which word is highlighted
   const audioPlayerRef = useRef(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
@@ -64,7 +77,12 @@ const SideProjectTabs = ({
   const searchParams = useSearchParams();
   const currentFileId = searchParams.get("current_file_id");
 
+  const [filteredTranscriptions, setFilteredTranscriptions] = useState([]);
+
   const [searchTerm, setSearchTerm] = useState("");
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+
+  const [copied, setCopied] = useState(false);
 
   const dispatch = useAppDispatch();
 
@@ -79,11 +97,22 @@ const SideProjectTabs = ({
     },
   ];
 
-  const handleCopy = () => {
-    // const text = entries
-    //   .map((entry) => `${entry.timestamp} ${entry.content}`)
-    //   .join("\n");
-    // navigator.clipboard.writeText(text);
+  const handleCopy = async () => {
+    const text = filteredTranscriptions
+      .map((entry) => `${entry.content}`)
+      .join("\n");
+    await navigator.clipboard.writeText(text).then(
+      () => {
+        setCopied(true);
+        setTimeout(() => {
+          setCopied(false);
+        }, 2000);
+      },
+      (err) => {
+        console.error("Failed to copy text: ", err);
+        setCopied(false);
+      }
+    );
   };
 
   useEffect(() => {
@@ -96,10 +125,25 @@ const SideProjectTabs = ({
     setTranscriptions(transcriptionEntries);
   }, [transcriptionEntries]);
 
+  // Filter transcription entries based on the search term
+  useEffect(() => {
+    if (searchTerm.trim()) {
+      const filtered = transcriptionEntries.filter((entry) =>
+        entry.content.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredTranscriptions(filtered);
+    } else {
+      setFilteredTranscriptions(transcriptionEntries);
+    }
+  }, [searchTerm, transcriptionEntries]);
+
   const handleContentUpdate = (index, newContent) => {
     const updatedEntries = [...transcriptionEntries];
     updatedEntries[index] = { ...updatedEntries[index], content: newContent };
-    setTranscriptions(updatedEntries);
+    setFilteredTranscriptions(updatedEntries as never[]);
+    console.log("Updated entries = ", updatedEntries);
+    const mergedEntries = mergeTranscriptionEntries(updatedEntries);
+    console.log("Merged entries = ", mergedEntries);
   };
 
   const handlePlayTimestamp = (timestamp: string) => {
@@ -133,15 +177,19 @@ const SideProjectTabs = ({
             transcriptionId: file?.transcriptions[0]?.id?.toString(),
           })
         ).unwrap();
-        // filter this transcript from the files transcriptions
-        // const filteredTranscriptions = file?.transcriptions?.filter(
-        //   (transcription) => transcription.id !== file?.transcriptions[0]?.id
-        // )
 
-        file.transcriptions = file.transcriptions.filter(
-          (t) => t.id !== file?.transcriptions[0]?.id
-        );
-        setCurrentFile(file);
+        const updatedFile = {
+          ...file,
+          transcriptions: file.transcriptions.filter(
+            (t) => t.id !== file.transcriptions[0]?.id
+          ),
+        };
+
+        console.log("Deleted transcription and updated file");
+
+        setTranscriptions(updatedFile?.transcriptions);
+        setFilteredTranscriptions(updatedFile?.transcriptions);
+        setCurrentFile(updatedFile);
       } catch (error) {
         console.error("Error deleting transcription:", error);
       }
@@ -154,8 +202,11 @@ const SideProjectTabs = ({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
-      className="pb-20 overflow-hidden  "
+      className="pb-20 overflow-hidden  relative"
     >
+      {/* <div className="fixed bottom-0 left-0 z-50 w-full h-[100%] bg-white flex flex-col items-center justify-center">
+        <AudioEditor audioUrl={selectedFile?.path} />
+      </div> */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -176,8 +227,6 @@ const SideProjectTabs = ({
             animate={{ x: 0 }}
             className="flex items-center justify-end gap-1"
           >
-            
-
             {/* <span>
               <EllipsisVertical
                 size={16}
@@ -193,79 +242,95 @@ const SideProjectTabs = ({
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
+            className="relative w-full h-[calc(100%-80px)]"
           >
-            <div className="relative flex flex-col w-full h-[600px] overflow-hidden pb-8 ">
+            <div className="relative flex flex-col w-full h-[700px] overflow-hidden pb-8">
               <div className="relative w-full h-[calc(100%-80px)] overflow-auto ">
-                <div className="flex items-center justify-between gap-4 flex-wrap px-0 pt-2 pb-4 pr-2 border-b-0 border-gray-200">
-                  <div className="relative">
-                    <Search
-                      className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400"
-                      size={20}
-                    />
-                    <Input
-                      type="text"
-                      placeholder="Search"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-8 pr-4 py-1 w-64 rounded-full bg-gray-100 text-xs h-8"
-                    />
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleCopy}
-                      className="border-gray-100 hover:bg-gray-100 transition-colors space-x-1"
-                    >
-                      <Copy size={14} />
-                      {/* <span className="text-xs font-semibold hidden md:block">
-                        Copy
-                      </span> */}
-                    </Button>
-
-                    <Button
-                      variant={"outline"}
-                      size="sm"
-                      className="w-8 h-8 border-gray-100 hover:bg-gray-100 transition-colors"
-                      onClick={() => {
-                        if (selectedFile) {
-                          onDeleteTranscription(selectedFile);
-                        }
-                      }}
-                    >
-                      <span>
-                        <Trash size={14} />
-                      </span>
-                    </Button>
-                    <ShareDialog />
-                    <TranscriptionDropdown file={selectedFile} />
-                    
-                  </div>
-                </div>
                 <AnimatePresence>
-                  {transcriptionEntries && transcriptionEntries.length > 0 ? (
-                    <motion.div
-                      key="transcription"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="text-sm"
-                    >
-                      <EditableTranscriptionEntries
-                        transcriptionEntries={transcriptions}
-                        currentPlayingEntry={currentPlayingEntry}
-                        handlePlayTimestamp={handlePlayTimestamp}
-                        formatTimestamp={formatTimestamp}
-                        handleContentUpdate={handleContentUpdate}
-                        currentTime={currentTime}
-                        isAudioPlaying={isAudioPlaying}
-                      />
-                    </motion.div>
+                  {transcriptions && transcriptions.length > 0 ? (
+                    <>
+                      <div className="flex items-center justify-between gap-2  px-0 pt-2 pb-4 pr-2 border-b-0 border-gray-200 px-1">
+                        <Searchbar
+                          isExpanded={isSearchExpanded}
+                          setIsExpanded={setIsSearchExpanded}
+                          searchQuery={searchTerm}
+                          setSearchQuery={setSearchTerm}
+                        />
+                        {!isSearchExpanded && (
+                          <motion.div
+                            initial={{ opacity: 0, x: -2 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -2 }}
+                            className="flex space-x-2"
+                          >
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleCopy}
+                              className="border-gray-100 hover:bg-gray-100 transition-colors space-x-1"
+                            >
+                              {copied ? (
+                                <Check size={14} />
+                              ) : (
+                                <Copy size={14} />
+                              )}
+                            </Button>
+
+                            <DeleteButton
+                              selectedFile={selectedFile}
+                              onDeleteTranscription={onDeleteTranscription}
+                            />
+                            <ShareDialog />
+                            <TranscriptionDropdown file={selectedFile} />
+                          </motion.div>
+                        )}
+                      </div>
+                      {filteredTranscriptions &&
+                      filteredTranscriptions.length > 0 ? (
+                        <motion.div
+                          key="transcription"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          className="text-sm py-4"
+                        >
+                          <EditableTranscriptionEntries
+                            //transcriptionEntries={transcriptions}
+                            transcriptionEntries={filteredTranscriptions}
+                            currentPlayingEntry={currentPlayingEntry}
+                            handlePlayTimestamp={handlePlayTimestamp}
+                            formatTimestamp={formatTimestamp}
+                            handleContentUpdate={handleContentUpdate}
+                            currentTime={currentTime}
+                            isAudioPlaying={isAudioPlaying}
+                          />
+                        </motion.div>
+                      ) : (
+                        <SearchNotFound />
+                      )}
+                    </>
                   ) : (
                     <NoTranscription
                       selectedFile={selectedFile}
                       transcribing={transcribing}
                       transcribeAudio={transcribeAudio}
+                      onTranscriptionComplete={(newTranscription) => {
+                        console.log(
+                          "new transcription = ",
+                          newTranscription.transcription
+                        );
+                        const entries = parseTranscriptionText(
+                          newTranscription?.transcription?.transcription_text
+                        );
+                        setTranscriptions((prevTranscriptions) => [
+                          ...prevTranscriptions,
+                          ...entries,
+                        ]);
+                        setFilteredTranscriptions((prevFiltered) => [
+                          ...prevFiltered,
+                          ...entries,
+                        ]);
+                      }}
                     />
                   )}
                 </AnimatePresence>
@@ -276,7 +341,7 @@ const SideProjectTabs = ({
                 transition={{ delay: 0.4 }}
                 className="absolute bottom-0 left-0 w-full border-t-[1px] border-gray-200 bg-white flex flex-col items-center gap-2 justify-center py-2"
               >
-                {/* <div className="flex gap-2 items-center text-xs text-gray-600 w-full">
+                <div className="flex gap-2 items-center text-xs text-gray-600 w-full">
                   <div className="w-full">
                     <div className="w-full flex items-center justify-center fixed bottom-0 left-0">
                       {currentFile && currentFile?.path && (
@@ -315,7 +380,7 @@ const SideProjectTabs = ({
                       )}
                     </div>
                   </div>
-                </div> */}
+                </div>
               </motion.div>
             </div>
           </motion.div>

@@ -27,6 +27,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { ProjectProps } from "@/types/interfaces";
 import { fetchProjects, setCurrentProject } from "@/lib/reducers/ProjectSlice";
 import { ProjectDialogue } from "./Dialogues/ProjectDialogue";
+import ProjectsIcon from "@/icons/ProjectsIcon";
 
 const Sidebar = ({
   isCollapsed,
@@ -48,7 +49,7 @@ const Sidebar = ({
     { label: "Home", icon: LayoutGrid, href: "/projects" },
 
     // { label: "Files", icon: FileMusic, href: "/files" },
-    // { label: "Workspaces", icon: Boxes, href: "/projects" },
+    // { label: "Workspaces", icon: ProjectsIcon, href: "/projects" },
     { label: "Rewards", icon: Gift, href: "/rewards" },
     { label: "Analytics", icon: Layout, href: "/analytics" },
     { label: "Settings", icon: Settings, href: "/settings" },

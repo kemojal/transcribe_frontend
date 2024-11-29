@@ -14,10 +14,18 @@ interface CustomTabsProps {
   endTabItem?: ReactNode;
 }
 
-export default function CustomTabs(
-  { items, defaultValue, endTabItem }: CustomTabsProps = { items: [] }
-) {
-  const [activeTab, setActiveTab] = useState(defaultValue || items[0]?.label);
+export default function CustomTabs({
+  items = [],
+  defaultValue,
+  endTabItem,
+}: CustomTabsProps) {
+  const [activeTab, setActiveTab] = useState(
+    defaultValue || (items.length > 0 ? items[0].label : "")
+  );
+
+  if (items.length === 0) {
+    return null;
+  }
 
   return (
     <Tabs

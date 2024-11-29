@@ -46,160 +46,228 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 ">
+    <div className="relative min-h-screen bg-white overflow-hidden flex items-center justify-center">
+      {/* Dashboard Preview with Parallax Effect */}
       <motion.div
-        className="absolute w-full flex flex-col items-center"
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.5 }}
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 1, ease: [0.4, 0.0, 0.2, 1] }}
+        className="absolute inset-0 flex items-center justify-center pointer-events-none select-none"
       >
-        <Image
-          src="/dashboard.png"
-          width={900}
-          height={464}
-          alt="Dashboard preview"
-          className="blur-sm rounded-3xl border border-gray-200 mt-20 opacity-80 transition-opacity duration-700 ease-in-out"
-        />
+        <div className="relative w-full max-w-5xl px-4">
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.4 }}
+            className="relative group mx-auto"
+          >
+            {/* Animated glow effect */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0.4, 0.2, 0.4] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute inset-0 bg-gradient-radial from-primary/20 via-transparent to-transparent rounded-3xl blur-2xl"
+            />
+
+            {/* Border glow */}
+            <div className="absolute inset-0 rounded-3xl border border-white/10 shadow-[inset_0_0_100px_rgba(255,255,255,0.05)]" />
+
+            {/* Main image */}
+
+            {/* Hover overlay */}
+            <motion.div
+              initial={false}
+              animate={{ opacity: 0 }}
+              whileHover={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="absolute inset-0 bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5 rounded-3xl backdrop-blur-sm"
+            />
+          </motion.div>
+
+          {/* Additional decorative elements */}
+          <div className="absolute -inset-4 bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5 rounded-[2rem] blur-2xl -z-10 opacity-50" />
+          <div className="absolute -inset-8 bg-gradient-radial from-primary/10 via-transparent to-transparent rounded-[2rem] blur-3xl -z-10" />
+        </div>
       </motion.div>
-      <div className="absolute bg-purple-200 dark:bg-purple-900 w-[603px] h-[464px] blur-[100px] dark:opacity-30 left-8 top-1/3"></div>
+
+      {/* Login Form Container */}
       <motion.div
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.5 }}
+        transition={{ duration: 1, delay: 0.2, ease: [0.4, 0.0, 0.2, 1] }}
         className="container relative z-10 w-full max-w-md p-8"
       >
-        <div className="w-full p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out hover:shadow-2xl">
-          <h3 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight text-center mb-2">
-            Welcome Back
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 text-center mb-8">
-            Sign in to your account
-          </p>
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.4 }}
+          className="w-full p-8 bg-background/40 backdrop-blur-2xl rounded-3xl shadow-none border border-border/0 transition-all duration-300"
+        >
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="space-y-2 text-center"
+          >
+            <h3 className="text-2xl font-bold  text-primary tracking-tight">
+              Welcome Back
+            </h3>
+            <p className="text-muted-foreground text-sm">
+              Sign in to your account to continue
+            </p>
+          </motion.div>
 
-          <div className="space-y-6">
-            <GoogleLoginButton />
+          <div className="mt-8 space-y-6">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+              className=" flex items-center justify-center"
+            >
+              <GoogleLoginButton />
+            </motion.div>
 
-            <div className="relative text-center">
+            <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-gray-300 dark:border-gray-600"></span>
+                <span className="w-full border-t border-white/10" />
               </div>
-              <div className="relative">
-                <span className="px-2 text-sm text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800">
-                  OR
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background/40 backdrop-blur-sm px-4 text-muted-foreground">
+                  Or continue with
                 </span>
               </div>
             </div>
 
-            <form className="space-y-6" onSubmit={handleLogin}>
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                >
+            <form onSubmit={handleLogin} className="space-y-4">
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.5 }}
+                className="space-y-2"
+              >
+                <label className="text-sm font-medium text-foreground/80">
                   Email
                 </label>
-                <Input
-                  type="email"
-                  id="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-lg border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-600 transition-all duration-200"
-                  disabled={isLoading}
-                  required
-                />
-              </div>
+                <div className="relative group">
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="w-full  rounded-xl focus:ring-2 focus:ring-primary/20 focus:rng-offset-2 transition-all duration-300 group-hover:bg-white/10"
+                    placeholder="Enter your email"
+                  />
+                  <motion.div
+                    initial={false}
+                    animate={{ scale: email ? 0.98 : 1 }}
+                    className="absolute inset-0 -z-10 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-xl blur-xl transition-all duration-300 opacity-0 group-hover:opacity-100"
+                  />
+                </div>
+              </motion.div>
 
-              <div>
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                >
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+                className="space-y-2"
+              >
+                <label className="text-sm font-medium text-foreground/80">
                   Password
                 </label>
-                <div className="relative">
+                <div className="relative group">
                   <Input
                     type={showPassword ? "text" : "password"}
-                    id="password"
-                    placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-lg border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-600 transition-all duration-200"
-                    disabled={isLoading}
                     required
+                    className="w-full  rounded-xl focus:ring-2 focus:ring-primary/20 focus:rng-offset-2 transition-all duration-300 group-hover:bg-white/10"
+                    placeholder="Enter your password"
                   />
-                  <Button
+                  <button
                     type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-1 top-1/2 transform -translate-y-1/2"
                     onClick={() => setShowPassword(!showPassword)}
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-200"
                   >
                     {showPassword ? (
-                      <EyeOffIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                      <EyeOffIcon className="w-5 h-5" />
                     ) : (
-                      <EyeIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                      <EyeIcon className="w-5 h-5" />
                     )}
-                  </Button>
+                  </button>
+                  <motion.div
+                    initial={false}
+                    animate={{ scale: password ? 0.98 : 1 }}
+                    className="absolute inset-0 -z-10 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-xl blur-xl transition-all duration-300 opacity-0 group-hover:opacity-100"
+                  />
                 </div>
-              </div>
+              </motion.div>
 
-              <Button
-                type="submit"
-                className="w-full py-3 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200"
-                disabled={isLoading}
-              >
-                {isLoading ? "Signing In..." : "Sign In"}
-              </Button>
-            </form>
-            <AnimatePresence>
               {error && (
-                <p className="text-sm text-red-600 dark:text-red-400 text-center mt-4 animate-fade-in">
-                  {error}
-                </p>
-              )}
-            </AnimatePresence>
-
-            <div className="text-center text-xs text-gray-500 dark:text-gray-400 mt-6">
-              By signing in, you agree to our{" "}
-              <Link
-                href="/terms"
-                className="text-indigo-600 dark:text-indigo-400 hover:underline"
-              >
-                Terms of Service
-              </Link>{" "}
-              and{" "}
-              <Link
-                href="/privacy"
-                className="text-indigo-600 dark:text-indigo-400 hover:underline"
-              >
-                Privacy Policy
-              </Link>
-              .
-            </div>
-
-            <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-              <p className="text-gray-600 dark:text-gray-400">
-                No account?{" "}
-                <Link
-                  href="/register"
-                  className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                <motion.p
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="text-sm text-red-500 text-center"
                 >
-                  Register
+                  {error}
+                </motion.p>
+              )}
+
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.7, duration: 0.5 }}
+                className="pt-2"
+              >
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full  bg-primary/80 hover:bg-primary hover:ring-2 hover:ring-offset-2  text-primary-foreground rounded-xl py-6 font-medium transition-all duration-300 disabled:opacity-50 group relative overflow-hidden"
+                >
+                  <motion.div
+                    initial={false}
+                    animate={{
+                      y: isLoading ? "0%" : "100%",
+                    }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute inset-0 bg-black/10"
+                  />
+                  {isLoading ? (
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{
+                        duration: 1,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
+                      className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                    />
+                  ) : (
+                    <span className="relative z-10">Sign in</span>
+                  )}
+                </Button>
+              </motion.div>
+            </form>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8, duration: 0.8 }}
+              className="text-center space-y-2"
+            >
+              <p className="text-sm text-muted-foreground">
+                Don't have an account?{" "}
+                <Link href="/register" className="text-primary hover:underline">
+                  Sign up
                 </Link>
               </p>
               <Link
                 href="/reset-password"
-                className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                className="text-sm text-primary hover:underline"
               >
-                Forgot password?
+                Forgot your password?
               </Link>
-            </div>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </motion.div>
     </div>
   );

@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import GoogleLoginButton from "../login/GoogleLogin";
+import { motion } from "framer-motion";
+import Image from "next/image";
 
 const Register = () => {
   const router = useRouter();
@@ -14,11 +16,11 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
-  const [fadeClass, setFadeClass] = useState("fade-in");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleRegister = async () => {
     try {
+      setIsLoading(true);
       await axios.post(`${BASEURL}/users/register`, {
         username,
         email,
@@ -28,150 +30,184 @@ const Register = () => {
     } catch (error) {
       console.error(error);
       setError("Failed to register. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div
-      className={`flex items-center justify-center min-h-screen  ${fadeClass}`}
-    >
-      <section className="gap-8 pb-8 pt-6 md:py-8 container flex h-[100dvh] w-full flex-col items-center justify-center max-w-lg overflow-hidden">
-        <div className="bg-white text-gray-900 rounded-lg border border-gray-50 w-full p-8">
-          <div className="flex flex-col p-6 space-y-4">
-            <h3 className="font-bold text-3xl">Create Account</h3>
-            <p className="text-gray-500 text-sm">
+    <div className="relative w-full min-h-screen overflow-hidden bg-background flex items-center justify-center">
+      
+
+      {/* Register Form Container */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.8 }}
+        className="container relative z-10 w-full max-w-md p-8"
+      >
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.4 }}
+          className="w-full p-8  transition-all duration-300"
+        >
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="space-y-2"
+          >
+            <h3 className="text-2xl font-bold text-primary tracking-tight">
+              Create Account
+            </h3>
+            <p className="text-muted-foreground text-sm">
               Sign up to start your journey
             </p>
-          </div>
+          </motion.div>
 
-          <div className="p-6 pt-0 grid gap-6">
-            <GoogleLoginButton />
-            {/* <button
-              className="focus-visible:ring-ring inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 border-input hover:bg-blue-500 hover:text-white border shadow-md px-4 py-3 bg-white h-12 w-full"
-              aria-label="Sign in with Google"
+          <div className="mt-8 space-y-6">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+              className="flex items-center justify-center"
             >
-              <svg
-                role="img"
-                viewBox="0 0 24 24"
-                className="mr-3 h-5 w-5"
-                aria-hidden="true"
-              >
-                <path
-                  fill="currentColor"
-                  d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
-                ></path>
-              </svg>
-              Continue with Google
-            </button> */}
+              <GoogleLoginButton />
+            </motion.div>
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t"></span>
+                <span className="w-full border-t border-border/50"></span>
               </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="bg-white text-gray-400 px-2">or</span>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background/40 backdrop-blur-md text-muted-foreground px-2">or continue with</span>
               </div>
             </div>
 
-            <form
-              className="grid gap-4"
+            <motion.form
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+              className="space-y-4"
               onSubmit={(e) => {
                 e.preventDefault();
                 handleRegister();
               }}
             >
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
+                <label className="text-sm font-medium text-foreground/90">
                   Username
                 </label>
                 <Input
                   type="text"
                   name="username"
-                  id="username"
                   placeholder="Username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="placeholder:text-gray-400 focus-visible:ring-blue-500 border-gray-300 h-10 w-full rounded-md border bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
+                   className="w-full  rounded-xl focus:ring-2 focus:ring-primary/20 focus:rng-offset-2 transition-all duration-300 group-hover:bg-white/10"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
+                <label className="text-sm font-medium text-foreground/90">
                   Email
                 </label>
                 <Input
                   type="email"
                   name="email"
-                  id="email"
                   placeholder="Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="placeholder:text-gray-400 focus-visible:ring-blue-500 border-gray-300 h-10 w-full rounded-md border bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
+                   className="w-full  rounded-xl focus:ring-2 focus:ring-primary/20 focus:rng-offset-2 transition-all duration-300 group-hover:bg-white/10"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
+                <label className="text-sm font-medium text-foreground/90">
                   Password
                 </label>
                 <Input
                   type="password"
                   name="password"
-                  id="password"
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="placeholder:text-gray-400 focus-visible:ring-blue-500 border-gray-300 h-10 w-full rounded-md border bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="w-full  rounded-xl focus:ring-2 focus:ring-primary/20 focus:rng-offset-2 transition-all duration-300 group-hover:bg-white/10"
                 />
               </div>
-              <Button className="cursor-pointer focus-visible:ring-offset-white focus-visible:ring-blue-500 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-500 text-white hover:bg-blue-600 shadow h-10 w-full">
-                Register
-              </Button>
-            </form>
-          </div>
-          {error && (
-            <p className="text-sm text-red-500 text-center mt-4">{error}</p>
-          )}
 
-          <div className="text-center text-xs text-gray-500 my-6">
-            By clicking "Sign In with Google", or registering with an email, you
-            agree to our{" "}
-            <a
-              href="/terms"
-              className="text-blue-500 underline hover:text-blue-600"
-              aria-label="Terms of Service"
-            >
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a
-              href="/privacy"
-              className="text-blue-500 underline hover:text-blue-600"
-              aria-label="Privacy Policy"
-            >
-              Privacy Policy
-            </a>
-            .
-          </div>
-          <div className="p-6 pt-0 flex flex-wrap items-center justify-between gap-2">
-            <div className="text-gray-500 text-sm">
-              Already have an account?{" "}
-              <Link
-                aria-label="Sign in"
-                className="text-blue-500 underline-offset-4 transition-colors hover:underline"
-                href="/login"
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.6, duration: 0.8 }}
+                className="pt-2"
               >
-                Login
-              </Link>
-            </div>
-            <a
-              aria-label="Reset password"
-              className="text-blue-500 text-sm underline-offset-4 transition-colors hover:underline"
-              href="/reset-password"
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-primary/80 hover:bg-primary hover:ring-2 hover:ring-offset-2 text-primary-foreground rounded-xl py-6 font-medium transition-all duration-300 disabled:opacity-50 group relative overflow-hidden"
+                >
+                  <motion.div
+                    initial={false}
+                    animate={{
+                      y: isLoading ? "0%" : "100%",
+                    }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute inset-0 bg-black/10"
+                  />
+                  <span className="relative">
+                    {isLoading ? "Creating account..." : "Create Account"}
+                  </span>
+                </Button>
+              </motion.div>
+            </motion.form>
+
+            {error && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-sm text-destructive text-center"
+              >
+                {error}
+              </motion.p>
+            )}
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7, duration: 0.8 }}
+              className="text-center text-xs text-muted-foreground"
             >
-              Reset password
-            </a>
+              By clicking continue, you agree to our{" "}
+              <Link href="/terms" className="text-primary hover:underline">
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy" className="text-primary hover:underline">
+                Privacy Policy
+              </Link>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8, duration: 0.8 }}
+              className="text-center space-y-2"
+            >
+              <p className="text-sm text-muted-foreground">
+                Already have an account?{" "}
+                <Link href="/login" className="text-primary hover:underline">
+                  Sign in
+                </Link>
+              </p>
+              <Link
+                href="/reset-password"
+                className="text-sm text-primary hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </motion.div>
           </div>
-        </div>
-      </section>
+        </motion.div>
+      </motion.div>
     </div>
   );
 };

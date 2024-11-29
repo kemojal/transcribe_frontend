@@ -1,37 +1,60 @@
-import React, { useRef, useState } from "react";
+import React, { useState, useCallback } from "react";
+import { DialogueBase } from "./DialogueBase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trash2 } from "lucide-react";
-import { DialogueBase } from "./DialogueBase";
-
-import { deleteProject } from "@/lib/reducers/ProjectSlice";
-import { useAppDispatch } from "@/lib/hooks";
-import { BASEURL } from "@/constants";
 import { useToast } from "@/components/ui/use-toast";
-import { ToastAction } from "../ui/toast";
+import { BASEURL } from "@/constants";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { deleteProject, setCurrentProject } from "@/lib/reducers/ProjectSlice";
+import { useRouter } from "next/navigation";
 
-export const DeleteProjectModal = ({ item }) => {
+interface DeleteProjectModalProps {
+  projectId: string;
+}
+
+export const DeleteProjectModal = ({ projectId }: DeleteProjectModalProps) => {
   const [open, setOpen] = useState(false);
-  const [confirmationText, setConfirmationText] = useState("");
+  const [confirmText, setConfirmText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const dispatch = useAppDispatch();
-
-  const inputRef = useRef(null);
   const { toast } = useToast();
+  const router = useRouter();
+  const { currentProject } = useAppSelector((state) => state.project);
 
+  const resetState = useCallback(() => {
+    setConfirmText("");
+    setSubmitting(false);
+    setOpen(false);
+  }, []);
 
-  const handleDelete = async () => {
-    setSubmitting(true);
+  const handleDelete = async (e: React.MouseEvent | React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("No token found");
-      setSubmitting(false); // Make sure to reset submitting state
+    if (confirmText !== "Delete") {
+      toast({
+        title: "Error",
+        description: "Please type 'Delete' to confirm",
+        variant: "destructive",
+      });
       return;
     }
 
+    setSubmitting(true);
     try {
-      const response = await fetch(`${BASEURL}/projects/${item.id}`, {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast({
+          title: "Error",
+          description: "Authentication required",
+          variant: "destructive",
+        });
+        resetState();
+        return;
+      }
+
+      const response = await fetch(`${BASEURL}/projects/${projectId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -39,80 +62,97 @@ export const DeleteProjectModal = ({ item }) => {
       });
 
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error("Failed to delete project");
       }
 
+      const numericProjectId = parseInt(projectId, 10);
+      dispatch(deleteProject(numericProjectId));
+
+      if (currentProject && currentProject.id === numericProjectId) {
+        dispatch(setCurrentProject(null));
+        router.push("/projects");
+      }
+
+      resetState();
+
       toast({
-        variant: "destructive",
-        title: "Deleted successfully",
-        description: `${item.name} is permanently deleted successfully`,
-        // action: <ToastAction altText="undo">Undo</ToastAction>,
+        title: "Success",
+        description: "Project has been permanently deleted",
+        variant: "default",
       });
-
-      setTimeout(() => {
-        setSubmitting(false);
-        setOpen(false);
-      }, 1000);
-
-      dispatch(deleteProject(item.id));
     } catch (error) {
-      console.error("There was a problem with the fetch operation:", error);
-      setSubmitting(false);
+      console.error("Delete operation failed:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete project",
+        variant: "destructive",
+      });
+      resetState();
     }
+  };
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
+      resetState();
+    }
+    setOpen(newOpen);
   };
 
   return (
     <DialogueBase
       trigger={
-        <>
-          <span className="w-6 h-6 flex items-center justify-center text-gray-500 mr-2 rounded-xl bg-gray-100">
-            <Trash2 className="h-3 w-3" />
-          </span>
-          Delete
-        </>
+        <div className="w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-destructive/5 focus:bg-destructive/5 text-destructive">
+          <Trash2 className="h-4 w-4" />
+          Delete Project
+        </div>
       }
-      title="Delete Workspace"
-      triggerStyle="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 !bg-transparent text-gray-500 "
-      description={`Type "Delete ${item.name}" to confirm.`}
+      triggerStyle="text-destructive w-full text-left"
+      title="Delete Project"
+      description="Type 'Delete' to confirm. This action cannot be undone."
       open={open}
-      setOpen={setOpen}
-      footerButton={
-        <div className="mt-6 flex justify-end space-x-4">
+      setOpen={handleOpenChange}
+    >
+      <form onSubmit={handleDelete} className="space-y-6 p-1">
+        <div className="space-y-2">
+          <Input
+            type="text"
+            value={confirmText}
+            onChange={(e) => setConfirmText(e.target.value)}
+            placeholder="Type 'Delete' to confirm"
+            className="w-full transition-colors bg-background/50 border border-border/50 focus:border-destructive/50 focus:ring-1 focus:ring-destructive/20 rounded-md"
+            required
+            disabled={submitting}
+          />
+        </div>
+
+        <div className="flex justify-end gap-3">
           <Button
             variant="outline"
-            onClick={() => setOpen(false)}
+            onClick={(e) => {
+              e.stopPropagation();
+              resetState();
+            }}
             disabled={submitting}
-            type="button"
+            className="bg-background/50 border-border/50 hover:bg-primary/5"
           >
             Cancel
           </Button>
           <Button
-            type="button"
-            variant="destructive"
-            onClick={handleDelete}
-            // disabled={confirmationText !== `Delete ${item.name}` || submitting}
+            type="submit"
+            disabled={submitting || confirmText !== "Delete"}
+            className="bg-destructive/90 hover:bg-destructive text-destructive-foreground shadow-sm transition-all duration-200"
           >
-            {submitting ? "Deleting..." : "Delete"}
-
-            {}
+            {submitting ? (
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-background/50 border-t-destructive-foreground" />
+                <span>Deleting...</span>
+              </div>
+            ) : (
+              "Delete Project"
+            )}
           </Button>
         </div>
-      }
-    >
-      <div className="mt-4">
-        <Input
-          type="text"
-          placeholder={`Delete ${item.name}`}
-          value={confirmationText}
-          ref={inputRef}
-          onChange={(e) => {
-            console.log(e.target.value);
-            setConfirmationText(e.target.value);
-          }}
-          disabled={submitting}
-          required
-        />
-      </div>
+      </form>
     </DialogueBase>
   );
 };

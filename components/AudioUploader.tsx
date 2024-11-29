@@ -1,168 +1,237 @@
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { BsCheckCircle } from "react-icons/bs";
+import { motion, AnimatePresence } from "framer-motion";
+import { Waveform } from "@/components/ui/waveform";
+import { FileAudio, CheckCircle, Upload, Loader2 } from "lucide-react";
 
-// CSS for background animation
 const backgroundStyles = `
-@keyframes gradientAnimation {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-.animated-background {
-  background: linear-gradient(120deg, #ff7e5f, #feb47b, #86a8e7, #91eac9);
-  background-size: 300% 300%;
-  animation: gradientAnimation 8s ease infinite;
-}
+  .premium-gradient {
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.1) 0%,
+      rgba(168, 85, 247, 0.1) 50%,
+      rgba(236, 72, 153, 0.1) 100%
+    );
+  }
+
+  .progress-track {
+    background: linear-gradient(
+      90deg,
+      rgba(99, 102, 241, 0.2) 0%,
+      rgba(168, 85, 247, 0.2) 50%,
+      rgba(236, 72, 153, 0.2) 100%
+    );
+  }
+
+  .progress-indicator {
+    background: linear-gradient(
+      90deg,
+      #6366f1 0%,
+      #8b5cf6 50%,
+      #ec4899 100%
+    );
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  .wave-container {
+    position: relative;
+    height: 60px;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+
+  .wave {
+    position: absolute;
+    background: linear-gradient(
+      180deg,
+      rgba(99, 102, 241, 0.3) 0%,
+      rgba(99, 102, 241, 0.1) 100%
+    );
+    width: 200%;
+    height: 100%;
+    animation: wave 3s infinite linear;
+  }
+
+  @keyframes wave {
+    0% { transform: translateX(0) scaleY(1); }
+    50% { transform: translateX(-25%) scaleY(0.8); }
+    100% { transform: translateX(-50%) scaleY(1); }
+  }
 `;
 
 const AudioUploader = ({ isSubmitting }: { isSubmitting: boolean }) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadComplete, setUploadComplete] = useState(false);
+  const [currentStage, setCurrentStage] = useState(0);
+
+  const stages = [
+    "Preparing audio...",
+    "Analyzing format...",
+    "Optimizing quality...",
+    "Almost there...",
+  ];
 
   useEffect(() => {
     if (isSubmitting) {
       setUploadProgress(0);
       setUploadComplete(false);
-      let progress = 0;
+      setCurrentStage(0);
 
-      const uploadInterval = setInterval(() => {
-        progress += 10;
-        setUploadProgress(progress);
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(progressInterval);
+            setUploadComplete(true);
+            return 100;
+          }
+          return prev + 1;
+        });
+      }, 50);
 
-        if (progress >= 100) {
-          clearInterval(uploadInterval);
-          setUploadComplete(true);
-        }
-      }, 300);
+      const stageInterval = setInterval(() => {
+        setCurrentStage((prev) => (prev + 1) % stages.length);
+      }, 2000);
+
+      return () => {
+        clearInterval(progressInterval);
+        clearInterval(stageInterval);
+      };
     }
   }, [isSubmitting]);
 
   return (
     <>
-      <style>{backgroundStyles}</style> {/* Inject animated background CSS */}
-      <div className="relative flex flex-col items-center justify-center h-screen animated-background text-white w-full">
-        {/* Add floating particles */}
-        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-          {[...Array(15)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-2 h-2 bg-white rounded-full opacity-20"
-              initial={{ opacity: 0, y: -50 }}
-              animate={{
-                opacity: [0, 1, 0],
-                y: [
-                  Math.random() * -50,
-                  Math.random() * 50,
-                  Math.random() * 100,
-                ],
-                x: [Math.random() * -100, Math.random() * 100],
-              }}
-              transition={{
-                duration: Math.random() * 4 + 4,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-            />
-          ))}
-        </div>
-        <div className="z-10 w-full h-full bg-blue-500 flex flex-col items-center justify-end">
-          {!uploadComplete ? (
-            <motion.div
-              className="relative flex flex-col items-center p-8 w-full rounded-lg shadow-xl z-10 flex flex-col items-center justify-center"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5 }}
-            >
-              {/* Uploading Animation */}
-              <div className="w-full">
-                <div className="flex items-center justify-between mb-2">
-                  <span>Uploading...</span>
-                  <span>{uploadProgress}%</span>
+      <style>{backgroundStyles}</style>
+      <AnimatePresence mode="wait">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          className="relative w-full max-w-md mx-auto"
+        >
+          <div className="premium-gradient rounded-2xl p-8 backdrop-blur-lg border border-white/10 shadow-xl">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-8">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex items-center gap-3"
+              >
+                <div className="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center">
+                  {uploadComplete ? (
+                    <CheckCircle className="w-6 h-6 text-green-500" />
+                  ) : (
+                    <FileAudio className="w-6 h-6 text-indigo-500" />
+                  )}
                 </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">
+                    {uploadComplete ? "Upload Complete" : "Uploading Audio"}
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    {uploadComplete
+                      ? "Ready for processing"
+                      : stages[currentStage]}
+                  </p>
+                </div>
+              </motion.div>
+            </div>
 
-                <motion.div
-                  className="h-6 bg-blue-500 rounded-xl"
-                  initial={{ width: "0%" }}
-                  animate={{ width: `${uploadProgress}%` }}
-                  transition={{ duration: 0.5, ease: "easeInOut" }}
-                />
-
-                <motion.div
-                  className="mt-4"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1, y: [0, -10, 0] }}
-                  transition={{ repeat: Infinity, duration: 1 }}
-                >
-                  {/* Simulated Soundwave Animation */}
-                  <svg
-                    className="w-full h-12 text-green-500"
-                    viewBox="0 0 100 10"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <rect x="5" width="10" height="10" rx="5">
-                      <animate
-                        attributeName="height"
-                        values="10;3;10"
-                        dur="0.3s"
-                        repeatCount="indefinite"
-                      />
-                    </rect>
-                    <rect x="25" width="10" height="10" rx="5">
-                      <animate
-                        attributeName="height"
-                        values="3;10;3"
-                        dur="0.5s"
-                        repeatCount="indefinite"
-                      />
-                    </rect>
-                    <rect x="45" width="10" height="10" rx="5">
-                      <animate
-                        attributeName="height"
-                        values="10;3;10"
-                        dur="0.3s"
-                        repeatCount="indefinite"
-                      />
-                    </rect>
-                    <rect x="65" width="10" height="10" rx="5">
-                      <animate
-                        attributeName="height"
-                        values="3;10;3"
-                        dur="0.5s"
-                        repeatCount="indefinite"
-                      />
-                    </rect>
-                    <rect x="85" width="10" height="10" rx="5">
-                      <animate
-                        attributeName="height"
-                        values="10;3;10"
-                        dur="0.3s"
-                        repeatCount="indefinite"
-                      />
-                    </rect>
-                  </svg>
-                </motion.div>
+            {/* Progress Section */}
+            <div className="space-y-6">
+              {/* Progress Bar */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span>{uploadProgress}% complete</span>
+                  <span>{uploadComplete ? "Done" : "Uploading..."}</span>
+                </div>
+                <div className="relative h-2 rounded-full overflow-hidden progress-track">
+                  <motion.div
+                    className="absolute top-0 left-0 h-full progress-indicator"
+                    initial={{ width: "0%" }}
+                    animate={{ width: `${uploadProgress}%` }}
+                    transition={{ duration: 0.3 }}
+                  />
+                  <div className="absolute top-0 left-0 w-full h-full shimmer" />
+                </div>
               </div>
-            </motion.div>
-          ) : (
+
+              {/* Waveform Visualization */}
+              <div className="wave-container bg-indigo-50/50">
+                <div className="wave" />
+                <div className="wave" style={{ animationDelay: "-1.5s" }} />
+              </div>
+
+              {/* Processing Steps */}
+              <div className="grid grid-cols-4 gap-2">
+                {stages.map((stage, index) => (
+                  <motion.div
+                    key={stage}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className={`h-1 rounded-full ${
+                      index <= currentStage ? "bg-indigo-500" : "bg-gray-200"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Footer */}
             <motion.div
-              className="p-8 bg-green-600 rounded-lg shadow-lg w-full full mx-2"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="mt-8 text-center"
             >
-              {/* Completion Animation */}
-              <BsCheckCircle size={100} className="text-white mb-4" />
-              <p className="text-xl font-semibold">Upload Complete!</p>
+              {uploadComplete ? (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="inline-flex items-center gap-2 text-green-500"
+                >
+                  <CheckCircle className="w-5 h-5" />
+                  <span>Ready for transcription</span>
+                </motion.div>
+              ) : (
+                <motion.div
+                  animate={{
+                    scale: [1, 1.05, 1],
+                    opacity: [0.5, 1, 0.5],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="text-sm text-gray-500"
+                >
+                  Please keep this window open
+                </motion.div>
+              )}
             </motion.div>
-          )}
-        </div>
-      </div>
+          </div>
+
+          {/* Background Decoration */}
+          <div className="absolute -inset-4 -z-10 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 rounded-3xl blur-xl opacity-50" />
+        </motion.div>
+      </AnimatePresence>
     </>
   );
 };

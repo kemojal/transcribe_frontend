@@ -42,17 +42,134 @@ import AudioUploader from "@/components/AudioUploader";
 import { useAppDispatch } from "@/lib/hooks";
 import { addFile } from "@/lib/reducers/fileSlice";
 
-// CSS for background animation
+// Enhanced background styles with premium effects
 const backgroundStyles = `
 @keyframes gradientAnimation {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+
+.premium-dialog {
+  backdrop-filter: blur(20px);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95),
+    rgba(255, 255, 255, 0.85)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+}
+
 .animated-background {
-  background: linear-gradient(120deg, #ff7e5f, #feb47b, #86a8e7, #91eac9);
+  background: linear-gradient(120deg, 
+    rgba(99, 102, 241, 0.08),
+    rgba(168, 85, 247, 0.08),
+    rgba(236, 72, 153, 0.08)
+  );
   background-size: 300% 300%;
-  animation: gradientAnimation 8s ease infinite;
+  animation: gradientAnimation 15s ease infinite;
+}
+
+.hover-scale {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+.file-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.file-card:hover {
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04),
+    0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+  transform: translateY(-2px);
+}
+
+.premium-button {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2);
+}
+
+.premium-button:hover {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 8px 12px -2px rgba(99, 102, 241, 0.3),
+    0 0 0 2px rgba(255, 255, 255, 0.1) inset;
+}
+
+.premium-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px -1px rgba(99, 102, 241, 0.2);
+}
+
+.upload-zone {
+  border: 2px dashed rgba(99, 102, 241, 0.3);
+  background: rgba(99, 102, 241, 0.03);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.upload-zone:hover {
+  border-color: rgba(99, 102, 241, 0.5);
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.grid-background {
+  background-size: 30px 30px;
+  background-image: 
+    linear-gradient(to right, rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
+  mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+}
+
+.glow-effect {
+  position: relative;
+}
+
+.glow-effect::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.glow-effect:hover::before {
+  opacity: 1;
+}
+
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 `;
 
@@ -267,273 +384,273 @@ export const FileDialogue = ({ id }) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 ">
-        <span>
-          {/* <Upload className="mr-2 h-4 w-4" /> */}
-          <CloudArrowUpIcon className="mr-2 h-4 w-4" />
-        </span>
-        Upload
+      <DialogTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 premium-button text-white px-5 py-2.5 hover-scale glow-effect bg-primary">
+        <motion.span
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex items-center gap-2"
+        >
+          <CloudArrowUpIcon className="h-4 w-4" />
+          <span>Upload</span>
+        </motion.span>
       </DialogTrigger>
 
       <DialogContent
-        className={` overflow-hidden pt-8 px-0 pb-0 bg-gradient-to-b from-primary/30 to-[#F3F4F6]  ${
-          acceptedFiles.length > 0 ? "sm:max-w-[600px]" : ""
-        }`}
+        className={`${
+          acceptedFiles.length > 0 ? "sm:max-w-[600px]" : "max-w-3xl"
+        } p-0 overflow-hidden rounded-2xl bg-white`}
       >
-        <DialogHeader className="border-b-1 border-gray-200">
-          <DialogTitle className=" flex items-center gap-2 px-4">
-            <motion.span
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-            >
-              {/* <AudioLines className="mr-1 h-5 w-5" /> */}
-              <span>
-                <FileUploadIcon className="w-6 h-6" />
-              </span>
-            </motion.span>
-
-            {acceptedFiles.length > 0
-              ? "Upload Files to transcribe"
-              : " Upload Audio files"}
-          </DialogTitle>
-          {acceptedFiles.length <= 0 && (
-            <DialogDescription className="border-b-[1px] border-gray-50  py-4 px-4">
-              Upload your content to transcribe.supports several audio and video
-              formats.
-              <br />
-              <span className="text-xs text-muted-foreground">
-                Supported file formats: MP3, MP4, WAV, AAC, M4A, WEBM, ...
-              </span>
+        <div className="relative">
+          <DialogHeader className="p-6 border-b border-gray-100">
+            <DialogTitle className="text-2xl font-semibold text-gray-800">
+              Upload Audio Files
+            </DialogTitle>
+            <DialogDescription className="text-gray-600">
+              Upload your content to transcribe. We support various audio and
+              video formats.
             </DialogDescription>
-          )}
-        </DialogHeader>
+          </DialogHeader>
 
-        <AnimatePresence mode="wait">
-          {!isRecording && !isRecordingFinished ? (
-            <motion.div
-              initial={{ opacity: 0, y: -30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 30 }}
-              transition={{ duration: 0.3 }}
-              className="flex flex-col  justify-center w-full h-full  opacity-90 pb-4"
-            >
-              {acceptedFiles && acceptedFiles.length > 0 ? (
-                <div className="px-4">
-                  <div className="px-4"></div>
-                  {fileMetadata.map((fileData, index) => (
-                    <div
-                      key={index}
-                      className="flex  flex-col  gap-2 justify-between w-full space-y-2 p-4 border rounded-lg"
-                    >
+          <div className="max-h-[60vh] overflow-y-auto custom-scrollbar">
+            <div className="p-6 space-y-6">
+              {acceptedFiles.length > 0 ? (
+                fileMetadata.map((fileData, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="file-card group relative overflow-hidden bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200"
+                  >
+                    <div className="p-4 space-y-3">
+                      {/* Header with File Name and Actions */}
                       <div className="flex items-center justify-between">
-                        <div className="text-lg font-semibold flex items-center space-x-1">
-                          <span>
-                            <VolumeHighIcon className="w-6 h-6" />
-                          </span>
-                          <span>{fileData.name}</span>
+                        <div className="flex items-center space-x-3 min-w-0">
+                          <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0">
+                            <VolumeHighIcon className="w-5 h-5 text-indigo-600" />
+                          </div>
+                          <h3 className="text-base font-medium text-gray-900 truncate pr-4">
+                            {fileData.name}
+                          </h3>
                         </div>
-                        <div className="flex space-x-1 items-center text-muted-foreground">
-                          <Button
-                            variant={"ghost"}
-                            size={"sm"}
+
+                        <div className="flex items-center gap-2">
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={playAudio}
-                            className="hover:bg-muted/20 hover:text-primary"
+                            className="rounded-full hover:bg-indigo-50 transition-colors"
                           >
+                            <span >
                             {isPlaying ? (
-                              <PauseIcon className="w-6 h-6" />
+                              <PauseIcon className="w-5 h-5 text-indigo-600" />
                             ) : (
-                              <PlayCircleIcon className="w-6 h-6" />
+                              <PlayCircleIcon className="w-5 h-5 text-indigo-600" />
                             )}
-                            {/* {isPlaying ? "Pause" : "Play"} */}
-                          </Button>
-                          <Button
-                            className="hover:bg-muted/20 hover:text-primary"
-                            variant={"ghost"}
-                            size={"sm"}
+                            </span>
+                          </motion.button>
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={deleteAudio}
+                            className="p-2 rounded-full hover:bg-red-50 transition-colors"
                           >
-                            <Trash2 className="w-6 h-6" />
-                          </Button>
+                            <Trash2 className="w-5 h-5 text-red-500" />
+                          </motion.button>
                         </div>
                       </div>
 
-                      <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-                        <p className="flex items-center space-x-2 ">
+                      {/* File Metadata */}
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Clock4 className="w-4 h-4" />
                           <span>
                             {fileData.duration
-                              ? `${fileData.duration} s`
+                              ? `${fileData.duration}s`
                               : "N/A"}
                           </span>
-                        </p>
-                        <span>|</span>
-                        <p className="flex items-center space-x-2">
+                        </div>
+                        <div className="w-1 h-1 rounded-full bg-gray-300" />
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <FileAudio className="w-4 h-4" />
                           <span>{bytesToMegabytes(fileData.size)} MB</span>
-                        </p>
-                        <span>|</span>
-                        <p className="flex items-center space-x-2">
+                        </div>
+                        <div className="w-1 h-1 rounded-full bg-gray-300" />
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <FileAudio className="w-4 h-4" />
                           <span>{fileData.type}</span>
-                        </p>
-                        <span>|</span>
-                        <p className="flex items-center space-x-2">
+                        </div>
+                        <div className="w-1 h-1 rounded-full bg-gray-300" />
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Globe2 className="w-4 h-4" />
                           <span>{fileData.language}</span>
-                        </p>
+                        </div>
                       </div>
 
-                      <div className="pt-2 w-full flex items-center ">
-                        <Button
+                      {/* Upload Button and Status */}
+                      <div className="flex items-center justify-between pt-2">
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                           onClick={() => handleUpload(acceptedFiles[index])}
-                          className="w-auto"
-                        >
-                          <span
-                            className={`${submitting ? "animate-bounce" : ""}`}
-                          >
-                            <UploadCloud className="mr-2 h-4 w-4" />
-                          </span>
-                          Upload to transcribe
-                        </Button>
-                        {/* <Button
-                          onClick={handleUpload}
-                          className="w-auto"
                           disabled={submitting}
+                          className="inline-flex items-center px-4 py-2 rounded-xl text-white font-medium bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 disabled:opacity-50 transition-all duration-200 shadow-sm"
                         >
-                          <span className="flex items-center">
-                            <motion.div
-                              animate={
-                                submitting ? { rotate: 360 } : { rotate: 0 }
-                              }
-                              transition={
-                                submitting
-                                  ? {
-                                      repeat: Infinity,
-                                      duration: 1,
-                                      ease: "linear",
-                                    }
-                                  : {}
-                              }
-                            >
-                              <UploadCloud className="mr-2 h-4 w-4" />
-                            </motion.div>
-                            {submitting
-                              ? "Uploading..."
-                              : "Upload to transcribe"}
-                          </span>
-                        </Button> */}
+                          <motion.span
+                            animate={submitting ? { rotate: 360 } : {}}
+                            transition={{
+                              duration: 1,
+                              repeat: Infinity,
+                              ease: "linear",
+                            }}
+                            className="mr-2"
+                          >
+                            <UploadCloud className="w-4 h-4" />
+                          </motion.span>
+                          {submitting
+                            ? "Processing..."
+                            : "Upload to Transcribe"}
+                        </motion.button>
+
+                        <div className="text-xs font-medium px-3 py-1 rounded-full bg-indigo-50 text-indigo-600">
+                          Ready
+                        </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              ) : recordedAudio ? (
-                // Recorded audio preview after stopping recording
-                <motion.div
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 30 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex items-center gap-2 justify-between w-full"
-                >
-                  <div className="flex items-center gap-2">
-                    <span>{recordedAudio.name}</span>
-                    <span className="text-gray-500 bg-gray-100 px-2 py-1 rounded-md text-xs">
-                      {bytesToMegabytes(recordedAudio.size)} MB
-                    </span>
-                    <span className="text-gray-500 bg-gray-100 px-2 py-1 rounded-md text-xs">
-                      {recordedAudio.type}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <audio src={mediaBlobUrl} controls ref={audioRef}></audio>
-                    <Button onClick={handleAudioPlayPause}>
-                      {isPlaying ? (
-                        <PauseIcon className="mr-2 h-4 w-4" />
-                      ) : (
-                        <PlayCircleIcon className="mr-2 h-4 w-4" />
-                      )}
-                      {isPlaying ? "Pause" : "Play"}
-                    </Button>
-                    <Button onClick={() => handleUpload(recordedAudio)}>
-                      Upload Recording
-                    </Button>
-                  </div>
-                </motion.div>
-              ) : (
-                <motion.div
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 30 }}
-                  transition={{ duration: 0.3 }}
-                  className="pt-4  px-4"
-                >
-                  <FileDropzone setAcceptedFiles={setAcceptedFiles} />
-                </motion.div>
-              )}
 
-              {/* {!isRecordingFinished && (
-              <Button className="mt-4" onClick={handleRecordingToggle}>
-                <Mic className="mr-2 h-4 w-4" />
-                {isRecording ? "Stop Recording" : "Record Audio"}
-              </Button>
-            )} */}
-            </motion.div>
-          ) : (
-            <div className="flex flex-col items-center justify-center">
-              {isRecordingFinished ? (
-                <div className="flex flex-col items-center justify-center">
-                  <div className="text-center mb-4">
-                    <span className="font-semibold text-lg">
-                      Recording Finished
-                    </span>
-                  </div>
-                </div>
+                    {/* Hover Effect Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                  </motion.div>
+                ))
               ) : (
                 <>
-                  <div className="text-center mb-4">
-                    <span className="font-semibold text-lg">Recording...</span>
+                  <FileDropzone setAcceptedFiles={setAcceptedFiles} />
+
+                  {/* Cloud Services Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-medium text-gray-700">
+                        Import from Cloud Services
+                      </h3>
+                      <div className="h-[1px] flex-1 bg-gray-100 mx-4" />
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <GDrivePicker>
+                          <div className="w-12 h-12 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all flex items-center justify-center bg-white hover:bg-gray-50">
+                            <svg
+                              className="w-6 h-6"
+                              viewBox="0 0 87.3 78"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z"
+                                fill="#0066da"
+                              />
+                              <path
+                                d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z"
+                                fill="#00ac47"
+                              />
+                              <path
+                                d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z"
+                                fill="#ea4335"
+                              />
+                              <path
+                                d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z"
+                                fill="#00832d"
+                              />
+                              <path
+                                d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z"
+                                fill="#2684fc"
+                              />
+                              <path
+                                d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z"
+                                fill="#ffba00"
+                              />
+                            </svg>
+                          </div>
+                        </GDrivePicker>
+                      </motion.div>
+
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <DropboxChooser
+                          appKey={"your-uniq-app-key"}
+                          success={(files) => onSuccess(files)}
+                          cancel={() => onCancel()}
+                          multiselect={true}
+                          extensions={[".mp4"]}
+                        >
+                          <div className="w-12 h-12 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all flex items-center justify-center bg-white hover:bg-gray-50">
+                            <svg
+                              className="w-6 h-6"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M12 2L6 6.5L12 11L18 6.5L12 2Z"
+                                fill="#0061FF"
+                              />
+                              <path
+                                d="M6 13L12 17.5L18 13L12 8.5L6 13Z"
+                                fill="#0061FF"
+                              />
+                              <path
+                                d="M6 19.5L12 24L18 19.5L12 15L6 19.5Z"
+                                fill="#0061FF"
+                              />
+                            </svg>
+                          </div>
+                        </DropboxChooser>
+                      </motion.div>
+                    </div>
                   </div>
-                  <Button
-                    onClick={handleRecordingToggle}
-                    className="bg-red-500 text-white"
-                  >
-                    <StopCircle className="mr-2 h-4 w-4" />
-                    Stop Recording
-                  </Button>
                 </>
               )}
             </div>
-          )}
-        </AnimatePresence>
-
-        <AnimatePresence>
-          {acceptedFiles && acceptedFiles.length === 0 && (
-            <div className="space-y-4 px-2 pb-4 text-sm text-muted-foreground border-b-[0.5px] border-gray-500">
-              <p>Pick from Cloud </p>
-
-              <div className="flex items-center space-x-2 ">
-                <GDrivePicker />
-                <DropboxChooser
-                  appKey={"your-uniq-app-key"}
-                  success={(files) => this.onSuccess(files)}
-                  cancel={() => this.onCancel()}
-                  multiselect={true}
-                  extensions={[".mp4"]}
-                >
-                  <div className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-background hover:text-accent-foreground w-12 h-12 rounded-xl p-0 border-gray-100 shadow-sm hover:bg-gray-100">
-                    <DropboxIcon />
-                  </div>
-                </DropboxChooser>
-                {/* <GDrivePicker /> */}
-                {/* <GDrivePicker /> */}
-              </div>
-            </div>
-          )}
-        </AnimatePresence>
-
-        {submitting && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-xl opacity-50 w-[calc(100%+24px)] -left-6 -top-6 h-[calc(100%+24px)]">
-            <div className="h-full w-full flex flex-col space-y-2 items-center justify-center">
-              <AudioUploader isSubmitting={submitting} />
-            </div>
           </div>
-        )}
+        </div>
       </DialogContent>
+
+      <style jsx>{`
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background-color: rgba(99, 102, 241, 0.3);
+          border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background-color: rgba(99, 102, 241, 0.5);
+        }
+
+        .file-card {
+          backdrop-filter: blur(8px);
+          transition: all 0.2s ease-in-out;
+        }
+
+        .file-card:hover {
+          transform: translateY(-2px);
+        }
+      `}</style>
     </Dialog>
   );
 };

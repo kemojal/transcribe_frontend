@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { motion } from "framer-motion";
 import {
   Search,
   Home,
@@ -15,99 +16,225 @@ import {
   Settings,
   HelpCircle,
   ChevronDown,
-  Link,
+  Link as LinkIcon,
   Users,
   Zap,
+  Share2,
+  Copy,
+  CheckCircle2,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 },
+};
 
 const RewardsPage = () => {
   const [inviteEmails, setInviteEmails] = useState("");
+  const [copied, setCopied] = useState(false);
+  const referralLink = "https://transcribai.com/invite/user123";
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(referralLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
-    <div className="flex-1  p-6">
-      <h1 className="text-2xl font-bold mb-6">Earn free videos</h1>
+    <motion.div
+      initial="hidden"
+      animate="show"
+      variants={container}
+      className="max-w-7xl mx-auto p-8 bg-red-500 "
+    >
+      <motion.div variants={item} className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Rewards Program</h1>
+        <p className="text-gray-500 mt-2">
+          Invite friends and earn rewards for every successful referral
+        </p>
+      </motion.div>
 
-      {/* Invite card */}
-      <div className="bg-indigo-50 rounded-lg p-6 mb-8">
-        <div className="flex justify-between items-start">
-          <div>
-            <h2 className="text-2xl font-bold mb-2">
-              Invite to this space,
-              <br />
-              earn free videos
-            </h2>
-            <p className="text-gray-600 mb-4">
-              Get 25 free videos when someone you invite signs up, and
-              <br />
-              another 25 when they record a Loom video.
-            </p>
-            <Input
-              type="text"
-              placeholder="Separate emails with a space"
-              className="mb-4 max-w-md"
-              value={inviteEmails}
-              onChange={(e) => setInviteEmails(e.target.value)}
-            />
-            <div className="flex space-x-4">
-              <Button variant="outline" className="flex items-center">
-                <Link className="w-4 h-4 mr-2" />
-                Copy invite link
+      {/* Stats Section */}
+      <motion.div
+        variants={item}
+        className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
+      >
+        {[
+          {
+            title: "Total Rewards",
+            value: "2,500",
+            subtitle: "minutes earned",
+            icon: Gift,
+            color: "bg-purple-50 text-purple-600",
+          },
+          {
+            title: "Successful Referrals",
+            value: "12",
+            subtitle: "friends joined",
+            icon: Users,
+            color: "bg-blue-50 text-blue-600",
+          },
+          {
+            title: "Available Minutes",
+            value: "1,250",
+            subtitle: "minutes remaining",
+            icon: Clock,
+            color: "bg-green-50 text-green-600",
+          },
+        ].map((stat, index) => (
+          <motion.div
+            key={index}
+            className="bg-white rounded-xl p-6 shadow-sm border border-gray-100"
+            whileHover={{ y: -2, transition: { duration: 0.2 } }}
+          >
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-gray-500 text-sm font-medium">{stat.title}</p>
+                <h3 className="text-2xl font-bold mt-1 text-gray-900">
+                  {stat.value}
+                </h3>
+                <p className="text-gray-500 text-sm mt-1">{stat.subtitle}</p>
+              </div>
+              <div className={cn("p-3 rounded-lg", stat.color)}>
+                <stat.icon className="w-5 h-5" />
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Invite Section */}
+      <motion.div
+        variants={item}
+        className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-8 mb-8 border border-indigo-100/50"
+      >
+        <div className="max-w-3xl">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Share Transcribai & Earn Rewards
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Get 25 minutes of free transcription when someone you invite signs up,
+            and another 25 minutes when they make their first transcription.
+          </p>
+
+          <div className="space-y-6">
+            {/* Referral Link */}
+            <div className="bg-white rounded-lg p-4 flex items-center gap-4 shadow-sm border border-gray-100">
+              <div className="flex-1 truncate font-mono text-sm text-gray-600">
+                {referralLink}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleCopy}
+                className={cn(
+                  "transition-all duration-200",
+                  copied && "bg-green-50 border-green-200 text-green-600"
+                )}
+              >
+                {copied ? (
+                  <CheckCircle2 className="w-4 h-4 mr-2" />
+                ) : (
+                  <Copy className="w-4 h-4 mr-2" />
+                )}
+                {copied ? "Copied!" : "Copy Link"}
               </Button>
-              <Button>Send invite</Button>
+            </div>
+
+            {/* Email Invite */}
+            <div>
+              <div className="flex gap-4">
+                <Input
+                  type="text"
+                  placeholder="Enter email addresses (separated by spaces)"
+                  className="flex-1"
+                  value={inviteEmails}
+                  onChange={(e) => setInviteEmails(e.target.value)}
+                />
+                <Button className="bg-indigo-600 hover:bg-indigo-700">
+                  <Share2 className="w-4 h-4 mr-2" />
+                  Send Invites
+                </Button>
+              </div>
+              <p className="text-sm text-gray-500 mt-2">
+                We'll send them a personal invitation from you
+              </p>
             </div>
           </div>
-          <img
-            src="/placeholder.svg?height=150&width=200"
-            alt="Illustration"
-            className="w-48 h-auto"
-          />
         </div>
-      </div>
+      </motion.div>
 
-      {/* Progress section */}
-      <div className="bg-white rounded-lg border p-6 mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold">
-            No videos earned, start inviting your team!
-          </h3>
-          <HelpCircle className="w-5 h-5 text-gray-400" />
-        </div>
-        <Progress value={0} max={500} className="h-2 mb-2" />
-        <div className="flex justify-between text-sm text-gray-500">
-          <span>0</span>
-          <span>50</span>
-          <span>100</span>
-          <span>150</span>
-          <span>200</span>
-          <span>250</span>
-          <span>300</span>
-          <span>350</span>
-          <span>400</span>
-          <span>450</span>
-          <span>500</span>
-        </div>
-      </div>
-
-      {/* Ways to earn section */}
-      <h2 className="text-xl font-bold mb-4">
-        Ways to earn videos and use Loom
-      </h2>
-      <div className="space-y-4">
-        {[
-          "How to invite",
-          "How your team can use Loom together",
-          "Boost productivity with your team",
-        ].map((title, index) => (
-          <div
-            key={index}
-            className="bg-white rounded-lg border p-4 flex justify-between items-center"
-          >
-            <span className="font-semibold">{title}</span>
-            <ChevronDown className="w-5 h-5 text-gray-400" />
+      {/* Recent Activity */}
+      <motion.div variants={item}>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          Recent Activity
+        </h3>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div className="divide-y divide-gray-100">
+            {[
+              {
+                name: "Sarah Chen",
+                action: "joined through your invitation",
+                time: "2 hours ago",
+                reward: "+25 minutes",
+              },
+              {
+                name: "Michael Park",
+                action: "made their first transcription",
+                time: "1 day ago",
+                reward: "+25 minutes",
+              },
+              {
+                name: "Emma Wilson",
+                action: "joined through your invitation",
+                time: "2 days ago",
+                reward: "+25 minutes",
+              },
+            ].map((activity, index) => (
+              <motion.div
+                key={index}
+                className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                whileHover={{ x: 4 }}
+              >
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={`https://avatar.vercel.sh/${activity.name}`} />
+                    <AvatarFallback>
+                      {activity.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      {activity.name}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {activity.action} • {activity.time}
+                    </p>
+                  </div>
+                </div>
+                <span className="text-sm font-medium text-green-600">
+                  {activity.reward}
+                </span>
+              </motion.div>
+            ))}
           </div>
-        ))}
-      </div>
-    </div>
+        </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

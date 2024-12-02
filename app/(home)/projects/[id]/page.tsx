@@ -58,6 +58,7 @@ import Loader from "@/components/Loader";
 import { SideTabs } from "@/components/SideProjecTabs/tabs";
 import { FileRecordDialogue } from "@/components/Dialogues/File/FileRecordDialogue";
 import TableDropdown from "@/components/Dropdowns/TableDropdown";
+import Searchbar from "@/components/Searchbar";
 
 // import { fetchProjectDetails } from "@/utils/api";
 // import { fetchProject, updateProjectName } from './projectSlice';
@@ -106,6 +107,8 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
 
   const searchParams = useSearchParams();
   const currentFileId = searchParams.get("file_id");
+
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -285,7 +288,6 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                 {project.name}
               </span>
             </div>
-            
 
             <div>
               <TableDropdown item={project} />
@@ -306,21 +308,21 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                   <div className="flex items-center justify-between border-b-[0.5px] border-gray-200 pb-2 ">
                     {/* <h2 className="font-medium">Files</h2> */}
                     {files && files.length > 0 ? (
-                      <div>
-                        <div className="flex items-center gap-1 py-3 flex-wrap gap-2">
+                      <div className="w-full flex items-center">
+                        <div className="flex items-center gap-1 py-3 gap-2 w-full pr-2">
                           {/* Search Input */}
-                          <div className="relative flex-grow max-w-6xl z-50 min-w-[310px] px-1">
-                            <input
-                              type="text"
-                              placeholder="Search files..."
-                              className=" w-full py-2 px-4 rounded-md border border-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200"
-                              value={searchQuery}
-                              onChange={(e) => setSearchQuery(e.target.value)}
-                            />
-                          </div>
-                          {/* Filter Dropdown */}
-                          <div className="relative z-50">
-                            {/* <Button
+                          <Searchbar
+                            isExpanded={isSearchExpanded}
+                            setIsExpanded={setIsSearchExpanded}
+                            searchQuery={searchQuery}
+                            setSearchQuery={setSearchQuery}
+                          />
+
+                          {!isSearchExpanded && (
+                            <div className="flex items-center gap-2" >
+                              {/* Filter Dropdown */}
+                              <div className="relative z-50">
+                                {/* <Button
                             size={"sm"}
                             disabled
                             className="flex items-center px-4 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200 text-sm"
@@ -329,45 +331,51 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                             Filter
                             <ChevronRight size={16} className="ml-2" />
                           </Button> */}
-                            {/* Dropdown Menu */}
-                            {filterOpen && (
-                              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg">
-                                <a
-                                  href="#"
-                                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                  onClick={() => setFilterTypeFilter("all")}
-                                >
-                                  All Files
-                                </a>
-                                <a
-                                  href="#"
-                                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                  onClick={() => setFilterTypeFilter("audio")}
-                                >
-                                  Audio Files
-                                </a>
-                                <a
-                                  href="#"
-                                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                  onClick={() => setFilterTypeFilter("video")}
-                                >
-                                  Video Files
-                                </a>
-                                <a
-                                  href="#"
-                                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                  onClick={() =>
-                                    setFilterTypeFilter("document")
-                                  }
-                                >
-                                  Documents
-                                </a>
+                                {/* Dropdown Menu */}
+                                {filterOpen && (
+                                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg">
+                                    <a
+                                      href="#"
+                                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                      onClick={() => setFilterTypeFilter("all")}
+                                    >
+                                      All Files
+                                    </a>
+                                    <a
+                                      href="#"
+                                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                      onClick={() =>
+                                        setFilterTypeFilter("audio")
+                                      }
+                                    >
+                                      Audio Files
+                                    </a>
+                                    <a
+                                      href="#"
+                                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                      onClick={() =>
+                                        setFilterTypeFilter("video")
+                                      }
+                                    >
+                                      Video Files
+                                    </a>
+                                    <a
+                                      href="#"
+                                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                      onClick={() =>
+                                        setFilterTypeFilter("document")
+                                      }
+                                    >
+                                      Documents
+                                    </a>
+                                  </div>
+                                )}
                               </div>
-                            )}
-                          </div>
 
-                          <FileDialogue id={id} />
-                          <FileRecordDialogue id={id} />
+                              <FileDialogue id={id} />
+                              <FileRecordDialogue id={id} />
+                            </div>
+                          )}
                         </div>
                       </div>
                     ) : (

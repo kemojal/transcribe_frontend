@@ -56,7 +56,7 @@ const RewardsPage = () => {
       initial="hidden"
       animate="show"
       variants={container}
-      className="max-w-7xl mx-auto p-8 bg-red-500 "
+      className="max-w-7xl mx-auto p-8 h-screen overflow-y-auto pb-20"
     >
       <motion.div variants={item} className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Rewards Program</h1>

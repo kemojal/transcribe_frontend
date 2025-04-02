@@ -451,6 +451,373 @@
 4. Advanced analytics
 5. CI/CD pipeline
 
+## Global State Management Refactoring Plan
+
+### Current Issues Identified
+
+1. **Mixed State Management Approaches**
+
+   - Using both Redux and Context API
+   - Inconsistent state management patterns
+   - Duplicate state management logic
+
+2. **Type Safety Issues**
+
+   - GlobalState.js and AppReducer.js are in JavaScript
+   - Missing TypeScript interfaces
+   - Inconsistent type checking
+
+3. **State Organization Problems**
+
+   - Scattered state across different stores
+   - Unclear separation of concerns
+   - Redundant state management
+
+4. **Performance Concerns**
+   - Unnecessary re-renders
+   - Missing memoization
+   - Inefficient state updates
+
+### Proposed Solution
+
+#### 1. Unified State Management Architecture
+
+```typescript
+// lib/store/types.ts
+export interface RootState {
+  auth: AuthState;
+  project: ProjectState;
+  files: FileState;
+  ui: UIState;
+  settings: SettingsState;
+}
+
+// lib/store/uiSlice.ts
+interface UIState {
+  theme: ThemeState;
+  language: string;
+  modals: ModalState;
+  notifications: NotificationState;
+}
+
+interface ThemeState {
+  mode: "light" | "dark";
+  colors: {
+    primary: string;
+    secondary: string;
+    background: string;
+    text: string;
+  };
+}
+
+// lib/store/settingsSlice.ts
+interface SettingsState {
+  userPreferences: {
+    language: string;
+    theme: string;
+    notifications: boolean;
+  };
+  appSettings: {
+    audioQuality: string;
+    transcriptionSettings: TranscriptionSettings;
+  };
+}
+```
+
+#### 2. Redux Store Enhancement
+
+```typescript
+// lib/store/index.ts
+import { configureStore } from "@reduxjs/toolkit";
+import { setupListeners } from "@reduxjs/toolkit/query";
+import { api } from "./api";
+import { authReducer } from "./slices/authSlice";
+import { projectReducer } from "./slices/projectSlice";
+import { fileReducer } from "./slices/fileSlice";
+import { uiReducer } from "./slices/uiSlice";
+import { settingsReducer } from "./slices/settingsSlice";
+import { errorMiddleware } from "./middleware/errorMiddleware";
+import { persistenceMiddleware } from "./middleware/persistenceMiddleware";
+import { analyticsMiddleware } from "./middleware/analyticsMiddleware";
+
+export const makeStore = () => {
+  const store = configureStore({
+    reducer: {
+      [api.reducerPath]: api.reducer,
+      auth: authReducer,
+      project: projectReducer,
+      files: fileReducer,
+      ui: uiReducer,
+      settings: settingsReducer,
+    },
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        serializableCheck: {
+          ignoredActions: ["auth/setAuthState", "files/addFile"],
+        },
+        thunk: true,
+      })
+        .concat(api.middleware)
+        .concat(errorMiddleware)
+        .concat(persistenceMiddleware)
+        .concat(analyticsMiddleware),
+    devTools: process.env.NODE_ENV !== "production",
+    preloadedState: {
+      auth: {
+        authState: false,
+      },
+      ui: {
+        theme: {
+          mode: "light",
+          colors: defaultTheme,
+        },
+      },
+    },
+  });
+
+  setupListeners(store.dispatch);
+  return store;
+};
+```
+
+#### 3. API Integration Layer
+
+```typescript
+// lib/store/api.ts
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+
+export const api = createApi({
+  reducerPath: "api",
+  baseQuery: fetchBaseQuery({
+    baseUrl: process.env.NEXT_PUBLIC_API_URL,
+    prepareHeaders: (headers, { getState }) => {
+      const token = (getState() as RootState).auth.token;
+      if (token) {
+        headers.set("authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
+  }),
+  endpoints: (builder) => ({
+    getProjects: builder.query<Project[], void>({
+      query: () => "projects",
+      providesTags: ["Projects"],
+    }),
+    getProject: builder.query<Project, string>({
+      query: (id) => `projects/${id}`,
+      providesTags: (result, error, id) => [{ type: "Project", id }],
+    }),
+    // ... other endpoints
+  }),
+  tagTypes: ["Projects", "Project", "Files", "File"],
+});
+```
+
+#### 4. Custom Hooks for State Management
+
+```typescript
+// lib/hooks/useAppState.ts
+import { useSelector, useDispatch } from "react-redux";
+import type { RootState, AppDispatch } from "../store";
+import { useCallback } from "react";
+
+export const useAppState = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const state = useSelector((state: RootState) => state);
+
+  const updateTheme = useCallback(
+    (theme: ThemeState) => {
+      dispatch(updateThemeAction(theme));
+    },
+    [dispatch]
+  );
+
+  const updateLanguage = useCallback(
+    (language: string) => {
+      dispatch(updateLanguageAction(language));
+    },
+    [dispatch]
+  );
+
+  return {
+    ...state,
+    updateTheme,
+    updateLanguage,
+  };
+};
+
+// lib/hooks/useAuth.ts
+export const useAuth = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const authState = useSelector((state: RootState) => state.auth);
+
+  const login = useCallback(
+    async (credentials: LoginCredentials) => {
+      try {
+        await dispatch(loginUser(credentials)).unwrap();
+        return true;
+      } catch (error) {
+        return false;
+      }
+    },
+    [dispatch]
+  );
+
+  const logout = useCallback(() => {
+    dispatch(logoutUser());
+  }, [dispatch]);
+
+  return {
+    ...authState,
+    login,
+    logout,
+  };
+};
+```
+
+#### 5. Middleware Implementation
+
+```typescript
+// lib/store/middleware/errorMiddleware.ts
+import { Middleware } from "@reduxjs/toolkit";
+import { setError } from "../slices/uiSlice";
+
+export const errorMiddleware: Middleware = () => (next) => (action) => {
+  try {
+    return next(action);
+  } catch (error) {
+    return next(setError(error.message));
+  }
+};
+
+// lib/store/middleware/persistenceMiddleware.ts
+export const persistenceMiddleware: Middleware = () => (next) => (action) => {
+  const result = next(action);
+
+  if (action.type.startsWith("auth/") || action.type.startsWith("settings/")) {
+    const state = store.getState();
+    localStorage.setItem(
+      "appState",
+      JSON.stringify({
+        auth: state.auth,
+        settings: state.settings,
+      })
+    );
+  }
+
+  return result;
+};
+```
+
+#### 6. Component Integration
+
+```typescript
+// components/ThemeProvider.tsx
+import { useAppState } from "@/lib/hooks/useAppState";
+
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const { ui } = useAppState();
+
+  return (
+    <ThemeContext.Provider value={ui.theme}>{children}</ThemeContext.Provider>
+  );
+};
+
+// components/AuthProvider.tsx
+import { useAuth } from "@/lib/hooks/useAuth";
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const auth = useAuth();
+
+  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
+};
+```
+
+### Implementation Steps
+
+1. **Phase 1: Setup and Configuration**
+
+   - Create new TypeScript files for store configuration
+   - Set up RTK Query for API integration
+   - Implement middleware structure
+
+2. **Phase 2: State Migration**
+
+   - Migrate GlobalState context to Redux
+   - Create new slices for UI and settings
+   - Implement proper TypeScript types
+
+3. **Phase 3: API Integration**
+
+   - Set up RTK Query endpoints
+   - Implement proper error handling
+   - Add request/response interceptors
+
+4. **Phase 4: Component Updates**
+
+   - Update components to use new hooks
+   - Implement proper memoization
+   - Add error boundaries
+
+5. **Phase 5: Testing and Optimization**
+   - Add unit tests for reducers
+   - Implement performance monitoring
+   - Add proper error tracking
+
+### Benefits of New Implementation
+
+1. **Type Safety**
+
+   - Full TypeScript support
+   - Better IDE integration
+   - Catch errors at compile time
+
+2. **Performance**
+
+   - Optimized re-renders
+   - Proper memoization
+   - Efficient state updates
+
+3. **Maintainability**
+
+   - Clear separation of concerns
+   - Consistent patterns
+   - Better code organization
+
+4. **Developer Experience**
+   - Better debugging tools
+   - Improved error handling
+   - Clear documentation
+
+### Migration Strategy
+
+1. **Preparation**
+
+   - Create new file structure
+   - Set up TypeScript configuration
+   - Add necessary dependencies
+
+2. **Incremental Migration**
+
+   - Start with new features
+   - Gradually migrate existing code
+   - Maintain backward compatibility
+
+3. **Testing**
+
+   - Add comprehensive tests
+   - Implement monitoring
+   - Track performance metrics
+
+4. **Documentation**
+   - Update API documentation
+   - Add usage examples
+   - Document migration guide
+
 ## Conclusion
 
 The codebase shows promise but needs significant refactoring to improve maintainability and scalability. The immediate focus should be on security updates, consistent architecture patterns, and improved error handling. Following these recommendations will result in a more robust, scalable, and maintainable application that can better serve users' needs while supporting future feature development.

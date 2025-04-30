@@ -1,12 +1,14 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { Project, File, User } from "./types";
+import { RootState } from "./types";
 
 export const api = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_API_URL,
+    baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000",
     prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as any).auth.token;
+      const token =
+        (getState() as RootState).auth.token || localStorage.getItem("token");
       if (token) {
         headers.set("authorization", `Bearer ${token}`);
       }
@@ -21,24 +23,33 @@ export const api = createApi({
       { email: string; password: string }
     >({
       query: (credentials) => ({
-        url: "auth/login",
+        url: "/users/login",
         method: "POST",
         body: credentials,
       }),
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("refreshToken", data.refreshToken);
+        } catch (error) {
+          console.error("Login failed:", error);
+        }
+      },
     }),
     refreshToken: builder.mutation<
       { token: string; refreshToken: string },
       string
     >({
       query: (refreshToken) => ({
-        url: "auth/refresh",
+        url: "/users/refresh-token",
         method: "POST",
         body: { refreshToken },
       }),
     }),
     logout: builder.mutation<void, void>({
       query: () => ({
-        url: "auth/logout",
+        url: "/users/logout",
         method: "POST",
       }),
     }),

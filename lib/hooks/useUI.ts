@@ -3,162 +3,192 @@ import { useAppDispatch, useAppSelector } from "./useAppState";
 import {
   setTheme,
   setLanguage,
-  openModal,
-  closeModal,
-  addNotification,
-  removeNotification,
-  clearNotifications,
-  toggleSidebar,
-  setSidebarWidth,
-  setSidebarCollapsedWidth,
-} from "../store/slices/uiSlice";
+  openModal as openModalAction,
+  closeModal as closeModalAction,
+  addNotification as addNotificationAction,
+  removeNotification as removeNotificationAction,
+  clearNotifications as clearNotificationsAction,
+  toggleSidebar as toggleSidebarAction,
+  setSidebarWidth as setSidebarWidthAction,
+  setSidebarCollapsedWidth as setSidebarCollapsedWidthAction,
+  setBioTheme as setBioThemeAction,
+  setUserSlug as setUserSlugAction,
+  setProfileImg as setProfileImgAction,
+  setModalType as setModalTypeAction,
+  setCurrentLanguage as setCurrentLanguageAction,
+  updateBioThemeProperty as updateBioThemePropertyAction,
+} from "@/lib/store/slices/uiSlice";
+import {
+  ThemeState,
+  BioThemeState,
+  NotificationState,
+} from "@/lib/store/types/ui";
 
 export const useUI = () => {
   const dispatch = useAppDispatch();
-  const ui = useAppSelector((state) => state.ui);
+  const {
+    theme,
+    language,
+    modals,
+    notifications,
+    sidebar,
+    bioTheme,
+    userSlug,
+    profileImg,
+    isModalType,
+  } = useAppSelector((state) => state.ui);
 
-  // Theme management
+  // Theme
   const updateTheme = useCallback(
-    (themeData: Partial<typeof ui.theme>) => {
-      dispatch(setTheme(themeData));
-      // Apply theme changes to document
-      document.documentElement.style.setProperty(
-        "--primary-color",
-        themeData.primaryColor
-      );
-      document.documentElement.style.setProperty(
-        "--secondary-color",
-        themeData.secondaryColor
-      );
-      document.documentElement.style.setProperty(
-        "--accent-color",
-        themeData.accentColor
-      );
-      document.documentElement.style.setProperty(
-        "--background-color",
-        themeData.backgroundColor
-      );
-      document.documentElement.style.setProperty(
-        "--text-color",
-        themeData.textColor
-      );
-      document.documentElement.style.setProperty(
-        "--error-color",
-        themeData.errorColor
-      );
-      document.documentElement.style.setProperty(
-        "--success-color",
-        themeData.successColor
-      );
-      document.documentElement.style.setProperty(
-        "--warning-color",
-        themeData.warningColor
-      );
-      document.documentElement.style.setProperty(
-        "--info-color",
-        themeData.infoColor
-      );
+    (newTheme: Partial<ThemeState>) => {
+      dispatch(setTheme(newTheme));
     },
     [dispatch]
   );
 
-  // Language management
+  // Language
   const changeLanguage = useCallback(
-    (language: string) => {
-      dispatch(setLanguage(language));
-      // Apply language changes
-      document.documentElement.lang = language;
+    (lang: string) => {
+      dispatch(setCurrentLanguageAction(lang));
+      document.documentElement.lang = lang;
     },
     [dispatch]
   );
 
-  // Modal management
-  const showModal = useCallback(
+  // Bio Theme
+  const updateBioTheme = useCallback(
+    (theme: BioThemeState) => {
+      dispatch(setBioThemeAction(theme));
+    },
+    [dispatch]
+  );
+
+  const updateBioThemeProperty = useCallback(
+    (key: keyof BioThemeState, value: string) => {
+      dispatch(updateBioThemePropertyAction({ key, value }));
+    },
+    [dispatch]
+  );
+
+  // User Profile
+  const updateUserSlug = useCallback(
+    (slug: string) => {
+      dispatch(setUserSlugAction(slug));
+    },
+    [dispatch]
+  );
+
+  const updateProfileImg = useCallback(
+    (img: string) => {
+      dispatch(setProfileImgAction(img));
+    },
+    [dispatch]
+  );
+
+  // Modal
+  const toggleModalType = useCallback(
+    (isModal: boolean) => {
+      dispatch(setModalTypeAction(isModal));
+    },
+    [dispatch]
+  );
+
+  // Modal Management
+  const openModal = useCallback(
     (type: string, data?: any) => {
-      dispatch(openModal({ type, data }));
+      dispatch(openModalAction({ type, data }));
     },
     [dispatch]
   );
 
-  const hideModal = useCallback(() => {
-    dispatch(closeModal());
+  const closeModal = useCallback(() => {
+    dispatch(closeModalAction());
   }, [dispatch]);
 
-  // Notification management
+  // Notification Management
   const showNotification = useCallback(
-    (notification: Omit<(typeof ui.notifications)[0], "id">) => {
-      dispatch(addNotification(notification));
+    (notification: Omit<NotificationState, "id">) => {
+      dispatch(addNotificationAction(notification));
+      // Auto-remove notification after duration
+      if (notification.duration) {
+        setTimeout(() => {
+          dispatch(removeNotificationAction(notification.id));
+        }, notification.duration);
+      }
     },
     [dispatch]
   );
 
-  const removeNotificationById = useCallback(
+  const removeNotification = useCallback(
     (id: string) => {
-      dispatch(removeNotification(id));
+      dispatch(removeNotificationAction(id));
     },
     [dispatch]
   );
 
   const clearAllNotifications = useCallback(() => {
-    dispatch(clearNotifications());
+    dispatch(clearNotificationsAction());
   }, [dispatch]);
 
-  // Sidebar management
-  const toggleSidebarVisibility = useCallback(() => {
-    dispatch(toggleSidebar());
+  // Sidebar Management
+  const toggleSidebar = useCallback(() => {
+    dispatch(toggleSidebarAction());
   }, [dispatch]);
 
   const updateSidebarWidth = useCallback(
     (width: number) => {
-      dispatch(setSidebarWidth(width));
+      dispatch(setSidebarWidthAction(width));
     },
     [dispatch]
   );
 
   const updateSidebarCollapsedWidth = useCallback(
     (width: number) => {
-      dispatch(setSidebarCollapsedWidth(width));
+      dispatch(setSidebarCollapsedWidthAction(width));
     },
     [dispatch]
   );
 
-  // Auto-remove notifications after timeout
+  // Auto-remove notifications
   useEffect(() => {
-    const timeouts = ui.notifications.map((notification) => {
+    notifications.forEach((notification) => {
       if (notification.duration) {
-        return setTimeout(() => {
-          dispatch(removeNotification(notification.id));
+        const timer = setTimeout(() => {
+          dispatch(removeNotificationAction(notification.id));
         }, notification.duration);
+        return () => clearTimeout(timer);
       }
-      return null;
     });
-
-    return () => {
-      timeouts.forEach((timeout) => {
-        if (timeout) clearTimeout(timeout);
-      });
-    };
-  }, [dispatch, ui.notifications]);
+  }, [notifications, dispatch]);
 
   // Apply theme on mount
   useEffect(() => {
-    updateTheme(ui.theme);
-  }, [updateTheme]);
+    document.documentElement.classList.toggle("dark", theme.mode === "dark");
+  }, [theme.mode]);
 
   return {
-    theme: ui.theme,
-    language: ui.language,
-    modals: ui.modals,
-    notifications: ui.notifications,
-    sidebar: ui.sidebar,
+    theme,
+    language,
+    modals,
+    notifications,
+    sidebar,
+    bioTheme,
+    userSlug,
+    profileImg,
+    isModalType,
     updateTheme,
     changeLanguage,
-    showModal,
-    hideModal,
+    updateBioTheme,
+    updateBioThemeProperty,
+    updateUserSlug,
+    updateProfileImg,
+    toggleModalType,
+    openModal,
+    closeModal,
     showNotification,
-    removeNotification: removeNotificationById,
-    clearNotifications: clearAllNotifications,
-    toggleSidebar: toggleSidebarVisibility,
+    removeNotification,
+    clearAllNotifications,
+    toggleSidebar,
     updateSidebarWidth,
     updateSidebarCollapsedWidth,
   };

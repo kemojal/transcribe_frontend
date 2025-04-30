@@ -25,10 +25,15 @@ import ProfileMenu from "./ProfileMenu";
 import { SelectProjectOption } from "./SelectProjectOption";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { ProjectProps } from "@/types/interfaces";
-import { fetchProjects, setCurrentProject } from "@/lib/reducers/ProjectSlice";
+import { createProject } from "@/lib/store/slices/projectSlice";
 import { ProjectDialogue } from "./Dialogues/ProjectDialogue";
 import ProjectsIcon from "@/icons/ProjectsIcon";
 import { cn } from "@/lib/utils";
+import type { Project } from "@/lib/store/types";
+import { api } from "@/lib/store/api";
+import { setCurrentProject } from "@/lib/store/slices/projectSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/lib/store";
 
 const menuItems = [
   {
@@ -72,22 +77,38 @@ const Sidebar = ({
 }) => {
   const pathname = usePathname();
   const { projects, currentProject, isLoading, error } = useAppSelector(
-    (state) => state.project
+    (state) => state.projects
   );
   const dispatch = useAppDispatch();
   const [selectedProjectOption, setSelectedProjectOption] =
     useState<ProjectProps | null>(null);
   const router = useRouter();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [isProjectDialogueOpen, setIsProjectDialogueOpen] = useState(false);
+  const { data: projectsData = [] } = api.useGetProjectsQuery();
+  const [createProject] = api.useCreateProjectMutation();
 
-  const handleProjectOptionChange = (project: ProjectProps) => {
-    setSelectedProjectOption(project);
-    dispatch(setCurrentProject(project));
-    router.push(`/projects?projectId=${project}`);
+  const handleProjectOptionChange = (projectId: string) => {
+    const project = projectsData.find(
+      (p: Project) => String(p.id) === projectId
+    );
+    if (project) {
+      dispatch(setCurrentProject(project));
+      router.push(`/projects?projectId=${projectId}`);
+    }
+  };
+
+  const handleAddProject = async (project: Partial<Project>) => {
+    try {
+      await createProject(project).unwrap();
+      setIsProjectDialogueOpen(false);
+    } catch (error) {
+      console.error("Failed to create project:", error);
+    }
   };
 
   useEffect(() => {
-    dispatch(fetchProjects());
+    dispatch(api.endpoints.getProjects.initiate());
   }, [dispatch]);
 
   return (
@@ -98,7 +119,7 @@ const Sidebar = ({
       }}
       className={cn(
         "relative bg-white/50 backdrop-blur-xl border-r border-gray-100 flex flex-col items-center py-6 h-screen",
-        "shadow-[0_2px_40px_-12px_rgba(0,0,0,0.05)]"
+        isCollapsed ? "w-20" : "w-64"
       )}
     >
       {/* Logo Section */}
@@ -149,13 +170,25 @@ const Sidebar = ({
               </motion.div>
             )}
           </AnimatePresence>
-          <SelectProjectOption
-            isCollapsed={isCollapsed}
-            projects={projects}
-            selectedProjectOption={selectedProjectOption}
-            handleProjectOptionChange={handleProjectOptionChange}
-          />
-          <ProjectDialogue />
+          <div className="w-full px-4 space-y-4">
+            <SelectProjectOption
+              options={projectsData.map((project: Project) => ({
+                label: project.name,
+                value: String(project.id),
+              }))}
+              onValueChange={handleProjectOptionChange}
+              defaultValue={
+                selectedProjectOption
+                  ? String(selectedProjectOption.id)
+                  : undefined
+              }
+            />
+            <ProjectDialogue
+              onAddProject={handleAddProject}
+              onClose={() => setIsProjectDialogueOpen(false)}
+              defaultOpen={isProjectDialogueOpen}
+            />
+          </div>
         </div>
 
         {/* Menu Items */}

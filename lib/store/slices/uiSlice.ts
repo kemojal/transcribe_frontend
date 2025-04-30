@@ -1,5 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { UIState, ThemeState, ModalState, NotificationState } from "../types";
+import {
+  UIState,
+  ThemeState,
+  BioThemeState,
+  ModalState,
+  NotificationState,
+} from "../types/ui";
 
 const initialState: UIState = {
   theme: {
@@ -26,6 +32,17 @@ const initialState: UIState = {
     width: 250,
     collapsedWidth: 80,
   },
+  currentLanguage: "en",
+  bioTheme: {
+    pageBgColor: "#ffffff",
+    linkButtonColor: "#000000",
+    linkButtonTextColor: "#ffffff",
+    socialIconColor: "#000000",
+    bioTextColor: "#000000",
+  },
+  userSlug: "",
+  profileImg: "",
+  isModalType: false,
 };
 
 const uiSlice = createSlice({
@@ -79,6 +96,28 @@ const uiSlice = createSlice({
     setSidebarCollapsedWidth: (state, action: PayloadAction<number>) => {
       state.sidebar.collapsedWidth = action.payload;
     },
+    setBioTheme: (state, action: PayloadAction<BioThemeState>) => {
+      state.bioTheme = action.payload;
+    },
+    setUserSlug: (state, action: PayloadAction<string>) => {
+      state.userSlug = action.payload;
+    },
+    setProfileImg: (state, action: PayloadAction<string>) => {
+      state.profileImg = action.payload;
+    },
+    setModalType: (state, action: PayloadAction<boolean>) => {
+      state.isModalType = action.payload;
+    },
+    setCurrentLanguage: (state, action: PayloadAction<string>) => {
+      state.currentLanguage = action.payload;
+    },
+    updateBioThemeProperty: (
+      state,
+      action: PayloadAction<{ key: keyof BioThemeState; value: string }>
+    ) => {
+      const { key, value } = action.payload;
+      state.bioTheme[key] = value;
+    },
   },
 });
 
@@ -93,6 +132,12 @@ export const {
   toggleSidebar,
   setSidebarWidth,
   setSidebarCollapsedWidth,
+  setBioTheme,
+  setUserSlug,
+  setProfileImg,
+  setModalType,
+  setCurrentLanguage,
+  updateBioThemeProperty,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

@@ -2,23 +2,12 @@
 
 import { formatDate, formatFullDate } from "@/utils";
 import { ColumnDef } from "@tanstack/react-table";
-import { create } from "domain";
-import TableDropdown from "../Dropdowns/TableDropdown";
 import { Box } from "lucide-react";
+import type { Project } from "@/lib/store/types";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal } from "lucide-react";
 
-interface User {
-  username: string;
-  email: string;
-}
-export type ProjectProps = {
-  id: string;
-  name: number;
-  user: User;
-  created_at: string;
-  lastViewed: string;
-};
-
-export const ProjectColumns: ColumnDef<ProjectProps>[] = [
+export const ProjectColumns: ColumnDef<Project>[] = [
   {
     accessorKey: "name",
     header: "Name",
@@ -37,16 +26,9 @@ export const ProjectColumns: ColumnDef<ProjectProps>[] = [
     accessorKey: "user",
     header: "Members",
     cell: ({ row }) => {
-      const user = row.getValue("user");
       return (
         <div className="flex items-center text-xs gap-1">
-          {/* <span className="w-6 h-6 rounded-full bg-gray-300 text-center flex items-center justify-center">
-            {(user && user?.username?.substring(0, 1).toUpperCase()) || "-"}
-          </span>
-          <span className="text-gray-600">{(user && user?.email) || "-"}</span> */}
-          <span className="flex items-center gap-1">
-            1 Member
-          </span>
+          <span className="flex items-center gap-1">1 Member</span>
         </div>
       );
     },
@@ -55,7 +37,7 @@ export const ProjectColumns: ColumnDef<ProjectProps>[] = [
     accessorKey: "created_at",
     header: "Created",
     cell: ({ row }) => {
-      const createdAt = row.getValue("created_at");
+      const createdAt = row.getValue("created_at") as string;
       return (
         <div
           className="text-xs text-gray-500 truncate cursor-pointer"
@@ -70,11 +52,11 @@ export const ProjectColumns: ColumnDef<ProjectProps>[] = [
     accessorKey: "updated_at",
     header: "Last Viewed",
     cell: ({ row }) => {
-      const updatedAt = row.getValue("updated_at");
+      const updatedAt = row.getValue("updated_at") as string | null;
       return (
         <div
           className="text-xs text-gray-500 truncate cursor-pointer"
-          title={formatFullDate(updatedAt)}
+          title={updatedAt ? formatFullDate(updatedAt) : ""}
         >
           {updatedAt ? formatDate(updatedAt) : "-"}
         </div>
@@ -85,8 +67,14 @@ export const ProjectColumns: ColumnDef<ProjectProps>[] = [
     id: "actions",
     cell: ({ row }) => {
       const item = row.original;
-
-      return <TableDropdown item={item} />;
+      return (
+        <div className="flex items-center justify-end">
+          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </div>
+      );
     },
   },
 ];

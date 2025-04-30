@@ -8,12 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Box, CirclePlus, PlusCircle } from "lucide-react";
 import { DialogueBase } from "./DialogueBase";
 import { BASEURL } from "@/constants";
-import type { ProjectProps } from "@/types/interfaces";
+import type { Project } from "@/lib/store/types";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Label } from "../ui/label";
 
 interface ProjectDialogueProps {
-  onAddProject: (project: ProjectProps) => void;
+  onAddProject: (project: Project) => void;
   onClose: () => void;
   defaultOpen?: boolean;
 }
@@ -55,7 +55,7 @@ export function ProjectDialogue({
 
         if (!response.ok) throw new Error("Failed to create project");
 
-        const data: ProjectProps = await response.json();
+        const data: Project = await response.json();
         onAddProject(data);
         setSuccess(true);
 
@@ -73,6 +73,15 @@ export function ProjectDialogue({
 
   return (
     <DialogueBase
+      trigger={
+        <Button
+          variant="outline"
+          className="w-full rounded-full bg-background/50 backdrop-blur-sm border-border/50 hover:bg-background/80 transition-all duration-200"
+        >
+          <PlusCircle className="h-4 w-4 mr-2" />
+          Create New Space
+        </Button>
+      }
       title="Create a new Space"
       description="Give your space a name"
       open={defaultOpen}
@@ -98,93 +107,28 @@ export function ProjectDialogue({
               <motion.div
                 className="flex items-center justify-center gap-2"
                 initial={false}
-                animate={submitting ? { opacity: 1 } : { opacity: 1 }}
               >
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="flex items-center gap-2"
-                >
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{
-                      duration: 1,
-                      repeat: Infinity,
-                      ease: "linear",
-                    }}
-                  >
-                    <CirclePlus size={14} className="text-current" />
-                  </motion.div>
-                  Creating space...
-                </motion.div>
-              </motion.div>
-            ) : success ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="flex items-center gap-2"
-              >
-                <Box size={14} className="text-current" />
-                Space created!
+                <span className="animate-spin">⏳</span>
+                <span>Creating...</span>
               </motion.div>
             ) : (
-              "Create space"
+              "Create Space"
             )}
           </Button>
         </div>
       }
     >
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-6"
-      >
+      <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="name" className="text-sm font-medium">
-            Space Name
-          </Label>
+          <Label htmlFor="name">Space Name</Label>
           <Input
             id="name"
-            type="text"
+            placeholder="Enter space name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Enter space name"
-            className="w-full bg-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50 focus:ring-primary/20 transition-all duration-200"
-            disabled={submitting}
-            autoFocus
+            className="w-full"
           />
         </div>
-
-        {/* Premium loading effect */}
-        {submitting && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="absolute inset-0 -z-10"
-          >
-            <div className="absolute inset-0 rounded-full bg-primary/20 animate-pulse" />
-            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/10 to-primary/30 animate-pulse delay-75" />
-          </motion.div>
-        )}
-      </motion.div>
-      <div className="pt-6 space-y-3 bg-gray-50 rounded-2xl mt-4 p-2 text-muted-foreground opacity-80">
-        <h2 className="font-semibold tracking-tight text-sm">Privacy</h2>
-        <RadioGroup defaultValue="open" className="space-y-1 font-normal">
-          <div className="flex items-center space-x-1">
-            <RadioGroupItem value="open" id="open" disabled />
-            <Label htmlFor="open" className="text-sm font-normal">
-              <span className="font-semibold">Open</span> - Anyone at
-              Kemo&apos;s Workspace can join
-            </Label>
-          </div>
-          <div className="flex items-center space-x-1">
-            <RadioGroupItem value="closed" id="closed" disabled />
-            <Label htmlFor="closed" className="text-sm font-normal">
-              <span className="font-semibold">Closed</span> - Only invited
-              people can join
-            </Label>
-          </div>
-        </RadioGroup>
       </div>
     </DialogueBase>
   );

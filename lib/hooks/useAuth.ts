@@ -7,12 +7,20 @@ import {
   setError,
   setLoading,
 } from "../store/slices/authSlice";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
+import type { User } from "../store/types/index";
 
 export const useAuth = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const auth = useAppSelector((state) => state.auth);
+  const auth = useAppSelector((state) => state.auth) || {
+    user: null,
+    token: null,
+    refreshToken: null,
+    isAuthenticated: false,
+    loading: false,
+    error: null,
+  };
 
   const login = useCallback(
     async (email: string, password: string) => {
@@ -21,8 +29,16 @@ export const useAuth = () => {
         const result = await dispatch(
           api.endpoints.login.initiate({ email, password })
         ).unwrap();
+
+        // Store tokens in localStorage
+        localStorage.setItem("token", result.token);
+        localStorage.setItem("refresh_token", result.refreshToken);
+
+        // Update Redux state
         dispatch(setCredentials(result));
-        router.push("/dashboard");
+
+        // Redirect to projects page
+        router.push("/projects");
       } catch (error) {
         dispatch(
           setError(error instanceof Error ? error.message : "Login failed")
@@ -39,12 +55,16 @@ export const useAuth = () => {
     try {
       await dispatch(api.endpoints.logout.initiate()).unwrap();
       dispatch(logout());
-      router.push("/login");
+      localStorage.removeItem("token");
+      localStorage.removeItem("refresh_token");
+      router.push("/auth/login");
     } catch (error) {
       console.error("Logout error:", error);
       // Force logout even if API call fails
       dispatch(logout());
-      router.push("/login");
+      localStorage.removeItem("token");
+      localStorage.removeItem("refresh_token");
+      router.push("/auth/login");
     }
   }, [dispatch, router]);
 
@@ -55,7 +75,11 @@ export const useAuth = () => {
       const result = await dispatch(
         api.endpoints.refreshToken.initiate(auth.refreshToken)
       ).unwrap();
-      dispatch(setCredentials({ ...auth, ...result }));
+      if (auth.user) {
+        localStorage.setItem("token", result.token);
+        localStorage.setItem("refresh_token", result.refreshToken);
+        dispatch(setCredentials({ user: auth.user, ...result }));
+      }
     } catch (error) {
       console.error("Token refresh error:", error);
       handleLogout();
@@ -63,14 +87,22 @@ export const useAuth = () => {
   }, [dispatch, auth, handleLogout]);
 
   const updateUser = useCallback(
-    async (userData: Partial<typeof auth.user>) => {
+    async (userData: Partial<User>) => {
       if (!auth.user) return;
 
       try {
         const result = await dispatch(
           api.endpoints.updateUser.initiate(userData)
         ).unwrap();
-        dispatch(setCredentials({ ...auth, user: result }));
+        if (auth.token && auth.refreshToken) {
+          dispatch(
+            setCredentials({
+              user: result,
+              token: auth.token,
+              refreshToken: auth.refreshToken,
+            })
+          );
+        }
       } catch (error) {
         dispatch(
           setError(
@@ -83,15 +115,13 @@ export const useAuth = () => {
     [dispatch, auth]
   );
 
-  const isAuthenticated = auth.isAuthenticated && !!auth.token;
-  const isLoading = auth.isLoading;
-  const error = auth.error;
-
   return {
     user: auth.user,
-    isAuthenticated,
-    isLoading,
-    error,
+    isAuthenticated: auth.isAuthenticated,
+    token: auth.token,
+    refreshToken: auth.refreshToken,
+    isLoading: auth.loading,
+    error: auth.error,
     login,
     logout: handleLogout,
     refreshToken,

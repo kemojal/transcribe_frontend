@@ -32,18 +32,30 @@ const ProfileMenu = ({ isCollapsed }: { isCollapsed?: boolean }) => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    if (token === null) {
+    if (!token) {
       router.push("/login");
-    } else {
-      try {
-        const decoded: { name: string; email: string } = jwtDecode(token);
-        setUserInfo(decoded);
-      } catch (error) {
-        console.error("Invalid token:", error);
-        router.push("/login");
-      }
+      return;
     }
-    setLoading(false);
+
+    try {
+      // Check if token is valid
+      const decoded = jwtDecode(token);
+      if (
+        !decoded ||
+        typeof decoded !== "object" ||
+        !("name" in decoded) ||
+        !("email" in decoded)
+      ) {
+        throw new Error("Invalid token structure");
+      }
+      setUserInfo(decoded as { name: string; email: string });
+    } catch (error) {
+      console.error("Invalid token:", error);
+      localStorage.removeItem("token"); // Clear invalid token
+      router.push("/login");
+    } finally {
+      setLoading(false);
+    }
   }, [router]);
 
   if (loading) {
@@ -91,8 +103,7 @@ const ProfileMenu = ({ isCollapsed }: { isCollapsed?: boolean }) => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="w-full"
-      >
+      <DropdownMenuTrigger className="w-full">
         <div
           className={`flex items-center gap-2 bg-gray-50 rounded-xl p-1 ${
             isCollapsed ? "justify-center" : "justify-start"

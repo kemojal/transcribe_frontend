@@ -1,43 +1,30 @@
 "use client";
 // components/StoreProvider.tsx
 import { Provider } from "react-redux";
-import { makeStore, AppStore } from "@/lib/store";
-import { useRef, useEffect } from "react";
-import { useAppDispatch } from "@/lib/hooks";
-import { setAuthState } from "@/lib/reducers/authSlice";
-import { useRouter } from "next/navigation";
+import { PersistGate } from "redux-persist/integration/react";
+import { store, persistor } from "@/lib/store/store";
+import { ReactNode, useEffect, useState } from "react";
 
-export default function StoreProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const storeRef = useRef<AppStore>(makeStore());
-  // const dispatch = useAppDispatch();
-  // const router = useRouter();
+interface StoreProviderProps {
+  children: ReactNode;
+}
 
-  // useEffect(() => {
-  //   const checkAuth = async () => {
-  //     const token = localStorage.getItem("token");
-  //     if (token) {
-  //       // Replace with actual token validation logic
-  //       const isValidToken = true;
+export default function StoreProvider({ children }: StoreProviderProps) {
+  const [isClient, setIsClient] = useState(false);
 
-  //       if (isValidToken) {
-  //         dispatch(setAuthState(true));
-  //         router.push("/projects");
-  //       } else {
-  //         dispatch(setAuthState(false));
-  //         router.push("/login");
-  //       }
-  //     } else {
-  //       dispatch(setAuthState(false));
-  //       router.push("/login");
-  //     }
-  //   };
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
-  //   checkAuth();
-  // }, [dispatch, router]);
+  if (!isClient) {
+    return null;
+  }
 
-  return <Provider store={storeRef.current}>{children}</Provider>;
+  return (
+    <Provider store={store}>
+      <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
+        {children}
+      </PersistGate>
+    </Provider>
+  );
 }

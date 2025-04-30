@@ -4,6 +4,7 @@ import "./globals.css";
 import NextTopLoader from "nextjs-toploader";
 import StoreProvider from "./StoreProvider";
 import { Toaster } from "@/components/ui/toaster";
+import { Suspense } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,14 +19,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <StoreProvider>
-      <html lang="en">
-        <body className={`${inter.className}`}>
-          <NextTopLoader />
-          {children}
-          <Toaster />
-        </body>
-      </html>
-    </StoreProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className} suppressHydrationWarning>
+        <NextTopLoader />
+        <StoreProvider>
+          <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+        </StoreProvider>
+        <Toaster />
+      </body>
+    </html>
   );
 }

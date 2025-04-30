@@ -8,19 +8,18 @@ import {
 } from "@/components/ui/select";
 import { Input } from "./ui/input";
 import { Box } from "lucide-react";
-import { ProjectProps } from "@/types/interfaces";
+import type { Project } from "@/lib/store/types";
 import { ProjectDialogue } from "./Dialogues/ProjectDialogue";
-import { addProject } from "@/lib/reducers/ProjectSlice";
 import { useAppDispatch } from "@/lib/hooks";
 import TableDropdown from "./Dropdowns/TableDropdown";
 
-type Option = { value: number; label: string };
+type Option = { value: string; label: string };
 
 interface SelectOptionProps {
   placeholder?: string;
   options?: Option[];
-  onValueChange?: (project: ProjectProps) => void;
-  defaultValue?: number | undefined;
+  onValueChange?: (value: string) => void;
+  defaultValue?: string | undefined;
   isCollapsed?: boolean;
 }
 
@@ -32,7 +31,7 @@ export const SelectProjectOption = ({
   isCollapsed,
 }: SelectOptionProps) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedValue, setSelectedValue] = useState<number | undefined>(
+  const [selectedValue, setSelectedValue] = useState<string | undefined>(
     defaultValue
   );
 
@@ -40,38 +39,31 @@ export const SelectProjectOption = ({
     option.label.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const dispatch = useAppDispatch();
-
   useEffect(() => {
     if (defaultValue) {
       setSelectedValue(defaultValue);
     } else if (filteredOptions.length > 0) {
-      setSelectedValue(filteredOptions[0]?.value); // Set the first filtered option if defaultValue is not set
+      setSelectedValue(filteredOptions[0]?.value);
     }
   }, [options, defaultValue, filteredOptions]);
 
-  const handleAddProject = (newProject: ProjectProps) => {
-    dispatch(addProject(newProject));
-  };
-
   const handleValueChange = (value: string) => {
     setSelectedValue(value);
-    onValueChange?.(value); // Trigger the parent function when the value changes
+    onValueChange?.(value);
   };
 
   return (
     <Select value={selectedValue} onValueChange={handleValueChange}>
       <SelectTrigger className="py-6 text-sm focus:ring-0 outline-gray-50 flex items-center gap-1">
         <div className="flex space-x-1 items-center">
-          
           {isCollapsed ? (
             <span className="text-gray-500">W</span>
           ) : (
             <>
-            <span className="">
-            <Box size={16} strokeWidth={1} />
-          </span>
-            <SelectValue placeholder={placeholder || "No Space"} />
+              <span className="">
+                <Box size={16} strokeWidth={1} />
+              </span>
+              <SelectValue placeholder={placeholder || "No Space"} />
             </>
           )}
         </div>
@@ -83,30 +75,18 @@ export const SelectProjectOption = ({
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-2 h-8  border border-gray-300 rounded-xl text-xs"
+            className="w-full px-2 h-8 border border-gray-300 rounded-xl text-xs"
           />
         </div>
-        {filteredOptions.map((option, index) => {
-          let item = {
-            id: option.value,
-            name: option.label,
-          };
-          return (
-            <div key={index} className="flex items-center gap-2">
-              <SelectItem
-                key={index}
-                value={option.value}
-                className="text-left flex"
-              >
-                {option.label}
-              </SelectItem>
-              <TableDropdown item={item} />
-            </div>
-          );
-        })}
-        <div className="py-3 w-full">
-          <ProjectDialogue onAddProject={handleAddProject} />
-        </div>
+        {filteredOptions.map((option, index) => (
+          <SelectItem
+            key={index}
+            value={option.value}
+            className="text-left flex"
+          >
+            {option.label}
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select>
   );

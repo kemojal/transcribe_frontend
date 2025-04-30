@@ -79,6 +79,7 @@
     "react-resizable-panels": "^2.1.4",
     "react-use": "^17.5.1",
     "recharts": "^2.12.7",
+    "redux-persist": "^6.0.0",
     "remotion": "^4.0.211",
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.4.0",

@@ -13,6 +13,8 @@ export interface ProjectProps {
   created_at: string;
   updated_at: string | null;
   transcriptions: TranscriptionProps[];
+  status: "active" | "inactive" | "archived";
+  description?: string;
 }
 
 export interface FileProps {

@@ -10,6 +10,7 @@ import {
   setLoading,
 } from "../store/slices/projectSlice";
 import { useRouter } from "next/router";
+import { ProjectProps } from "@/types/interfaces";
 
 export const useProjects = () => {
   const dispatch = useAppDispatch();
@@ -56,11 +57,14 @@ export const useProjects = () => {
   );
 
   const createProject = useCallback(
-    async (projectData: Partial<(typeof projects.projects)[0]>) => {
+    async (projectData: Partial<ProjectProps>) => {
       try {
         dispatch(setLoading(true));
         const result = await dispatch(
-          api.endpoints.createProject.initiate(projectData)
+          api.endpoints.createProject.initiate({
+            ...projectData,
+            status: projectData.status || "active",
+          })
         ).unwrap();
         dispatch(setCurrentProject(result));
         router.push(`/projects/${result.id}`);
@@ -80,10 +84,7 @@ export const useProjects = () => {
   );
 
   const updateProject = useCallback(
-    async (
-      projectId: string,
-      projectData: Partial<(typeof projects.projects)[0]>
-    ) => {
+    async (projectId: string, projectData: Partial<ProjectProps>) => {
       try {
         dispatch(setLoading(true));
         const result = await dispatch(
@@ -147,8 +148,8 @@ export const useProjects = () => {
   }, [dispatch]);
 
   return {
-    projects: projects.projects,
-    currentProject: projects.currentProject,
+    projects: projects.projects as ProjectProps[],
+    currentProject: projects.currentProject as ProjectProps | null,
     isLoading: projects.isLoading,
     error: projects.error,
     filters: projects.filters,

@@ -7,13 +7,20 @@ export interface User {
 }
 
 export interface Project {
-  id: string;
+  id: number;
+  project_id: number;
+  public_id: string;
   name: string;
+  path: string;
   description?: string;
-  createdAt: string;
-  updatedAt: string;
-  userId: string;
-  status: "active" | "archived";
+  created_at: string;
+  updated_at: string | null;
+  status: "active" | "inactive" | "archived";
+  transcriptions: Array<{
+    id: number;
+    transcription_text: string;
+    language: string | null;
+  }>;
 }
 
 export interface File {
@@ -35,7 +42,7 @@ export interface AuthState {
   token: string | null;
   refreshToken: string | null;
   isAuthenticated: boolean;
-  loading: boolean;
+  isLoading: boolean;
   error: string | null;
 }
 
@@ -152,8 +159,9 @@ export interface TranscriptionSettings {
 
 // Root State
 export interface RootState {
+  [key: string]: unknown;
   auth: AuthState;
-  project: ProjectState;
+  projects: ProjectState;
   files: FileState;
   ui: UIState;
   settings: SettingsState;

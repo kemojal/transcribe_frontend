@@ -6,11 +6,11 @@ import { BASEURL } from "@/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { setAuthState } from "@/lib/reducers/authSlice";
 import { jwtDecode } from "jwt-decode";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
-
-import { QueryClient, QueryClientProvider } from "react-query";
+import { useAuth } from "@/lib/hooks/useAuth";
+import { useUI } from "@/lib/hooks/useUI";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 // Define the token payload structure
@@ -30,11 +30,10 @@ const AuthWrapper = ({
   const dispatch = useAppDispatch();
   const router = useRouter();
   const pathname = usePathname();
-
-  const authState = useAppSelector((state) => state.auth.authState);
-  const [loading, setLoading] = useState(true);
+  const { isAuthenticated, isLoading, refreshToken } = useAuth();
+  const { addNotification } = useUI();
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const toggleCollpased = () => setIsCollapsed(!isCollapsed);
+  const toggleCollapsed = () => setIsCollapsed(!isCollapsed);
 
   const [fullUrl, setFullUrl] = useState("");
 
@@ -49,75 +48,32 @@ const AuthWrapper = ({
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem("token");
-      const refreshToken = localStorage.getItem("refresh_token");
-
-      if (token) {
+      if (!isAuthenticated) {
         try {
-          const decodedToken: TokenPayload = jwtDecode(token);
-          const currentTime = Math.floor(Date.now() / 1000);
-
-          if (decodedToken.exp > currentTime) {
-            dispatch(setAuthState(true));
-            // console.log("Current pathname: ", pathname);
-            router.push(pathname || "/projects");
-          } else {
-            // Token has expired, try to refresh it
-            const refreshResponse = await fetch(
-              `${BASEURL}/users/refresh-token`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ refresh_token: refreshToken }),
-              }
-            );
-            if (refreshResponse.ok) {
-              const refreshData = await refreshResponse.json();
-              localStorage.setItem("token", refreshData.access_token); // Update the token
-              localStorage.setItem("refresh_token", refreshData.refresh_token); // Update the refresh token
-              dispatch(setAuthState(true));
-              router.push(pathname || "/projects");
-              // console.log("Current pathname: ", pathname);
-              // return <p>Current pathname: {pathname}</p>;
-            } else {
-              dispatch(setAuthState(false));
-              // get the current path
-
-              router.push("/login");
-              // router.push(`/login?redirect=${encodeURIComponent(fullUrl)}`);
-            }
-          }
+          await refreshToken();
+          router.push(pathname || "/projects");
         } catch (error) {
-          console.error("Authentication check failed:", error);
-          dispatch(setAuthState(false));
-
-          //   router.push("/login");
+          addNotification({
+            id: Date.now().toString(),
+            type: "error",
+            message: "Session expired. Please log in again.",
+            duration: 5000,
+          });
+          router.push("/login");
         }
-      } else {
-        dispatch(setAuthState(false));
-        router.push("/login");
-        // router.push(`/login?redirect=${encodeURIComponent(fullUrl)}`);
       }
-
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
     };
 
     checkAuth();
-    setLoading(false);
-  }, [dispatch, router]);
+  }, [isAuthenticated, pathname, refreshToken, router, addNotification]);
 
-  if (loading) {
-    return;
-    <div className="w-screen h-screen">
-      <Loader />;
-    </div>;
+  if (isLoading) {
+    return <div>Loading...</div>;
   }
 
-  if (!authState) return;
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -127,7 +83,7 @@ const AuthWrapper = ({
           <div className="flex flex-1 mt-0 ">
             <Sidebar
               isCollapsed={isCollapsed}
-              toggleCollpased={toggleCollpased}
+              toggleCollpased={toggleCollapsed}
             />
             <main
               className={`flex px-12 py-8  ${inter.className} 
